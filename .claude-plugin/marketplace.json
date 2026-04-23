@@ -1,0 +1,19 @@
+{
+  "name": "adologyai-marketplace",
+  "owner": {
+    "name": "Haldun Anil",
+    "email": "hal@getadology.com"
+  },
+  "plugins": [
+    {
+      "name": "marketing-skills",
+      "description": "Marketing skills library for Claude",
+      "version": "1.0.0",
+      "source": "./",
+      "author": {
+        "name": "Haldun Anil",
+        "email": "hal@getadology.com"
+      }
+    }
+  ]
+}

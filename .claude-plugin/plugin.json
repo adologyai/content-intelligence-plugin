@@ -1,0 +1,13 @@
+{
+  "name": "marketing-skills",
+  "description": "Marketing skills library for Claude",
+  "version": "1.0.0",
+  "author": {
+    "name": "Haldun Anil",
+    "email": "hal@getadology.com"
+  },
+  "homepage": "https://github.com/adologyai/marketing-skills",
+  "repository": "https://github.com/adologyai/marketing-skills",
+  "license": "MIT",
+  "keywords": ["skills", "marketing"]
+}
