@@ -35,9 +35,21 @@ For every Adology thumbnail you want to embed:
 
 This makes the document self-contained — the recipient can open it offline without needing Adology auth or network access.
 
-### Option 2: Through-proxy reference (for live documents)
+### Reference implementation (Python, sandbox-safe)
 
-If the document will be viewed in a context that has Adology auth (e.g., a workbench page in the Adology app itself), you can keep the thumbnail URL as a live reference. But for any export or hand-off, prefer Option 1.
+```python
+import base64, mimetypes, urllib.request
+
+def to_data_uri(url: str, timeout: int = 10) -> str:
+    with urllib.request.urlopen(url, timeout=timeout) as r:
+        data = r.read()
+        mime = r.headers.get("Content-Type") or mimetypes.guess_type(url)[0] or "image/jpeg"
+    return f"data:{mime};base64,{base64.b64encode(data).decode()}"
+```
+
+Do **not** use bash `curl`/`wget` — those are the exact failure mode this skill exists to work around. Use Python's `urllib.request` (or equivalent) instead.
+
+*Edge case: if the deliverable will only be viewed inside the Adology workbench (where the page already has Adology auth), you can skip the encoding and use the bare URL. Rare for plugin users — when in doubt, always inline.*
 
 ## Workflow inside a host skill
 
