@@ -1,19 +1,45 @@
 {
-  "name": "adologyai-marketplace",
+  "$schema": "https://claude.ai/schemas/marketplace.json",
+  "name": "adology-marketplace",
+  "displayName": "Adology",
   "owner": {
-    "name": "Haldun Anil",
-    "email": "hal@getadology.com"
+    "name": "Adology, Inc.",
+    "email": "hello@getadology.com",
+    "url": "https://getadology.com"
   },
   "plugins": [
     {
-      "name": "marketing-skills",
-      "description": "Marketing skills library for Claude",
-      "version": "1.0.0",
-      "source": "./",
-      "author": {
-        "name": "Haldun Anil",
-        "email": "hal@getadology.com"
-      }
+      "name": "content-intelligence",
+      "displayName": "Adology — Content Intelligence",
+      "source": ".",
+      "version": "0.1.0",
+      "description": "Competitive ad intelligence inside Claude — discover brands, build knowledge sets, analyze content, coach creators, vet influencers, and run audience deep-dives powered by Adology's data platform.",
+      "shortDescription": "Competitive ad intelligence + creator coaching for marketers, powered by Adology.",
+      "category": "marketing",
+      "tags": [
+        "marketing",
+        "advertising",
+        "competitive-intelligence",
+        "influencer",
+        "creative",
+        "audience-research",
+        "content-strategy",
+        "ad-library",
+        "social-media",
+        "brand-analysis"
+      ],
+      "icon": "./.claude-plugin/icon.svg",
+      "homepage": "https://getadology.com",
+      "documentation": "https://github.com/adologyai/content-intelligence#readme",
+      "support": "hello@getadology.com",
+      "repository": "https://github.com/adologyai/content-intelligence",
+      "license": "Apache-2.0",
+      "pricing": "subscription",
+      "pricingUrl": "https://getadology.com/pricing",
+      "authRequired": true,
+      "authType": "oauth2.1",
+      "privacyPolicy": "https://app.termly.io/policy-viewer/policy.html?policyUUID=1ae61180-1e11-43b8-9e28-0e872447a395",
+      "termsOfService": "https://getadology.com/terms"
     }
   ]
 }
