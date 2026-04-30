@@ -51,15 +51,16 @@ fi
 mkdir -p dist
 OUTFILE="dist/${NAME}-${VERSION}${SUFFIX}.zip"
 
-# Stage to temp dir
+# Stage to temp dir (guard the cleanup trap so it never runs with an empty TMP)
 TMP=$(mktemp -d)
-trap "rm -rf $TMP" EXIT
+trap 'if [ -n "${TMP:-}" ] && [ -d "$TMP" ]; then rm -rf "$TMP"; fi' EXIT
 STAGE="$TMP/${NAME}"
 mkdir -p "$STAGE"
 
 echo "Staging files..."
 rsync -a \
   --exclude='.git' \
+  --exclude='.claude' \
   --exclude='dist' \
   --exclude='node_modules' \
   --exclude='.DS_Store' \
@@ -76,15 +77,25 @@ rsync -a \
 # Strip .gitkeep
 find "$STAGE" -name '.gitkeep' -delete
 
-# Zip
+# Drop empty directories left behind by exclusions (e.g., docs/ when only superpowers/ existed)
+find "$STAGE" -type d -empty -delete
+
+# Re-create the staging root if the empty-dir prune removed it (defensive — shouldn't happen because $STAGE has content from rsync, but ensures the zip step has somewhere to cd)
+if [ ! -d "$STAGE" ]; then
+  echo "ERROR: staging directory was unexpectedly removed"
+  exit 1
+fi
+
+# Zip (clean overwrite if the file already exists)
 echo "Building $OUTFILE..."
+rm -f "$OUTFILE"
 (cd "$TMP" && zip -rq "${REPO_ROOT}/${OUTFILE}" "${NAME}/")
 
 # SHA256
 if command -v sha256sum >/dev/null 2>&1; then
-  SHA256=$(sha256sum "$OUTFILE" | cut -d' ' -f1)
+  SHA256=$(sha256sum "$OUTFILE" | awk '{print $1}')
 else
-  SHA256=$(shasum -a 256 "$OUTFILE" | cut -d' ' -f1)
+  SHA256=$(shasum -a 256 "$OUTFILE" | awk '{print $1}')
 fi
 
 echo ""
