@@ -72,7 +72,7 @@ jobs:
         if: steps.changeset.outputs.has_changeset == 'true'
         run: |
           git add -A
-          git commit -m "chore(release): v${{ steps.version.outputs.version }}"
+          git commit -m "chore(release): v${{ steps.version.outputs.version }} [skip ci]"
           git tag plugin-v${{ steps.version.outputs.version }}
           git push origin main
           git push origin plugin-v${{ steps.version.outputs.version }}
