@@ -44,3 +44,34 @@ test('sync-versions propagates package.json#version to plugin.json and marketpla
     await fs.rm(tmp, { recursive: true, force: true });
   }
 });
+
+test('sync-versions errors when marketplace.json has no matching plugin entry', async () => {
+  const tmp = await fs.mkdtemp(path.join(os.tmpdir(), 'sync-error-test-'));
+  try {
+    await fs.writeFile(
+      path.join(tmp, 'package.json'),
+      JSON.stringify({ name: 'content-intelligence', version: '1.2.3' })
+    );
+    await fs.mkdir(path.join(tmp, '.claude-plugin'));
+    await fs.writeFile(
+      path.join(tmp, '.claude-plugin/plugin.json'),
+      JSON.stringify({ name: 'content-intelligence', version: '0.0.0' })
+    );
+    await fs.writeFile(
+      path.join(tmp, '.claude-plugin/marketplace.json'),
+      JSON.stringify({ name: 'm', plugins: [{ name: 'other', version: '0.0.0' }] })
+    );
+
+    const scriptPath = path.resolve('scripts/sync-versions.mjs');
+    let threw = false;
+    try {
+      execSync(`node ${scriptPath}`, { cwd: tmp, stdio: 'pipe' });
+    } catch (err) {
+      threw = true;
+      assert.match(err.stderr.toString(), /no plugin entry named 'content-intelligence'/);
+    }
+    assert.ok(threw, 'script should exit non-zero when no matching plugin entry exists');
+  } finally {
+    await fs.rm(tmp, { recursive: true, force: true });
+  }
+});
