@@ -15,42 +15,44 @@ and providing credentials.
 Once the plugin is listed in the official directory:
 
 ```bash
-claude /plugin install adology
+claude /plugin install content-intelligence
 ```
 
 Claude Code will prompt for the two required environment variables.
 
 ## Option 2: Install from a released zip
 
-1. Download `adology-plugin-<version>.zip` from
-   [https://github.com/adology/adology-backend/releases](https://github.com/adology/adology-backend/releases)
+1. Download `content-intelligence-<version>.zip` from
+   [https://github.com/adologyai/content-intelligence/releases](https://github.com/adologyai/content-intelligence/releases)
 2. Extract the archive to a location of your choice, e.g.
-   `~/.claude/plugins/adology-plugin-0.2.0/`
+   `~/.claude/plugins/content-intelligence-0.1.0/`
 3. Point Claude Code at the plugin directory:
 
 ```bash
-claude --plugin-dir ~/.claude/plugins/adology-plugin-0.2.0
+claude --plugin-dir ~/.claude/plugins/content-intelligence-0.1.0
 ```
 
 ## Option 3: Install from source (for local development)
 
 ```bash
-git clone https://github.com/adology/adology-backend.git
-cd adology-backend
-claude --plugin-dir ./packages/cowork-plugin
+git clone https://github.com/adologyai/content-intelligence.git
+cd content-intelligence
+claude --plugin-dir .
 ```
 
 ## Configure credentials
 
-Export the required environment variables before launching Claude Code:
+Export the required environment variable before launching Claude Code:
 
 ```bash
-export ADOLOGY_MCP_URL="https://mcp.adologyai.com/mcp"
 export ADOLOGY_API_TOKEN="<your-token>"
 ```
 
-Place these in `~/.zshrc`, `~/.bashrc`, or your preferred shell profile to
+Place this in `~/.zshrc`, `~/.bashrc`, or your preferred shell profile to
 persist across sessions.
+
+> **Note:** The MCP server URL (`https://mcp.adologyai.com/mcp`) is hardcoded
+> in `.mcp.json` and does not need to be set as an environment variable.
 
 ## Verify the install
 
@@ -60,7 +62,7 @@ In a Claude Code session, run:
 /plugin list
 ```
 
-You should see `adology` in the output. Then try a simple tool call:
+You should see Adology tools available. Then try a simple tool call:
 
 ```
 Can you use the Adology whoami tool?

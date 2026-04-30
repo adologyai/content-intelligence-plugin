@@ -23,7 +23,7 @@ The `content-intelligence` plugin connects Claude to your Adology workspace, giv
 | Component       | Count | Description                                              |
 | --------------- | ----- | -------------------------------------------------------- |
 | MCP Tools       | 27    | Server-side tools for data access and operations         |
-| Domain Skills   | 10    | Guided workflows for common analysis and strategy tasks  |
+| Domain Skills   | 11    | Guided workflows for common analysis and strategy tasks  |
 | Slash Commands  | 4     | Quick-access commands for frequent actions               |
 
 ### Skills

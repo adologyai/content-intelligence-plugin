@@ -37,7 +37,7 @@ This document consolidates everything Anthropic's plugin directory review team n
 ## 3. Capabilities
 
 - **27 MCP tools** (see `docs/tools-reference.md`) for workspace, knowledge-set, analysis, search, conversation, and action operations
-- **10 bundled skills** (see `docs/skills-reference.md`)
+- **11 bundled skills** (see `docs/skills-reference.md`)
 - **4 slash commands**: `/analyze`, `/compare`, `/discover`, `/export`
 - **0 subagents** — multi-step research is handled by `research-analyst` skill (with optional fork dispatch via Task tool)
 
