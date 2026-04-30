@@ -1,6 +1,6 @@
 # Thumbnail handling for Adology / web visuals
 
-When producing any deliverable that needs thumbnails (decks, reports, HTML canvases with example creative), **use the `anthropic-skills:adology-thumbnails` skill**. It exists specifically to solve a sandbox limitation where bash can't fetch images from external CDNs — without the workaround, thumbnails silently fail and you ship broken image tags.
+When producing any deliverable that needs thumbnails (decks, reports, HTML canvases with example creative), **use the `content-intelligence:thumbnails` skill**. It exists specifically to solve a sandbox limitation where bash can't fetch images from external CDNs — without the workaround, thumbnails silently fail and you ship broken image tags.
 
 **Rule of thumb:** before embedding *any* external image in a .docx, .pptx, .html, or .md deliverable, invoke the adology-thumbnails skill to get the correct fetch method. Don't try to `curl` or `wget` the image directly.
 
