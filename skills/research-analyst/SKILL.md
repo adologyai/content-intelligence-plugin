@@ -123,6 +123,9 @@ All item-returning tools support `fields` and `labelFields` parameters to contro
 | `analyze` | Full pipeline (sampled items + tableData). Use `fields: [], labelFields: []` for a minimal scan. |
 | `save_to_collection` | Save standout items for the user to browse in the app. Use at the end of every analysis. |
 | `list_labels` | Discover available label dimensions and values in a KS. Run during the landscape scan. |
+| `whoami` | Identify the active team and accessible KSs. Run during Heavy Mode Phase 1. |
+| `list_knowledge_sets` | Enumerate available KSs. Run during Heavy Mode Phase 1. |
+| `compare_knowledge_sets` | Cross-KS comparison with internal parallel retrieval. Use for Heavy Mode multi-KS analysis. |
 
 ### Reading tableData
 
@@ -249,3 +252,5 @@ For genuinely heavy multi-pass research that would clutter the main turn with hu
 - The user explicitly asks for fork-dispatched research
 
 For lighter Heavy Mode runs (single brand, single question, <10 calls), execute inline.
+
+**Forks must execute inline.** A forked agent runs Heavy Mode directly — it never dispatches further forks. The escape hatch is the parent's tool, not the fork's.
