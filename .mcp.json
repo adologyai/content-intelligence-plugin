@@ -1,0 +1,9 @@
+{
+  "adology": {
+    "type": "http",
+    "url": "https://mcp.adologyai.com/mcp",
+    "headers": {
+      "Authorization": "Bearer ${ADOLOGY_API_TOKEN}"
+    }
+  }
+}
