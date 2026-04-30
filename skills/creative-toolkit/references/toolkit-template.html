@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{TOOLKIT_TITLE}}</title>
+<!--
+  CREATIVE TOOLKIT HTML TEMPLATE
+
+  This is a reference template for the Creative Toolkit skill.
+  When building a toolkit, replace the {{PLACEHOLDERS}} and the DATA object
+  with actual toolkit content. Follow the design system exactly.
+
+  Design system: Space Grotesk (headings), DM Sans (body), JetBrains Mono (data/badges)
+  Palette: cream bg (#f0ead6), forest green (#1b4332), lime (#c8e64a), yellow (#d4d069)
+-->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root {
+  --bg: #f0ead6;
+  --forest: #1b4332;
+  --forest-deep: #14332a;
+  --lime: #c8e64a;
+  --lime-dim: #a8c23a;
+  --yellow: #d4d069;
+  --black: #1a1a1a;
+  --dark: #333;
+  --mid: #555;
+  --light: #888;
+  --cream: #e4dfc8;
+  --leaf: #8fbc8f;
+  --leaf-light: #c5d5b5;
+  --green-text: #6b8c1a;
+  --white: #ffffff;
+  --orange: #c77a30;
+  --pink: #b85a72;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', 'Helvetica Neue', sans-serif;
+  background: var(--bg);
+  color: var(--black);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+
+/* ═══ LAYOUT ═══ */
+.wrap { max-width: 1100px; margin: 0 auto; padding: 0 32px; }
+.section { padding: 48px 0; border-bottom: 1px solid var(--cream); }
+.section:last-child { border-bottom: none; }
+
+/* ═══ NAV BAR ═══ */
+.topnav {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--black); height: 44px;
+  display: flex; align-items: center; padding: 0 32px;
+}
+.topnav .logo {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+  font-size: 12px; color: white; letter-spacing: 2.5px; text-transform: uppercase;
+}
+.topnav .logo .dot { color: var(--lime); }
+.topnav .sep { width: 1px; height: 18px; background: #444; margin: 0 20px; }
+.topnav .type {
+  font-size: 10px; color: var(--light); letter-spacing: 1.5px;
+  text-transform: uppercase; font-family: 'Space Grotesk', sans-serif;
+}
+.topnav .right { margin-left: auto; display: flex; gap: 16px; align-items: center; }
+.topnav .stat-pill {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  color: var(--lime); letter-spacing: 0.5px;
+}
+
+/* ═══ SECTION NAV ═══ */
+.secnav {
+  position: sticky; top: 44px; z-index: 90;
+  background: var(--bg); border-bottom: 1px solid var(--cream);
+  display: flex; gap: 0; overflow-x: auto; -webkit-overflow-scrolling: touch;
+  padding: 0 32px;
+}
+.secnav a {
+  padding: 12px 16px; font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--light); text-decoration: none; white-space: nowrap;
+  border-bottom: 2px solid transparent; transition: all .15s;
+}
+.secnav a:hover { color: var(--dark); }
+.secnav a.active { color: var(--forest); border-bottom-color: var(--lime); }
+
+/* ═══ TYPOGRAPHY ═══ */
+h1 { font-family: 'Space Grotesk', sans-serif; font-size: 42px; font-weight: 700; line-height: 1.08; color: var(--black); }
+h1 .acc { color: var(--green-text); }
+h2 { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; line-height: 1.12; color: var(--black); }
+h2 .acc { color: var(--green-text); }
+h3 { font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--lime); }
+.sub { font-size: 14px; color: var(--mid); margin-top: 6px; line-height: 1.55; max-width: 720px; }
+.body-text { font-size: 14px; line-height: 1.6; color: var(--dark); }
+
+/* ═══ BADGES ═══ */
+.badge {
+  display: inline-block; font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; font-weight: 700; padding: 3px 10px;
+  border-radius: 3px; letter-spacing: 1px;
+}
+.badge.lime { background: var(--lime); color: var(--black); }
+.badge.yellow { background: var(--yellow); color: #3d3d00; }
+.badge.dark { background: var(--forest); color: var(--lime); }
+.badge.cream { background: var(--cream); color: var(--dark); }
+.badge.orange { background: #f0d0a0; color: #6b4400; }
+.badge.pink { background: #f0c0d0; color: #6b2040; }
+
+/* ═══ CARDS ═══ */
+.card { border-radius: 10px; padding: 22px 26px; }
+.card.dark { background: var(--forest); }
+.card.dark h4 { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 700; color: var(--lime); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+.card.dark p { font-size: 13px; line-height: 1.55; color: var(--leaf-light); }
+.card.dark p strong { color: var(--white); }
+.card.accent { background: var(--yellow); }
+.card.accent h4 { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 700; color: #3d3d00; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+.card.accent p { font-size: 13px; line-height: 1.55; color: #2a2a00; }
+.card.cream-card { background: var(--cream); }
+.card.cream-card h4 { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 700; color: var(--forest); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+.card.cream-card p { font-size: 13px; line-height: 1.55; color: var(--dark); }
+
+/* ═══ COVER ═══ */
+.cover { padding: 80px 0 48px; }
+.cover .meta { display: flex; gap: 24px; margin-top: 24px; }
+.cover .meta span { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--light); letter-spacing: 1px; text-transform: uppercase; }
+.stats-row { display: flex; gap: 14px; margin-top: 32px; flex-wrap: wrap; }
+.stat-card { background: var(--forest); border-radius: 10px; padding: 18px 22px; min-width: 140px; }
+.stat-card .n { font-family: 'Space Grotesk', sans-serif; font-size: 36px; font-weight: 700; color: var(--lime); line-height: 1; }
+.stat-card .l { font-size: 10px; color: var(--leaf); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 4px; font-family: 'Space Grotesk', sans-serif; }
+
+/* ═══ VOICE DNA ═══ */
+.dna-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 20px; }
+.attr-card { background: var(--forest); border-radius: 10px; padding: 18px 22px; }
+.attr-card .name { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+.attr-card .desc { font-size: 12px; color: var(--leaf-light); line-height: 1.5; }
+.attr-card .not { font-size: 11px; color: var(--lime); margin-top: 8px; font-style: italic; }
+.tone-bar { display: flex; align-items: center; gap: 10px; padding: 8px 0; }
+.tone-bar .labels { width: 160px; display: flex; justify-content: space-between; font-size: 11px; color: var(--mid); flex-shrink: 0; }
+.tone-bar .track { flex: 1; height: 6px; background: var(--cream); border-radius: 3px; position: relative; }
+.tone-bar .dot { position: absolute; top: -5px; width: 16px; height: 16px; background: var(--forest); border: 2px solid var(--lime); border-radius: 50%; transform: translateX(-50%); }
+
+/* ═══ HOOK BANK ═══ */
+.hook-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; margin-top: 16px; }
+.hook-card { background: var(--white); border-radius: 10px; padding: 18px 22px; border: 1px solid var(--cream); transition: border-color .15s; }
+.hook-card:hover { border-color: var(--lime); }
+.hook-card .hook-text { font-size: 15px; font-weight: 600; line-height: 1.45; color: var(--black); margin-bottom: 10px; }
+.hook-card .hook-meta { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* ═══ COPY BANK ═══ */
+.copy-section { margin-top: 20px; }
+.copy-section-title { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--forest); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--cream); }
+.copy-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; margin-bottom: 24px; }
+.copy-item { background: var(--white); border-radius: 8px; padding: 14px 18px; border-left: 3px solid var(--lime); }
+.copy-item .text { font-size: 14px; color: var(--black); line-height: 1.5; }
+.copy-item .use { font-size: 11px; color: var(--light); margin-top: 6px; font-family: 'JetBrains Mono', monospace; }
+
+/* ═══ CONCEPT BRIEFS ═══ */
+.concept-card { background: var(--white); border-radius: 10px; padding: 24px 28px; margin-bottom: 14px; border: 1px solid var(--cream); }
+.concept-card .concept-title { font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 700; color: var(--black); margin-bottom: 4px; }
+.concept-card .concept-brief { font-size: 14px; color: var(--dark); line-height: 1.6; margin-bottom: 14px; }
+.concept-card .concept-details { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.concept-card .detail-item h5 { font-family: 'Space Grotesk', sans-serif; font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--light); margin-bottom: 4px; }
+.concept-card .detail-item p { font-size: 13px; color: var(--dark); line-height: 1.5; }
+
+/* ═══ SCRIPT ═══ */
+.script-card { background: var(--forest); border-radius: 10px; padding: 24px 28px; margin-bottom: 14px; }
+.script-card .script-title { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; color: var(--lime); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+.script-beat { display: flex; gap: 14px; margin-bottom: 10px; }
+.script-beat .time { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--lime); width: 50px; flex-shrink: 0; padding-top: 2px; }
+.script-beat .action { font-size: 13px; color: var(--leaf-light); line-height: 1.55; }
+.script-beat .action .dialogue { color: var(--white); font-weight: 500; }
+.script-beat .action .direction { color: var(--leaf); font-style: italic; }
+
+/* ═══ ANGLES ═══ */
+.angle-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; margin-top: 16px; }
+.angle-card { border-radius: 10px; padding: 20px 24px; }
+.angle-card .angle-title { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+.angle-card .angle-brief { font-size: 13px; line-height: 1.55; margin-bottom: 10px; }
+.angle-card .angle-proof { font-size: 11px; font-family: 'JetBrains Mono', monospace; }
+
+/* ═══ TAGLINES ═══ */
+.tagline-wall { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.tagline-item { background: var(--forest); border-radius: 8px; padding: 12px 20px; }
+.tagline-item .text { font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 700; color: var(--white); }
+.tagline-item .register { font-size: 10px; color: var(--leaf); letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
+
+/* ═══ VISUAL DIRECTION ═══ */
+.vis-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-top: 16px; }
+.vis-card { background: var(--cream); border-radius: 10px; padding: 20px 24px; }
+.vis-card h4 { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 700; color: var(--forest); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+.vis-card p { font-size: 13px; color: var(--dark); line-height: 1.55; }
+
+/* ═══ INSPIRATION ═══ */
+.inspo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-top: 16px; }
+.inspo-card { background: var(--white); border-radius: 10px; padding: 18px 22px; border: 1px solid var(--cream); }
+.inspo-card .source-type { font-size: 11px; margin-bottom: 8px; }
+.inspo-card .inspo-text { font-size: 13px; color: var(--dark); line-height: 1.55; margin-bottom: 8px; }
+.inspo-card .inspo-proof { font-size: 11px; color: var(--light); font-family: 'JetBrains Mono', monospace; }
+
+/* ═══ FOOTER ═══ */
+.foot {
+  padding: 24px 32px; background: var(--black);
+  display: flex; align-items: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: #666; letter-spacing: 0.5px;
+}
+.foot .right { margin-left: auto; }
+
+/* ═══ SEARCH ═══ */
+.search-wrap { padding: 12px 32px; background: var(--bg); position: sticky; top: 80px; z-index: 80; display: none; }
+.search-wrap.visible { display: block; }
+.search-wrap input {
+  width: 100%; padding: 10px 16px; border-radius: 8px;
+  border: 1px solid var(--cream); background: var(--white);
+  font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--black);
+}
+.search-wrap input:focus { outline: none; border-color: var(--lime); }
+
+@media (max-width: 700px) {
+  .wrap { padding: 0 16px; }
+  .dna-grid, .concept-card .concept-details { grid-template-columns: 1fr; }
+  .hook-grid, .copy-grid, .angle-grid { grid-template-columns: 1fr; }
+  h1 { font-size: 28px; }
+  .stats-row { gap: 8px; }
+  .stat-card { min-width: 100px; padding: 14px 16px; }
+}
+</style>
+</head>
+<body>
+
+<!--
+  TEMPLATE INSTRUCTIONS FOR THE SKILL:
+
+  This HTML template defines the visual structure of a Creative Toolkit.
+  When generating a toolkit, the skill should produce an HTML file that follows
+  this exact design system but with real data populated in each section.
+
+  SECTIONS TO POPULATE (all 9):
+  1. Cover — brand name, toolkit type, date, stats
+  2. Voice DNA — archetype, attributes, tone dimensions, sounds like/doesn't
+  3. Hook Bank — 25-30 hooks organized by mechanism type
+  4. Angle Library — 10-15 strategic angles with briefs
+  5. Copy Bank — 50+ lines organized by usage (captions, overlays, CTAs, replies)
+  6. Tagline Options — 10-15 ownable phrases at different registers
+  7. Concept Briefs — 5-8 full concepts with format/hook/structure/production
+  8. Script Starters — 3-5 beat-by-beat scripts
+  9. Visual/Format Direction — editing pace, shot types, text treatment, music
+  10. Inspiration Sources — the actual posts/threads with data proof
+
+  DESIGN RULES:
+  - Use Space Grotesk for all headings (h1-h3, card titles, badges, stats)
+  - Use DM Sans for body text
+  - Use JetBrains Mono for data, badges, metadata
+  - Forest green (#1b4332) cards for primary content
+  - Yellow (#d4d069) cards for callouts/highlights
+  - Cream (#e4dfc8) cards for secondary content
+  - White cards with cream border for individual items
+  - Lime (#c8e64a) for accents, numbers, active states
+  - NEVER use dark/techy dashboard aesthetic
+  - Cards should have generous padding (22px 26px minimum)
+  - Badge style: uppercase, letter-spacing 1px, JetBrains Mono 9px
+-->
+
+<div class="topnav">
+  <span class="logo"><span class="dot">●</span>&nbsp; ADOLOGY</span>
+  <div class="sep"></div>
+  <span class="type">Creative Toolkit</span>
+  <div class="right">
+    <span class="stat-pill">{{ITEM_COUNT}} items</span>
+    <span class="stat-pill">{{DATE}}</span>
+  </div>
+</div>
+
+<div class="secnav">
+  <a href="#cover" class="active">Overview</a>
+  <a href="#voice">Voice DNA</a>
+  <a href="#hooks">Hook Bank</a>
+  <a href="#angles">Angles</a>
+  <a href="#copy">Copy Bank</a>
+  <a href="#taglines">Taglines</a>
+  <a href="#concepts">Concepts</a>
+  <a href="#scripts">Scripts</a>
+  <a href="#visual">Visual Direction</a>
+  <a href="#inspo">Inspiration</a>
+</div>
+
+<!-- ═══ COVER ═══ -->
+<div class="wrap">
+<div class="section cover" id="cover">
+  <h3>Creative Toolkit</h3>
+  <h1 style="margin-top:8px">{{BRAND_NAME}}<br><span class="acc">{{TOOLKIT_SUBTITLE}}</span></h1>
+  <p class="sub" style="margin-top:12px">{{TOOLKIT_DESCRIPTION}}</p>
+  <div class="meta">
+    <span>{{DATE}}</span>
+    <span>{{TOOLKIT_TYPE}}</span>
+    <span>V1.0</span>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="n">{{HOOK_COUNT}}</div><div class="l">Hooks</div></div>
+    <div class="stat-card"><div class="n">{{ANGLE_COUNT}}</div><div class="l">Angles</div></div>
+    <div class="stat-card"><div class="n">{{COPY_COUNT}}</div><div class="l">Copy Lines</div></div>
+    <div class="stat-card"><div class="n">{{TAGLINE_COUNT}}</div><div class="l">Taglines</div></div>
+    <div class="stat-card"><div class="n">{{CONCEPT_COUNT}}</div><div class="l">Concepts</div></div>
+    <div class="stat-card"><div class="n">{{SCRIPT_COUNT}}</div><div class="l">Scripts</div></div>
+  </div>
+</div>
+
+<!-- ═══ VOICE DNA ═══ -->
+<div class="section" id="voice">
+  <h3>Voice DNA</h3>
+  <h2 style="margin-top:8px">{{ARCHETYPE_PRIMARY}} / <span class="acc">{{ARCHETYPE_SECONDARY}}</span></h2>
+  <p class="sub">{{VOICE_SUMMARY}}</p>
+
+  <div class="dna-grid">
+    <!-- REPEAT for each voice attribute -->
+    <!--
+    <div class="attr-card">
+      <div class="name">{{ATTR_NAME}}</div>
+      <div class="desc">{{ATTR_DESCRIPTION}}</div>
+      <div class="not">NOT {{ATTR_CONTRAST}}</div>
+    </div>
+    -->
+  </div>
+
+  <div style="margin-top:24px;">
+    <h4 style="font-family:'Space Grotesk';font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--forest);margin-bottom:14px;">Tone Dimensions</h4>
+    <!-- REPEAT for each tone dimension -->
+    <!--
+    <div class="tone-bar">
+      <div class="labels"><span>{{LEFT_LABEL}}</span><span>{{RIGHT_LABEL}}</span></div>
+      <div class="track"><div class="dot" style="left:{{POSITION_PCT}}%"></div></div>
+    </div>
+    -->
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px;">
+    <div class="card dark">
+      <h4>Sounds Like</h4>
+      <!-- List 3-4 real quotes from brand content -->
+    </div>
+    <div class="card accent">
+      <h4>Doesn't Sound Like</h4>
+      <!-- List 3-4 examples of what the brand would never say -->
+    </div>
+  </div>
+</div>
+
+<!-- ═══ HOOK BANK ═══ -->
+<div class="section" id="hooks">
+  <h3>Hook Bank</h3>
+  <h2 style="margin-top:8px">{{HOOK_COUNT}} hooks <span class="acc">ready to use</span></h2>
+  <p class="sub">Organized by psychological mechanism. Each hook is the exact opening line or first 3 seconds.</p>
+
+  <!-- REPEAT for each hook mechanism group (Curiosity Gap, Contrarian, Pain Point, etc.) -->
+  <!--
+  <div style="margin-top:24px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+      <span class="badge dark">{{MECHANISM_NAME}}</span>
+      <span style="font-size:12px;color:var(--mid);">{{MECHANISM_COUNT}} hooks</span>
+    </div>
+    <div class="hook-grid">
+      REPEAT for each hook in this mechanism:
+      <div class="hook-card">
+        <div class="hook-text">{{HOOK_TEXT}}</div>
+        <div class="hook-meta">
+          <span class="badge lime">{{PLATFORM}}</span>
+          <span class="badge cream">{{INSPIRATION_SOURCE}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  -->
+</div>
+
+<!-- ═══ ANGLE LIBRARY ═══ -->
+<div class="section" id="angles">
+  <h3>Angle Library</h3>
+  <h2 style="margin-top:8px">Strategic <span class="acc">content angles</span></h2>
+  <p class="sub">Each angle is a strategic direction a creative can run with. Includes the framing, the target audience, and the data that proves it works.</p>
+
+  <div class="angle-grid">
+    <!-- REPEAT for each angle -->
+    <!--
+    <div class="angle-card dark"> or accent or cream-card depending on source
+      <div class="angle-title">{{ANGLE_TITLE}}</div>
+      <div class="angle-brief">{{ANGLE_DESCRIPTION}}</div>
+      <div class="angle-proof">{{DATA_PROOF}}</div>
+      <div style="margin-top:8px;display:flex;gap:6px;">
+        <span class="badge lime">{{INSPIRATION_SOURCE}}</span>
+        <span class="badge cream">{{AUDIENCE}}</span>
+      </div>
+    </div>
+    -->
+  </div>
+</div>
+
+<!-- ═══ COPY BANK ═══ -->
+<div class="section" id="copy">
+  <h3>Copy Bank</h3>
+  <h2 style="margin-top:8px">{{COPY_COUNT}} lines <span class="acc">in the brand's voice</span></h2>
+  <p class="sub">Ready-to-use copy organized by where it goes. Every line is written in the brand's extracted voice DNA.</p>
+
+  <!-- REPEAT for each copy category: Caption Openers, Text Overlays, CTAs, Comment Replies, One-Liners -->
+  <!--
+  <div class="copy-section">
+    <div class="copy-section-title">{{CATEGORY_NAME}} — {{COUNT}} lines</div>
+    <div class="copy-grid">
+      REPEAT:
+      <div class="copy-item">
+        <div class="text">{{COPY_LINE}}</div>
+        <div class="use">{{USAGE_CONTEXT}}</div>
+      </div>
+    </div>
+  </div>
+  -->
+</div>
+
+<!-- ═══ TAGLINES ═══ -->
+<div class="section" id="taglines">
+  <h3>Tagline Options</h3>
+  <h2 style="margin-top:8px">Ownable <span class="acc">phrases</span></h2>
+  <p class="sub">Memorable lines the brand could own. Different registers for different contexts.</p>
+
+  <div class="tagline-wall">
+    <!-- REPEAT for each tagline -->
+    <!--
+    <div class="tagline-item">
+      <div class="text">{{TAGLINE}}</div>
+      <div class="register">{{REGISTER — bold / playful / authoritative / minimal}}</div>
+    </div>
+    -->
+  </div>
+</div>
+
+<!-- ═══ CONCEPT BRIEFS ═══ -->
+<div class="section" id="concepts">
+  <h3>Concept Briefs</h3>
+  <h2 style="margin-top:8px">Big <span class="acc">creative ideas</span></h2>
+  <p class="sub">Full concepts a creative team can brief from directly. Each includes format, hook, structure, and production notes.</p>
+
+  <!-- REPEAT for each concept -->
+  <!--
+  <div class="concept-card">
+    <div style="display:flex;gap:8px;margin-bottom:10px;">
+      <span class="badge dark">{{CONCEPT_NUMBER}}</span>
+      <span class="badge lime">{{INSPIRATION_SOURCE}}</span>
+      <span class="badge cream">{{PLATFORM}}</span>
+    </div>
+    <div class="concept-title">{{CONCEPT_NAME}}</div>
+    <div class="concept-brief">{{CONCEPT_DESCRIPTION}}</div>
+    <div class="concept-details">
+      <div class="detail-item"><h5>Hook</h5><p>{{HOOK_APPROACH}}</p></div>
+      <div class="detail-item"><h5>Format</h5><p>{{FORMAT}}</p></div>
+      <div class="detail-item"><h5>Structure</h5><p>{{STRUCTURE}}</p></div>
+      <div class="detail-item"><h5>Production</h5><p>{{PRODUCTION_NOTES}}</p></div>
+    </div>
+    <div style="margin-top:12px;">
+      <div style="font-family:'Space Grotesk';font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--light);">Data Proof</div>
+      <div style="font-size:12px;color:var(--mid);margin-top:4px;">{{DATA_PROOF}}</div>
+    </div>
+  </div>
+  -->
+</div>
+
+<!-- ═══ SCRIPT STARTERS ═══ -->
+<div class="section" id="scripts">
+  <h3>Script Starters</h3>
+  <h2 style="margin-top:8px">Beat-by-beat <span class="acc">scripts</span></h2>
+  <p class="sub">Rough scripts with enough specificity to film from. Not polished production scripts — creative direction with beats.</p>
+
+  <!-- REPEAT for each script -->
+  <!--
+  <div class="script-card">
+    <div class="script-title">{{SCRIPT_NAME}}</div>
+    <div style="display:flex;gap:6px;margin-bottom:14px;">
+      <span class="badge lime">{{DURATION}}</span>
+      <span class="badge" style="background:var(--leaf);color:var(--forest-deep);">{{PLATFORM}}</span>
+    </div>
+    REPEAT for each beat:
+    <div class="script-beat">
+      <div class="time">{{TIMESTAMP}}</div>
+      <div class="action"><span class="direction">{{VISUAL_DIRECTION}}</span> <span class="dialogue">{{DIALOGUE}}</span></div>
+    </div>
+  </div>
+  -->
+</div>
+
+<!-- ═══ VISUAL / FORMAT DIRECTION ═══ -->
+<div class="section" id="visual">
+  <h3>Visual Direction</h3>
+  <h2 style="margin-top:8px">What the content <span class="acc">looks like</span></h2>
+  <p class="sub">Production guidance for the creative team: editing pace, shot types, text treatment, music approach.</p>
+
+  <div class="vis-grid">
+    <!-- Standard cards for: Editing Pace, Shot Types, Text Treatment, Music/Audio, Color/Mood, Thumbnail Strategy -->
+    <!--
+    <div class="vis-card">
+      <h4>{{DIRECTION_CATEGORY}}</h4>
+      <p>{{DIRECTION_CONTENT}}</p>
+    </div>
+    -->
+  </div>
+</div>
+
+<!-- ═══ INSPIRATION SOURCES ═══ -->
+<div class="section" id="inspo">
+  <h3>Inspiration Sources</h3>
+  <h2 style="margin-top:8px">What <span class="acc">inspired this toolkit</span></h2>
+  <p class="sub">The actual posts, threads, and data points that drove every item above. Organized by source type.</p>
+
+  <!-- REPEAT for each source type: Category Performers, Audience Gaps, Whitespace, Trends -->
+  <!--
+  <div style="margin-top:24px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+      <span class="badge dark">{{SOURCE_TYPE}}</span>
+    </div>
+    <div class="inspo-grid">
+      <div class="inspo-card">
+        <div class="source-type"><span class="badge lime">{{PLATFORM}}</span></div>
+        <div class="inspo-text">{{DESCRIPTION_OF_WHAT_THIS_IS}}</div>
+        <div class="inspo-proof">{{METRIC — e.g., 3.7M views, 117.9K likes}}</div>
+      </div>
+    </div>
+  </div>
+  -->
+</div>
+
+</div><!-- /wrap -->
+
+<div class="foot">
+  <span>Creative Toolkit · {{BRAND_NAME}} · Powered by Adology</span>
+  <span class="right">{{DATE}}</span>
+</div>
+
+<script>
+// Section nav highlighting on scroll
+const sections = document.querySelectorAll('.section');
+const navLinks = document.querySelectorAll('.secnav a');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      navLinks.forEach(l => l.classList.remove('active'));
+      const id = entry.target.id;
+      const link = document.querySelector(`.secnav a[href="#${id}"]`);
+      if (link) link.classList.add('active');
+    }
+  });
+}, { threshold: 0.3, rootMargin: '-100px 0px -50% 0px' });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
