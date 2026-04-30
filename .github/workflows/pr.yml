@@ -4,10 +4,18 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   validate-and-build:
     name: Validate manifests and build preview artifact
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -50,7 +58,7 @@ jobs:
       - name: Detect changeset
         id: changeset
         run: |
-          changesets=$(find .changeset -name '*.md' -not -name 'README.md' 2>/dev/null | wc -l)
+          changesets=$(find .changeset -maxdepth 1 -name '*.md' ! -path '.changeset/README.md' 2>/dev/null | wc -l)
           echo "count=$changesets" >> $GITHUB_OUTPUT
           if [ "$changesets" -gt 0 ]; then
             echo "has_changeset=true" >> $GITHUB_OUTPUT
@@ -64,15 +72,18 @@ jobs:
           name: content-intelligence-preview
           path: dist/*.zip
           if-no-files-found: error
+          retention-days: 14
 
       - name: Required check (changeset PRs must produce artifact)
         run: |
           if [ "${{ steps.changeset.outputs.has_changeset }}" = "true" ]; then
-            if [ ! -f dist/*.zip ] 2>/dev/null && ! ls dist/*.zip > /dev/null 2>&1; then
+            shopt -s nullglob
+            zips=(dist/*.zip)
+            if [ ${#zips[@]} -eq 0 ]; then
               echo "ERROR: changeset PR did not produce a .zip artifact"
               exit 1
             fi
-            echo "Changeset PR produced artifact: $(ls dist/*.zip)"
+            echo "Changeset PR produced artifact(s): ${zips[*]}"
           else
             echo "No changeset present — release not cut by this PR"
           fi
