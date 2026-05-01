@@ -60,6 +60,7 @@ mkdir -p "$STAGE"
 echo "Staging files..."
 rsync -a \
   --exclude='.git' \
+  --exclude='.gitignore' \
   --exclude='.claude' \
   --exclude='dist' \
   --exclude='node_modules' \
@@ -72,6 +73,8 @@ rsync -a \
   --exclude='package-lock.json' \
   --exclude='scripts' \
   --exclude='docs/superpowers' \
+  --exclude='docs/plans' \
+  --exclude='SUBMISSION_CHECKLIST.md' \
   ./ "$STAGE/"
 
 # Strip .gitkeep
@@ -80,7 +83,10 @@ find "$STAGE" -name '.gitkeep' -delete
 # Drop empty directories left behind by exclusions (e.g., docs/ when only superpowers/ existed)
 find "$STAGE" -type d -empty -delete
 
-# Re-create the staging root if the empty-dir prune removed it (defensive — shouldn't happen because $STAGE has content from rsync, but ensures the zip step has somewhere to cd)
+# Defensive guard: bail if the empty-dir prune unexpectedly removed the
+# staging root. Should never happen because $STAGE has content from
+# rsync, but if it does we want a clear error rather than a confusing
+# zip failure.
 if [ ! -d "$STAGE" ]; then
   echo "ERROR: staging directory was unexpectedly removed"
   exit 1

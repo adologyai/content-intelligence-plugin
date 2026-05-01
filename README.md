@@ -46,13 +46,16 @@ The `content-intelligence` plugin connects Claude to your Adology workspace, giv
 
 ### Claude Code (local plugin)
 
-Point Claude Code at the plugin directory:
+Inside a Claude Code session, register this directory as a local
+marketplace and install the plugin:
 
-```bash
-claude --plugin-dir ./
+```
+/plugin marketplace add /absolute/path/to/content-intelligence
+/plugin install content-intelligence@adology-marketplace
 ```
 
-Or install the exported `.zip` artifact via the plugin marketplace.
+For full instructions (released-zip and directory-listing flows),
+see [`docs/installation-claude-code.md`](./docs/installation-claude-code.md).
 
 ### Claude.ai connector
 

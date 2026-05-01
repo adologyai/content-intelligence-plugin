@@ -62,7 +62,7 @@ Offer to save each brand's top performers to separate collections via `save_to_c
 
 Suggest next steps:
 - "Want me to go deeper on either brand? Try `/analyze [brand]`"
-- "Want to export this comparison? Try `/export csv`"
+- "Want to save each brand's top performers to shareable collections? I can call `save_to_collection`."
 - "Want to look at a specific platform or time period?"
 - "Want to find how other brands handle [gap identified]? I can search the full Adology database."
 

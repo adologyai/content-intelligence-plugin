@@ -54,7 +54,7 @@ Offer to save standout items to a collection via `save_to_collection` — share 
 
 Suggest concrete next steps:
 - "Want me to compare this with a competitor? Try `/compare [brand A] vs [brand B]`"
-- "Want to export this data? Try `/export csv`"
+- "Want to save these standouts as a shareable collection? I can call `save_to_collection`."
 - "Want to dig deeper into a specific pattern I found?"
 - "Want to search across all of Adology's data, not just this KS? I can use `content_intelligence_search`"
 
