@@ -89,7 +89,7 @@ Use `fields` and `labelFields` params on get_items, search_items, analyze, get_i
 
 ### Retrieval Strategy
 
-Claude can make multiple tool calls in parallel. Use this pattern for comprehensive analysis:
+The agent can make multiple tool calls in parallel. Use this pattern for comprehensive analysis:
 
 1. **Scan** — `get_items` limit=50, fields=[], labelFields=[] (~75KB, ~19K tokens)
 2. **In parallel**: `aggregate_items` by relevant dimensions + `list_labels` to discover available dimensions

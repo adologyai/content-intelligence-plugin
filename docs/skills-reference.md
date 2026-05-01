@@ -1,6 +1,6 @@
 # Skills Reference
 
-The plugin bundles 11 skills. Each is a self-contained Claude workflow that
+The plugin bundles 11 skills. Each is a self-contained agent workflow that
 triggers on recognizable user phrases and runs to completion.
 
 ## Onboarding & foundational

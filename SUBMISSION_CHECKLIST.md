@@ -71,7 +71,7 @@ This checklist tracks the items required for Claude Plugin Directory approval.
 - [x] Clear declaration of what data is written
 - [x] Data retention periods stated (in canonical privacy policy)
 - [x] Deletion mechanism documented
-- [x] No persistence of Claude conversation text beyond explicit user saves
+- [x] No persistence of conversation text from the AI agent beyond explicit user saves
 - [x] No local filesystem or clipboard access
 
 ## Artifact

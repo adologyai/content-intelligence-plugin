@@ -10,7 +10,7 @@ description: >
 
 # Thumbnail Embedding
 
-This skill exists because the sandbox environment Claude runs in has a quirk: naive `<img src="https://...">` references to Adology-hosted thumbnails silently fail to render in produced HTML/PDF documents. The Adology thumbnail URL is reachable but the runtime fetch breaks during document generation.
+This skill exists because the sandbox environment the agent runs in has a quirk: naive `<img src="https://...">` references to Adology-hosted thumbnails silently fail to render in produced HTML/PDF documents. The Adology thumbnail URL is reachable but the runtime fetch breaks during document generation.
 
 ## When to use
 

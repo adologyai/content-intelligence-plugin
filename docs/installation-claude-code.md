@@ -99,7 +99,7 @@ You should see Adology tools available. Then try a simple tool call:
 Can you use the Adology whoami tool?
 ```
 
-Claude should call the `whoami` MCP tool and return your workspace
+The agent should call the `whoami` MCP tool and return your workspace
 information.
 
 ## Troubleshooting

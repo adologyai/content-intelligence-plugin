@@ -2,7 +2,7 @@
   "name": "content-intelligence",
   "version": "0.1.0",
   "private": true,
-  "description": "Adology Content Intelligence plugin for Claude",
+  "description": "Adology Content Intelligence plugin for AI agents",
   "license": "Apache-2.0",
   "author": "Adology, Inc. <hello@getadology.com>",
   "repository": {

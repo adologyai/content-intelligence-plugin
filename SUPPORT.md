@@ -12,7 +12,7 @@ We aim to respond within 1 business day.
 
 Verify that:
 
-- Your `ADOLOGY_API_TOKEN` is set in your environment (or that you have completed the OAuth flow in claude.ai)
+- Your `ADOLOGY_API_TOKEN` is set in your environment (or that you have completed the OAuth flow in your AI agent's connector settings)
 - The token has not expired (regenerate from your Adology dashboard if needed)
 - Your account is active
 

@@ -22,7 +22,7 @@ This document consolidates everything Anthropic's plugin directory review team n
 
 **Short (one sentence)**: Competitive ad intelligence + creator coaching for marketers, powered by Adology.
 
-**Medium (one paragraph)**: The `content-intelligence` plugin connects Claude to your Adology workspace, giving you access to competitive ad intelligence directly in conversation. Discover brands, build knowledge sets, analyze ad content, coach creator accounts, vet influencer partners, and produce strategy artifacts (briefs, toolkits, audit decks) without leaving Claude.
+**Medium (one paragraph)**: The `content-intelligence` plugin connects your AI agent to your Adology workspace, giving you access to competitive ad intelligence directly in conversation. Discover brands, build knowledge sets, analyze ad content, coach creator accounts, vet influencer partners, and produce strategy artifacts (briefs, toolkits, audit decks) without leaving your AI agent.
 
 **Target user**: marketers, creative strategists, CMOs, influencer managers, performance teams, growth operators, DTC founders.
 
@@ -111,7 +111,7 @@ See `CHANGELOG.md`.
 
 - This plugin is a thin client over a hosted MCP server with OAuth.
 - All workspace data is scoped to the authenticated user's organization via Stytch B2B tenancy.
-- The plugin does not bypass any Claude safety features and does not request file, clipboard, or network access beyond the declared MCP endpoint.
+- The plugin does not bypass any safety features of the AI client and does not request file, clipboard, or network access beyond the declared MCP endpoint.
 - Skills are instructional `SKILL.md` files; they do not execute code.
 - License is Apache-2.0; the plugin code is freely usable. Access to the Adology service is governed by the Terms of Service, not the LICENSE.
 - **Test account**: email `hello@getadology.com` to request reviewer credentials. We will provision a scoped workspace cloned from a pre-built "Reviewer Template" with at least one populated knowledge set (e.g., Glossier-DTC) so tools return real data immediately. Target turnaround: <30 min from email.

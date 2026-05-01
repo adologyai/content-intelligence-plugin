@@ -1,10 +1,10 @@
 # Adology — Content Intelligence
 
-Competitive ad intelligence inside Claude. Discover brands, build knowledge sets, analyze ad content, coach creators, vet influencers, run audience deep-dives, and generate strategic insights — all powered by Adology's data platform.
+Competitive ad intelligence inside Claude and other AI agents. Discover brands, build knowledge sets, analyze ad content, coach creators, vet influencers, run audience deep-dives, and generate strategic insights — all powered by Adology's data platform.
 
 ## What This Plugin Does
 
-The `content-intelligence` plugin connects Claude to your Adology workspace, giving you access to competitive ad intelligence directly in conversation. You can search for brands, manage knowledge sets, run content analysis, coach influencer accounts, vet creator partnerships, and produce strategy artifacts without leaving Claude.
+The `content-intelligence` plugin connects your AI agent to your Adology workspace, giving you access to competitive ad intelligence directly in conversation. You can search for brands, manage knowledge sets, run content analysis, coach influencer accounts, vet creator partnerships, and produce strategy artifacts without leaving your AI agent.
 
 ## Capabilities
 

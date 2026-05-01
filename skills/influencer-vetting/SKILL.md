@@ -128,7 +128,7 @@ Launch 4-6 parallel web search agents simultaneously, each targeting a different
 - Adjacent category searches (e.g., for fintech: corporate humor, accounting, entrepreneurship)
 - Competitor brand partnership searches (who has worked with similar brands?)
 
-Each parallel agent should return 10-15 candidates with handles. Claude's training data
+Each parallel agent should return 10-15 candidates with handles. The model's training data
 also contains substantial knowledge about prominent creators across categories — use it.
 Think about who you know in the space. The goal is raw volume: 30-50 names with handles
 before any Adology analysis begins.

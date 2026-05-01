@@ -312,18 +312,18 @@ for reference thumbnails or visual references alongside strategy.
 2. **Download thumbnails locally.** The thumbnail URLs from Adology are internal scraper URLs
    that won't load in a browser for the end user. You MUST download each thumbnail to the local
    filesystem using `curl` or `wget` in bash, then embed them in the HTML. Save them to
-   `/home/claude/thumbnails/` with descriptive filenames. For video thumbnails (.mp4 URLs),
+   `/tmp/adology-cache/thumbnails/` with descriptive filenames. For video thumbnails (.mp4 URLs),
    extract a frame using `ffmpeg` to create a .jpg still image — don't try to embed video files
    in the brief. For image thumbnails (.jpg/.png), just download them directly.
    
    Example workflow:
    ```bash
-   mkdir -p /home/claude/thumbnails
+   mkdir -p /tmp/adology-cache/thumbnails
    # For images:
-   curl -s -o /home/claude/thumbnails/celsius-routine.jpg "THUMBNAIL_URL"
+   curl -s -o /tmp/adology-cache/thumbnails/celsius-routine.jpg "THUMBNAIL_URL"
    # For videos — extract a frame:
    curl -s -o /tmp/video.mp4 "VIDEO_THUMBNAIL_URL"
-   ffmpeg -i /tmp/video.mp4 -vframes 1 -q:v 2 /home/claude/thumbnails/wellwithall-founder.jpg
+   ffmpeg -i /tmp/video.mp4 -vframes 1 -q:v 2 /tmp/adology-cache/thumbnails/wellwithall-founder.jpg
    ```
 
 3. **Write the brief.** The strategic narrative follows all the same principles from this skill —
