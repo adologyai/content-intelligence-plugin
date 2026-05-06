@@ -1,0 +1,89 @@
+name: PR Validation
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  validate-and-build:
+    name: Validate manifests and build preview artifact
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate plugin.json
+        run: jq . .claude-plugin/plugin.json > /dev/null
+
+      - name: Validate marketplace.json
+        run: jq . .claude-plugin/marketplace.json > /dev/null
+
+      - name: Validate skill frontmatter
+        run: |
+          set -e
+          shopt -s nullglob
+          for f in skills/*/SKILL.md; do
+            if ! head -1 "$f" | grep -q '^---$'; then
+              echo "ERROR: missing frontmatter: $f"
+              exit 1
+            fi
+          done
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Build preview artifact
+        env:
+          GITHUB_SHA: ${{ github.event.pull_request.head.sha }}
+          GITHUB_PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: ./scripts/export-plugin.sh --preview
+
+      - name: Detect changeset
+        id: changeset
+        run: |
+          changesets=$(find .changeset -maxdepth 1 -name '*.md' ! -path '.changeset/README.md' 2>/dev/null | wc -l)
+          echo "count=$changesets" >> $GITHUB_OUTPUT
+          if [ "$changesets" -gt 0 ]; then
+            echo "has_changeset=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changeset=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: content-intelligence-preview
+          path: dist/*.zip
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Required check (changeset PRs must produce artifact)
+        run: |
+          if [ "${{ steps.changeset.outputs.has_changeset }}" = "true" ]; then
+            shopt -s nullglob
+            zips=(dist/*.zip)
+            if [ ${#zips[@]} -eq 0 ]; then
+              echo "ERROR: changeset PR did not produce a .zip artifact"
+              exit 1
+            fi
+            echo "Changeset PR produced artifact(s): ${zips[*]}"
+          else
+            echo "No changeset present — release not cut by this PR"
+          fi

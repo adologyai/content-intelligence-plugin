@@ -1,13 +1,65 @@
 {
-  "name": "marketing-skills",
-  "description": "Marketing skills library for Claude",
-  "version": "1.0.0",
+  "$schema": "https://claude.ai/schemas/plugin.json",
+  "name": "content-intelligence",
+  "displayName": "Adology — Content Intelligence",
+  "version": "0.1.0",
+  "description": "Competitive ad intelligence inside Claude and other AI agents — discover brands, build knowledge sets, analyze content, coach creators, vet influencers, and run audience deep-dives powered by Adology's data platform.",
+  "shortDescription": "Competitive ad intelligence + creator coaching for marketers, powered by Adology.",
   "author": {
+    "name": "Adology, Inc.",
+    "email": "hello@getadology.com",
+    "url": "https://getadology.com"
+  },
+  "maintainer": {
     "name": "Haldun Anil",
     "email": "hal@getadology.com"
   },
-  "homepage": "https://github.com/adologyai/marketing-skills",
-  "repository": "https://github.com/adologyai/marketing-skills",
-  "license": "MIT",
-  "keywords": ["skills", "marketing"]
+  "homepage": "https://getadology.com",
+  "documentation": "https://github.com/adologyai/content-intelligence#readme",
+  "support": "hello@getadology.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/adologyai/content-intelligence"
+  },
+  "bugs": {
+    "email": "hello@getadology.com",
+    "url": "https://github.com/adologyai/content-intelligence/issues"
+  },
+  "license": "Apache-2.0",
+  "licenseUrl": "./LICENSE",
+  "privacyPolicy": "https://app.termly.io/policy-viewer/policy.html?policyUUID=1ae61180-1e11-43b8-9e28-0e872447a395",
+  "termsOfService": "https://getadology.com/terms",
+  "icon": "./.claude-plugin/icon.svg",
+  "category": "marketing",
+  "keywords": [
+    "marketing",
+    "advertising",
+    "competitive-intelligence",
+    "brand-analysis",
+    "influencer",
+    "creative",
+    "audience-research",
+    "content-strategy",
+    "ad-library",
+    "social-media"
+  ],
+  "pricing": {
+    "model": "subscription",
+    "url": "https://getadology.com/pricing",
+    "hasFreeTier": false
+  },
+  "auth": {
+    "required": true,
+    "type": "oauth2.1",
+    "provider": "stytch",
+    "resourceMetadataUrl": "https://mcp.adologyai.com/.well-known/oauth-protected-resource"
+  },
+  "compatibility": {
+    "claude": ">=1.0.0",
+    "clients": [
+      "claude-code",
+      "claude-ai",
+      "claude-desktop"
+    ]
+  }
 }

@@ -1,0 +1,110 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Cut release if changesets present
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Detect pending changesets
+        id: changeset
+        run: |
+          changesets=$(find .changeset -maxdepth 1 -name '*.md' ! -path '.changeset/README.md' 2>/dev/null | wc -l)
+          echo "count=$changesets" >> $GITHUB_OUTPUT
+          if [ "$changesets" -gt 0 ]; then
+            echo "has_changeset=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changeset=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Exit if no changesets
+        if: steps.changeset.outputs.has_changeset == 'false'
+        run: |
+          echo "No pending changesets — nothing to release"
+          exit 0
+
+      - name: Configure git identity
+        if: steps.changeset.outputs.has_changeset == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Bump version via changeset
+        if: steps.changeset.outputs.has_changeset == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run version
+
+      - name: Read new version
+        if: steps.changeset.outputs.has_changeset == 'true'
+        id: version
+        run: |
+          version=$(jq -r '.version' package.json)
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Commit version bump
+        if: steps.changeset.outputs.has_changeset == 'true'
+        run: |
+          git add -A
+          git commit -m "chore(release): v${{ steps.version.outputs.version }} [skip ci]"
+          git tag plugin-v${{ steps.version.outputs.version }}
+          git push origin main
+          git push origin plugin-v${{ steps.version.outputs.version }}
+
+      - name: Build release artifact
+        if: steps.changeset.outputs.has_changeset == 'true'
+        run: ./scripts/export-plugin.sh
+
+      - name: Compute SHA256
+        if: steps.changeset.outputs.has_changeset == 'true'
+        id: sha
+        run: |
+          if command -v sha256sum >/dev/null 2>&1; then
+            sha=$(sha256sum dist/content-intelligence-${{ steps.version.outputs.version }}.zip | awk '{print $1}')
+          else
+            sha=$(shasum -a 256 dist/content-intelligence-${{ steps.version.outputs.version }}.zip | awk '{print $1}')
+          fi
+          echo "sha256=$sha" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        if: steps.changeset.outputs.has_changeset == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: plugin-v${{ steps.version.outputs.version }}
+          name: v${{ steps.version.outputs.version }}
+          files: dist/content-intelligence-${{ steps.version.outputs.version }}.zip
+          body: |
+            ## v${{ steps.version.outputs.version }}
+
+            **Artifact:** `content-intelligence-${{ steps.version.outputs.version }}.zip`
+            **SHA256:** `${{ steps.sha.outputs.sha256 }}`
+
+            See [CHANGELOG.md](./CHANGELOG.md) for details.
+          draft: false
+          prerelease: false

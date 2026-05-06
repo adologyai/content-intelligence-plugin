@@ -1,1 +1,5 @@
-docs/
+docs/superpowers/
+node_modules/
+dist/
+*.log
+.DS_Store
