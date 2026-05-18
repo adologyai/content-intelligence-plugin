@@ -44,22 +44,12 @@ The `content-intelligence` plugin connects your AI agent to your Adology workspa
 
 ## Installation
 
-### Claude Code (local plugin)
+See **[`INSTALL.md`](./INSTALL.md)** for a full step-by-step guide covering both the Claude.ai connector and the Claude Code plugin.
 
-Inside a Claude Code session, register this directory as a local
-marketplace and install the plugin:
+Quick links:
 
-```
-/plugin marketplace add /absolute/path/to/content-intelligence
-/plugin install content-intelligence@adology-marketplace
-```
-
-For full instructions (released-zip and directory-listing flows),
-see [`docs/installation-claude-code.md`](./docs/installation-claude-code.md).
-
-### Claude.ai connector
-
-The Adology MCP server is a hosted HTTPS service with OAuth authentication. In Claude.ai, add it as a connector using the server URL `https://mcp.adologyai.com/mcp` and authenticate via Stytch.
+- **Claude.ai** — add `https://mcp.adologyai.com/mcp` as a custom connector under _Settings → Connectors_ and authenticate via Stytch.
+- **Claude Code** — inside a session, run `/plugin marketplace add adologyai/content-intelligence-plugin` followed by `/plugin install content-intelligence@adology-marketplace`. No clone required.
 
 ## Account Setup
 
@@ -73,8 +63,9 @@ The plugin code is freely usable under Apache 2.0. Access to the Adology service
 
 ## Documentation
 
-- [`docs/installation-claude-code.md`](./docs/installation-claude-code.md) — Claude Code install
-- [`docs/installation-connector.md`](./docs/installation-connector.md) — Claude.ai connector install
+- [`INSTALL.md`](./INSTALL.md) — customer install guide (Claude.ai + Claude Code)
+- [`docs/installation-claude-code.md`](./docs/installation-claude-code.md) — Claude Code install reference
+- [`docs/installation-connector.md`](./docs/installation-connector.md) — Claude.ai connector reference
 - [`docs/tools-reference.md`](./docs/tools-reference.md) — MCP tools reference
 - [`docs/skills-reference.md`](./docs/skills-reference.md) — bundled skills reference
 
