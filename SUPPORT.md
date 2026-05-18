@@ -10,11 +10,11 @@ We aim to respond within 1 business day.
 
 ### Authentication errors
 
-Verify that:
+The plugin uses OAuth 2.1 (Stytch). Recovery:
 
-- Your `ADOLOGY_API_TOKEN` is set in your environment (or that you have completed the OAuth flow in your AI agent's connector settings)
-- The token has not expired (regenerate from your Adology dashboard if needed)
-- Your account is active
+- Re-run the OAuth flow: in Claude Code, run `/mcp` and re-authenticate the `adology` server; in Claude.ai, disconnect and reconnect the Adology connector under _Settings → Connectors_.
+- Confirm your Adology account is active by signing in to <https://dash.adologyai.com>.
+- If a stale token survives an in-session reconnect, fully quit and relaunch your AI agent.
 
 ### Empty results from analysis tools
 

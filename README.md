@@ -53,7 +53,7 @@ Quick links:
 
 ## Account Setup
 
-You need an Adology account to use this plugin. Visit <https://getadology.com> to create an account and generate your API token from the dashboard settings page.
+You need an Adology account to use this plugin. Sign up at <https://adologyai.com>. The plugin uses OAuth 2.1 (Stytch) — your AI agent will prompt you to sign in the first time it calls an Adology tool. No API token to manage.
 
 ## License
 

@@ -14,7 +14,7 @@ Both options use the same hosted Adology MCP server (`https://mcp.adologyai.com/
 You need an **Adology account** to use the plugin.
 
 1. Go to <https://adologyai.com> and sign up (or log in if you already have an account).
-2. Keep your login credentials handy — you will use them during connector authentication or to generate an API token.
+2. Keep your login credentials handy — you'll sign in to Adology during the OAuth flow when your AI agent first connects.
 
 ---
 
@@ -65,19 +65,9 @@ For developers using [Claude Code](https://docs.claude.com/en/docs/claude-code) 
   claude --version
   ```
   Install or upgrade from <https://docs.claude.com/en/docs/claude-code/quickstart>.
-- You have your **Adology API token**. Generate one at <https://dash.adologyai.com/> → **Dashboard → Profile (dropdown) → Access Tokens → New Access Token**. Copy it somewhere safe — you'll need it in the next step.
+- You have an **Adology account** (see [Before you begin](#before-you-begin)). No API token to manage — the plugin uses OAuth 2.1.
 
-### Step 2 — Set your API token
-
-Export the token in your shell:
-
-```bash
-export ADOLOGY_API_TOKEN="paste-your-token-here"
-```
-
-To persist this across terminal sessions, add the same line to `~/.zshrc` (or `~/.bashrc` if you use bash), then run `source ~/.zshrc` (or open a new terminal). The token authorises every Adology MCP request and is separate from how the plugin code is fetched.
-
-### Step 3 — Install from GitHub
+### Step 2 — Install from GitHub
 
 Start Claude Code in any directory:
 
@@ -96,6 +86,10 @@ Claude Code fetches the marketplace catalogue and plugin contents directly from 
 
 > Private network or air-gapped environment? See [Offline install](#offline-install-claude-code) below.
 
+### Step 3 — Authenticate (first tool call)
+
+The first time Claude Code calls an Adology tool, it will start the OAuth 2.1 flow against the hosted MCP server. Run `/mcp` to inspect connector status or trigger auth manually — Claude Code will open a browser tab, you sign in with your Adology credentials (powered by Stytch), and the token is stored locally for future sessions.
+
 ### Step 4 — Verify
 
 In the same Claude Code session, list installed plugins:
@@ -108,7 +102,7 @@ You should see **Adology — Content Intelligence**. Then ask the agent:
 
 > Use the Adology `whoami` tool.
 
-Claude Code should return your workspace info. You're done.
+If OAuth hasn't completed yet, Claude Code prompts you through the sign-in flow. After that, the tool returns your workspace info. You're done.
 
 ---
 
@@ -168,8 +162,10 @@ git pull
 
 ### `401 Unauthorized` or "authentication failed"
 
-- **Claude.ai connector**: open **Settings → Connectors**, disconnect Adology, and reconnect to refresh the OAuth token.
-- **Claude Code**: confirm `ADOLOGY_API_TOKEN` is set in the same shell that launched Claude Code (`echo $ADOLOGY_API_TOKEN`). Regenerate the token from the Adology dashboard if it has been revoked.
+Both clients use OAuth 2.1, so the recovery is the same: re-run the OAuth flow to get a fresh access token.
+
+- **Claude.ai connector**: open **Settings → Connectors**, disconnect Adology, and reconnect.
+- **Claude Code**: run `/mcp` in a session and re-authenticate the `adology` server. If the issue persists, fully quit Claude Code, relaunch, and try again — stale tokens can survive an in-session reconnect.
 
 ### Plugin doesn't appear in `/plugin list`
 
@@ -179,7 +175,7 @@ Confirm the marketplace was added:
 /plugin marketplace list
 ```
 
-If `adology-marketplace` isn't listed, repeat Step 3 (or the [Offline install](#offline-install-claude-code) steps, if you went that route).
+If `adology-marketplace` isn't listed, repeat Step 2 (or the [Offline install](#offline-install-claude-code) steps, if you went that route).
 
 ### MCP server unreachable
 

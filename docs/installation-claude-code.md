@@ -1,29 +1,25 @@
 # Installing the Adology Plugin in Claude Code
 
-The Adology plugin runs as a Claude Code plugin that connects to the hosted
-Adology MCP server. Installation takes two steps: installing the plugin
-and providing credentials.
+The Adology plugin runs as a Claude Code plugin that connects to the hosted Adology MCP server. Installation has two phases: install the plugin, then sign in via OAuth on the first tool call.
+
+> For a step-by-step customer guide that also covers the Claude.ai connector, see [INSTALL.md](../INSTALL.md). This document is the reference detail for the Claude Code path.
 
 ## Prerequisites
 
-- **Adology account**: sign up at [https://getadology.com](https://getadology.com)
-- **Adology API token**: generate from _Dashboard → Settings → API Tokens_
+- **Adology account**: sign up at <https://adologyai.com>
 - **Claude Code**: latest version (`claude --version` to check)
 
-Plugins are installed inside a running Claude Code session via the
-`/plugin` slash command. Pick the option that matches how you obtained
-the plugin.
+The plugin uses OAuth 2.1 (Stytch). There is no API token to manage — credentials are negotiated in-browser on first tool call.
+
+Plugins are installed inside a running Claude Code session via the `/plugin` slash command. Pick the option that matches how you obtained the plugin.
 
 ## Option 1: Install from the Claude plugin directory
 
-Once the plugin is listed in the official directory, start Claude Code
-and run:
+Once the plugin is listed in the official directory, start Claude Code and run:
 
 ```
 /plugin install content-intelligence
 ```
-
-Claude Code will prompt for the two required environment variables.
 
 ## Option 2: Install from a released zip
 
@@ -53,37 +49,18 @@ Then, from a Claude Code session started in any directory:
 /plugin install content-intelligence@adology-marketplace
 ```
 
-## Configure credentials
+## Authenticate
 
-The plugin supports two auth flows. Most Claude Code users will only
-use one of them:
+The plugin's `.mcp.json` declares the hosted Adology MCP server, and `plugin.json` declares OAuth 2.1 (Stytch) as the auth method. On the first Adology tool call, Claude Code:
 
-- **Long-lived API token** (recommended for Claude Code): set
-  `ADOLOGY_API_TOKEN` in your environment and `.mcp.json` will send it
-  on every tool call as a bearer token. This is the simplest path if
-  you already generated a token from _Dashboard → Settings → API
-  Tokens_.
-- **OAuth 2.1 (Stytch B2B)**: declared in `plugin.json` and used by
-  default in clients that support it (e.g., the Claude.ai connector).
-  In Claude Code, OAuth will only be triggered if `ADOLOGY_API_TOKEN`
-  is unset and your client has been built to handle the flow — most
-  users should rely on the env-var token instead.
+1. Detects the 401 from the protected MCP endpoint.
+2. Reads the OAuth metadata at `https://mcp.adologyai.com/.well-known/oauth-protected-resource`.
+3. Opens a browser tab to the Adology / Stytch sign-in flow.
+4. Stores the resulting access token locally for future sessions.
 
-Export the required environment variable before launching Claude Code:
+You can also trigger or inspect auth manually with `/mcp` — pick the `adology` server and re-authenticate if needed.
 
-```bash
-export ADOLOGY_API_TOKEN="<your-token>"
-```
-
-Place this in `~/.zshrc`, `~/.bashrc`, or your preferred shell profile to
-persist across sessions.
-
-> **Note:** The MCP server URL is fixed in `.mcp.json`
-> (`https://mcp.adologyai.com/mcp`) and does not need any environment
-> configuration. Only the bearer token is interpolated at runtime — it
-> is read from `$ADOLOGY_API_TOKEN` and injected into the
-> `Authorization: Bearer …` header that `.mcp.json` sends to the MCP
-> server.
+> **Note:** The MCP server URL is fixed in `.mcp.json` (`https://mcp.adologyai.com/mcp`) and no environment configuration is required.
 
 ## Verify the install
 
