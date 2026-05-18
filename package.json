@@ -7,7 +7,7 @@
   "author": "Adology, Inc. <hello@getadology.com>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/adologyai/content-intelligence.git"
+    "url": "https://github.com/adologyai/content-intelligence-plugin.git"
   },
   "scripts": {
     "changeset": "changeset",

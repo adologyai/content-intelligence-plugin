@@ -73,4 +73,4 @@ The plugin code is freely usable under Apache 2.0. Access to the Adology service
 
 - General: <hello@getadology.com>
 - Privacy: see the [Privacy Policy](https://app.termly.io/policy-viewer/policy.html?policyUUID=1ae61180-1e11-43b8-9e28-0e872447a395)
-- Issues: <https://github.com/adologyai/content-intelligence/issues>
+- Issues: <https://github.com/adologyai/content-intelligence-plugin/issues>

@@ -15,15 +15,12 @@
     "email": "hal@getadology.com"
   },
   "homepage": "https://getadology.com",
-  "documentation": "https://github.com/adologyai/content-intelligence#readme",
+  "documentation": "https://github.com/adologyai/content-intelligence-plugin#readme",
   "support": "hello@getadology.com",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/adologyai/content-intelligence"
-  },
+  "repository": "https://github.com/adologyai/content-intelligence-plugin",
   "bugs": {
     "email": "hello@getadology.com",
-    "url": "https://github.com/adologyai/content-intelligence/issues"
+    "url": "https://github.com/adologyai/content-intelligence-plugin/issues"
   },
   "license": "Apache-2.0",
   "licenseUrl": "./LICENSE",

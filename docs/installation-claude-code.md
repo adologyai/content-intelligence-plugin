@@ -28,7 +28,7 @@ Claude Code will prompt for the two required environment variables.
 ## Option 2: Install from a released zip
 
 1. Download `content-intelligence-<version>.zip` from
-   [https://github.com/adologyai/content-intelligence/releases](https://github.com/adologyai/content-intelligence/releases)
+   [https://github.com/adologyai/content-intelligence-plugin/releases](https://github.com/adologyai/content-intelligence-plugin/releases)
 2. Extract the archive to a location of your choice, e.g.
    `~/.claude/plugins/content-intelligence-0.1.0/`
 3. Start Claude Code, then register the extracted directory as a local
@@ -42,8 +42,8 @@ Claude Code will prompt for the two required environment variables.
 ## Option 3: Install from source (for local development)
 
 ```bash
-git clone https://github.com/adologyai/content-intelligence.git
-cd content-intelligence
+git clone https://github.com/adologyai/content-intelligence-plugin.git
+cd content-intelligence-plugin
 ```
 
 Then, from a Claude Code session started in any directory:

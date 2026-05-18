@@ -2,7 +2,7 @@
 
 ## Getting help
 
-For questions, bug reports, and feature requests, email <hello@getadology.com> or open an issue at <https://github.com/adologyai/content-intelligence/issues>.
+For questions, bug reports, and feature requests, email <hello@adologyai.com> or open an issue at <https://github.com/adologyai/content-intelligence-plugin/issues>.
 
 We aim to respond within 1 business day.
 
