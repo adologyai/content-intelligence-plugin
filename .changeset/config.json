@@ -2,7 +2,7 @@
   "$schema": "https://unpkg.com/@changesets/config@3.0.0/schema.json",
   "changelog": [
     "@changesets/changelog-github",
-    { "repo": "adologyai/content-intelligence" }
+    { "repo": "adologyai/content-intelligence-plugin" }
   ],
   "commit": false,
   "fixed": [],
