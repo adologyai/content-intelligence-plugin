@@ -1,11 +1,24 @@
 # Installing the Adology Content Intelligence Plugin
 
-This guide walks you through installing the Adology Content Intelligence plugin in your AI agent of choice. You have two options depending on the client you use:
+This guide walks you through installing the Adology Content Intelligence plugin in your AI agent of choice. Three install paths cover the supported clients:
 
 - **[Claude.ai connector](#option-a-claudeai-connector-recommended-for-most-users)** — zero-install, works in the Claude.ai web app. Recommended for most customers.
 - **[Claude Code plugin](#option-b-claude-code-plugin)** — for developers and power users running Claude Code in a terminal.
+- **[Claude Cowork plugin](#option-c-claude-cowork-plugin)** — for Claude Desktop users on macOS or Windows running the Cowork agentic workspace.
 
-Both options use the same hosted Adology MCP server (`https://mcp.adologyai.com/mcp`) and the same Adology account.
+All three paths use the same hosted Adology MCP server (`https://mcp.adologyai.com/mcp`) and the same Adology account.
+
+### Capability comparison
+
+| Capability | Claude.ai connector | Claude Code plugin | Claude Cowork plugin |
+|---|:---:|:---:|:---:|
+| 27 MCP tools (`whoami`, knowledge sets, search, analyze, …) | ✅ | ✅ | ✅ |
+| 11 domain skills (`brand-builder`, `audience-deep-dive`, …) | — | ✅ | ✅ |
+| 4 slash commands | — | ✅ | ✅ |
+| OAuth via Stytch | ✅ | ✅ | ✅ |
+| Runs on | Web (any browser) | macOS / Linux / Windows terminal | Claude Desktop on macOS / Windows |
+
+Claude.ai gives you the MCP tools but not the bundled skills and slash commands. Claude Code and Cowork install the full plugin bundle.
 
 ---
 
@@ -106,6 +119,42 @@ If OAuth hasn't completed yet, Claude Code prompts you through the sign-in flow.
 
 ---
 
+## Option C: Claude Cowork plugin
+
+For Claude Cowork users running Claude Desktop on macOS or Windows. Cowork uses Claude Desktop's built-in plugin manager rather than a CLI command.
+
+### Step 1 — Confirm prerequisites
+
+- **Claude Desktop** for macOS or Windows. Install from <https://claude.ai/download>.
+- **Cowork access** on your Claude account (Pro or Max). Cowork is desktop-only; it does not run on web or mobile.
+- You have an **Adology account** (see [Before you begin](#before-you-begin)). No API token to manage — the plugin uses OAuth 2.1.
+
+### Step 2 — Install from the plugin directory
+
+1. Open Claude Desktop and switch to the **Cowork** tab.
+2. Click **Customize** in the left sidebar.
+3. Click **Browse plugins**.
+4. Search for `Adology` or `content-intelligence` and click **Install** on the Adology Content Intelligence plugin.
+
+> **Plugin not yet in the directory?** While the listing is pending approval, install manually instead:
+>
+> 1. Download `content-intelligence-<version>.zip` from <https://github.com/adologyai/content-intelligence-plugin/releases/latest>.
+> 2. In Claude Desktop → **Cowork → Customize**, choose the option to **upload a custom plugin file** and select the downloaded zip.
+
+### Step 3 — Authenticate (first tool call)
+
+The first time Cowork calls an Adology tool, it kicks off the OAuth 2.1 flow against the hosted MCP server. A browser tab opens for you to sign in with your Adology credentials (powered by Stytch); the token is stored locally for future sessions.
+
+### Step 4 — Verify
+
+In a Cowork conversation, ask:
+
+> Use the Adology `whoami` tool and tell me which workspace I'm connected to.
+
+You should see your workspace info returned.
+
+---
+
 ## Offline install (Claude Code)
 
 If your environment can't reach GitHub from inside Claude Code (e.g., corporate proxy, air-gapped network), clone the repository on a machine that has GitHub access and point the marketplace at the local copy instead.
@@ -156,16 +205,23 @@ git pull
 /plugin install content-intelligence@adology-marketplace
 ```
 
+### Claude Cowork plugin
+
+If you installed via **Browse plugins**, Claude Desktop auto-updates the plugin to the latest version published in the directory — no action needed.
+
+If you installed via **upload a custom plugin file**, download the new `content-intelligence-<version>.zip` from <https://github.com/adologyai/content-intelligence-plugin/releases/latest> and re-upload it via Claude Desktop → Cowork → Customize.
+
 ---
 
 ## Troubleshooting
 
 ### `401 Unauthorized` or "authentication failed"
 
-Both clients use OAuth 2.1, so the recovery is the same: re-run the OAuth flow to get a fresh access token.
+All three clients use OAuth 2.1, so the recovery is the same: re-run the OAuth flow to get a fresh access token.
 
 - **Claude.ai connector**: open **Settings → Connectors**, disconnect Adology, and reconnect.
 - **Claude Code**: run `/mcp` in a session and re-authenticate the `adology` server. If the issue persists, fully quit Claude Code, relaunch, and try again — stale tokens can survive an in-session reconnect.
+- **Claude Cowork**: in Claude Desktop → **Cowork → Customize**, disable and re-enable the Adology plugin (or uninstall and reinstall). The next tool call triggers a fresh OAuth flow.
 
 ### Plugin doesn't appear in `/plugin list`
 

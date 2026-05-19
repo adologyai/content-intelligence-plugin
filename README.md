@@ -44,12 +44,13 @@ The `content-intelligence` plugin connects your AI agent to your Adology workspa
 
 ## Installation
 
-See **[`INSTALL.md`](./INSTALL.md)** for a full step-by-step guide covering both the Claude.ai connector and the Claude Code plugin.
+See **[`INSTALL.md`](./INSTALL.md)** for a full step-by-step guide covering the Claude.ai connector, Claude Code plugin, and Claude Cowork plugin install paths.
 
 Quick links:
 
 - **Claude.ai** — add `https://mcp.adologyai.com/mcp` as a custom connector under _Settings → Connectors_ and authenticate via Stytch.
 - **Claude Code** — inside a session, run `/plugin marketplace add adologyai/content-intelligence-plugin` followed by `/plugin install content-intelligence@adology-marketplace`. No clone required.
+- **Claude Cowork** — in Claude Desktop, open the **Cowork** tab → **Customize → Browse plugins** and install the Adology plugin (or upload the [latest release zip](https://github.com/adologyai/content-intelligence-plugin/releases/latest) until the directory listing is live).
 
 ## Account Setup
 
