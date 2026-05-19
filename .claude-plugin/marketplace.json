@@ -15,7 +15,7 @@
         "source": "url",
         "url": "https://github.com/adologyai/content-intelligence-plugin.git"
       },
-      "version": "0.1.0",
+      "version": "0.1.1",
       "description": "Competitive ad intelligence inside Claude and other AI agents — discover brands, build knowledge sets, analyze content, coach creators, vet influencers, and run audience deep-dives powered by Adology's data platform.",
       "shortDescription": "Competitive ad intelligence + creator coaching for marketers, powered by Adology.",
       "category": "marketing",
