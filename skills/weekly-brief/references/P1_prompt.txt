@@ -1,0 +1,182 @@
+BLOCK RECIPE: Visual Scoreboard + Intel Strip (Page 1)
+======================================================
+Page Type: Portrait 8.5×11in — Hero page with stat pills, top-6 scoreboard grid,
+           primary brand spotlight, and intel strip.
+Layout: Nav → Header Band → Stat Pills → Insight Bar → 2×3 Scoreboard Grid →
+        Primary Brand Spotlight → Intel Strip (3 cols) → Footer
+
+INPUTS
+------
+  ks_id          = [Knowledge Set ID]
+  primary_brand  = [Primary brand name, e.g. "Glossier"]
+  ks_name        = [Knowledge Set display name, e.g. "Beauty Brands"]
+  week_start     = [Monday date, e.g. "2026-03-24"]
+  week_end       = [Sunday date, e.g. "2026-03-30"]
+
+ANALYSIS PROMPT
+---------------
+
+STEP 1 — PULL TOP POSTS (Scoreboard)
+  Call Adology MCP `get_items` with:
+    - knowledgeSetId = ks_id
+    - sortBy = "engagement"
+    - limit = 20
+    - compact = true
+    - feedTypes = ["brand"]
+  This returns an array of posts sorted by engagement descending.
+  Each item contains: brand, platform, engagement, caption, thumbnailUrl, url, labels.
+
+  DEDUP LOGIC: Walk the list top-down. For each post, skip if that brand already has
+  an entry. Stop when you have 6 unique brands (excluding primary_brand).
+  Result: scoreboard[] with 6 entries, rank 1–6.
+
+STEP 2 — PULL PRIMARY BRAND TOP POST (Spotlight)
+  Call Adology MCP `get_items` with:
+    - knowledgeSetId = ks_id
+    - sortBy = "engagement"
+    - limit = 3
+    - compact = true
+    - feedTypes = ["brand"]
+    - brandFilter = [primary_brand]
+  Take the #1 result as the spotlight post.
+
+STEP 3 — DOWNLOAD THUMBNAILS → BASE64
+  For each of the 7 posts (6 scoreboard + 1 spotlight):
+    a) Get the thumbnailUrl from the Adology response.
+    b) Download the image bytes (HTTP GET).
+    c) Base64-encode: "data:image/jpeg;base64,{encoded}"
+    d) Store as thumb_b64 on the post object.
+  NOTE: All thumbnails are typically 1080×1350 or 1080×1440 (portrait 4:5 or 3:4).
+  The render package uses object-fit:contain with dark background for letterboxing.
+
+STEP 4 — SCRAPE COMMENTS (3 per post)
+  For Instagram posts:
+    Call Apify MCP `call-actor` with:
+      - actor = "louisdeconinck/instagram-comments-scraper"
+      - input = { "urls": [array of IG post URLs], "maxComments": 10 }
+    Then call `get-actor-output` to retrieve results.
+    Sort comments by likes descending, take top 3 per post.
+
+  For TikTok posts:
+    Call Apify MCP `call-actor` with:
+      - actor = "clockworks/tiktok-comments-scraper"
+      - input = { "postURLs": [array of TT post URLs], "commentsPerPost": 10 }
+    Then call `get-actor-output` to retrieve results.
+    Sort by likes descending, take top 3 per post.
+
+  Each comment: { user: "@handle", text: "comment text", likes: "249" }
+
+STEP 5 — COMPUTE AGGREGATE STATS
+  a) Call Adology MCP `aggregate_items` with:
+       - knowledgeSetId = ks_id
+       - groupBy = "brand"
+       - feedTypes = ["brand"]
+     Sum all brand counts → total_posts.
+     Count number of brands → brand_count.
+
+  b) Call Adology MCP `aggregate_items` with:
+       - knowledgeSetId = ks_id
+       - groupBy = "platform"
+       - feedTypes = ["brand"]
+     Count platforms with count > 0 → platform_count.
+
+  c) top_engagement = scoreboard[0].engagement (formatted: "187K", "1.2M", etc.)
+
+  d) leader_vs_you = Round(scoreboard[0].engagement_raw / spotlight.engagement_raw, 0)
+     Format as "{N}x"
+
+  e) organic_mentions: Call `aggregate_items` with feedTypes = ["search","discussion"].
+     Sum all counts. Format with commas.
+
+STEP 6 — PULL LABEL DISTRIBUTIONS (for Insight + Intel)
+  Call Adology MCP `get_table_data` with:
+    - knowledgeSetId = ks_id
+    - startDate = week_start
+    - endDate = week_end
+    - focalBrandName = primary_brand
+    - feedTypes = ["brand"]
+    - topLabelsPerDimension = 8
+  This returns label breakdowns including:
+    - Hook type distribution (with median engagement per hook)
+    - Creative format distribution
+    - Emotion distribution
+    - Per-brand performance vs category average
+
+  COMPUTE MULTIPLIERS:
+    For each hook type: multiplier = median_engagement / overall_median
+    Sort by multiplier descending.
+    winning_hook = highest multiplier hook
+    winning_hook_mult = its multiplier (e.g. "1.8x")
+    primary_hook = primary_brand's most-used hook
+    primary_hook_mult = that hook's multiplier
+    underused_hook = hook with multiplier > 1.3x but usage < 5%
+
+STEP 7 — EXTRACT HOOK LABEL FOR EACH POST
+  From each post's labels array, find the label in dimension "Hook" or "hook_type".
+  Combine with any creative format label.
+  Format as "Hook · Format" (e.g. "Curiosity Gap · Celebrity")
+
+STEP 8 — FORMAT PLATFORM LABELS
+  Map platform names to short codes:
+    Instagram → "IG", TikTok → "TT", YouTube → "YT", Twitter → "TW", Facebook → "FB"
+
+STEP 9 — WRITE INSIGHT BAR TEXT
+  Three tiers based on winning hook:
+  IF winning_hook_mult >= 1.5:
+    insight = "<strong>{winning_hook_pattern}</strong> is the winning formula.
+              {winning_hook} hooks at <strong>{winning_hook_mult}</strong>,
+              {winning_format} at <strong>{winning_format_mult}</strong>.
+              <strong>{primary_brand}'s {primary_hook} sits at {primary_hook_mult}</strong>
+              — {assessment}."
+    WHERE assessment:
+      IF primary_hook_mult >= 1.0: "competitive and can push higher"
+      ELIF primary_hook_mult >= 0.5: "resonating but needs amplification"
+      ELSE: "underperforming vs category"
+  ELIF winning_hook_mult >= 1.0:
+    insight = "No dominant hook this week — {winning_hook} edges ahead at
+              {winning_hook_mult}. {primary_brand}'s {primary_hook} at
+              {primary_hook_mult} is in the mix."
+  ELSE:
+    insight = "Engagement is spread evenly across hooks. {primary_brand}'s
+              {primary_hook} is performing in line with category."
+
+STEP 10 — WRITE INTEL STRIP (3 columns)
+  Column 1 — "Hook That's Winning":
+    intel_hook_stat = winning_hook_mult
+    intel_hook_text = "<strong>{winning_hook}</strong> drives {pct}% of all
+                      engagement at {winning_hook_mult} category average."
+
+  Column 2 — "Creative Momentum":
+    intel_creative_stat = winning_format_mult
+    intel_creative_text = "<strong>{winning_format}</strong> at {format_mult} avg.
+                          <strong>{underused_hook}</strong> at {underused_mult}
+                          despite only {underused_pct}% usage."
+
+  Column 3 — "AI Brief" (no stat number):
+    Synthesize a 2-sentence summary of the competitive landscape:
+    - What pattern is winning (hook + format combination)
+    - How brands without celebrity/authority are breaking through
+    - Where primary_brand sits and what needs to change
+
+STEP 11 — COUNT ACTIVE ADS
+  Call Adology MCP `get_items` with:
+    - knowledgeSetId = ks_id
+    - feedTypes = ["adLibrary"]
+    - brandFilter = [primary_brand]
+    - limit = 1
+  The total count in the response header = active_ads for primary brand.
+
+STEP 12 — COMPUTE SPOTLIGHT METRICS
+  spotlight_eng = spotlight post engagement (formatted)
+  gap_to_leader = leader_vs_you (same as stat pill)
+  active_ads = from Step 11
+  hook_performance = primary_hook_mult (e.g. "0.5x")
+  spotlight_insight = "Your {primary_hook} hook sits at {primary_hook_mult} avg —
+                      {assessment_sentence}"
+
+OUTPUT: Fill the Output Schema (P1_output_schema.yaml) with all computed fields.
+RENDER: Substitute values into the Render Package (P1_render_package.html).
+        For repeating blocks (scoreboard, comments), generate the HTML per the
+        pattern shown in the render package comments, then substitute the full
+        block into the {{scoreboard_html}} and {{spotlight_html}} placeholders.
+        Render final HTML via WeasyPrint to produce the page.

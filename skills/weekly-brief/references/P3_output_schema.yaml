@@ -1,0 +1,136 @@
+# Page 3: Social Trends + Coaching — Output Schema
+# This is an EXAMPLE produced from the Beauty Brands knowledge set.
+# Field names and structure must be followed exactly.
+
+# ── Inputs ──
+ks_id: "692e37511fab217cd6735188"
+ks_name: "Beauty Brands"
+primary_brand: "Glossier"
+week_start: "2026-03-24"
+week_end: "2026-03-30"
+week_label: "Week of March 24, 2026"
+generated_date: "March 31, 2026"
+total_posts: "4,000"
+
+# ── Creative Profile (for methodology box) ──
+dominant_hook: "Sensory Appeal (80%+)"
+dominant_format: "Product Photo"
+creative_gaps: "No nostalgia, animation, founder demos, collabs"
+
+# ── Social Trends (5 items) ──
+# Each trend includes: data proof, compact description, primary brand play,
+# and 3 clickable source links.
+# Descriptions and plays must be COMPACT (max ~60 words each) to fit on page.
+trends:
+  - num: 1
+    name: "Nostalgia Bait at Scale"
+    thumb_b64: "data:image/jpeg;base64,..."    # Downloaded from best example post
+    proof: "Nostalgia Hook at 1.8x avg · MAC 90s throwback at 35K · Charlotte Tilbury x Sarah Michelle Gellar at 24K · Rhode heritage collage at 70K"
+    links:
+      - brand: "MAC \"90s Products\" · 35K"
+        url: "https://www.instagram.com/p/DWEmuamiO8B/"
+      - brand: "Charlotte Tilbury x SMG · 24K"
+        url: "https://www.instagram.com/p/DWY_tl4jAMR/"
+      - brand: "Rhode \"Snap Into Spring\" · 70K"
+        url: "https://www.instagram.com/p/DWWoLhyFJVh/"
+    desc: "MAC's \"90s products you still dream about\" hit 35K with pure heritage storytelling. Charlotte Tilbury x Sarah Michelle Gellar (24K). Rhode's mirror selfie collage taps social proof nostalgia. Pattern: shared cultural memory → audience fills in the emotion."
+    glossier_play: "White space — your last 60 days are 100% Sensory Appeal. A <strong>\"The OG Glossier Shelf\"</strong> throwback series (2014–2016 launches, pink pouches, Balm Dotcom originals) taps brand heritage your Reddit community already references."
+
+  - num: 2
+    name: "Celebrity Founder Raw Demos"
+    thumb_b64: "data:image/jpeg;base64,..."
+    proof: "Rhode 187K · Fenty 102K · Rare Beauty 39K — all founder-led demos in top 10 this week"
+    links:
+      - brand: "Rhode — Hailey masking · 187K"
+        url: "https://www.instagram.com/p/DWUCOdjFGzx/"
+      - brand: "Fenty — Rihanna blush · 102K"
+        url: "https://www.instagram.com/p/DWWvNtslC-f/"
+      - brand: "Rare Beauty — Selena demo · 39K"
+        url: "https://www.instagram.com/p/DWbxtFui6LG/"
+    desc: "Rhode's Hailey masking (187K), Rihanna's blush application (102K), Selena's foundation demo (39K). Same format: founder + product + camera. No script, no studio — collapses the aspiration-to-trust gap."
+    glossier_play: "Zero human-led content in your last 60 days. CMO Nicole Solórzano as <strong>\"the insider who uses the product daily\"</strong> — a \"Nicole's Morning 3\" routine series differentiates through executive authenticity."
+
+  - num: 3
+    name: "Animated Brand Mascots"
+    thumb_b64: "data:image/jpeg;base64,..."
+    proof: "Fenty launched 5 animated mascots for blush line · 70K combined eng · Mascot Crew Teaser at 16K"
+    links:
+      - brand: "Fenty \"Bow Peep\" mascot · 18K"
+        url: "https://www.instagram.com/p/DWZ3cfikneH/"
+      - brand: "Fenty \"Violet Vice$\" · 19K"
+        url: "https://www.instagram.com/p/DWeqdmdjyrx/"
+      - brand: "Fenty Mascot Crew Teaser · 16K"
+        url: "https://www.instagram.com/p/DWUYa7UD9f9/"
+    desc: "Fenty created animated characters per blush shade — a pink bear for \"Bow Peep,\" a purple spy bunny for \"Violet Vice$.\" Shades become collectible identities, turning a launch into a community event."
+    glossier_play: "Think <strong>\"Glossier Doodles\"</strong>: subtle hand-drawn characters layered on product shots. Cloud Paint shades (Beam, Dusk, Storm) already have evocative names — give them visual personalities. First-ever animation in your feed."
+
+  - num: 4
+    name: "Purpose-Driven Fashion Collabs"
+    thumb_b64: "data:image/jpeg;base64,..."
+    proof: "MAC Viva Glam x Conner Ives · 100% to charity · 27K + 16K across 2 posts · Belonging + Love labels"
+    links:
+      - brand: "MAC \"Protect the Dolls\" · 27K"
+        url: "https://www.instagram.com/p/DWYj6OslHo8/"
+      - brand: "MAC x Conner Ives profile · 16K"
+        url: "https://www.instagram.com/p/DWd7SBIoBla/"
+      - brand: "MAC Dominique Jackson · 16K"
+        url: "https://www.instagram.com/p/DWg0um8CtCp/"
+    desc: "MAC x Conner Ives: \"Protect the Dolls\" lipstick with 100% charity proceeds, bold typographic visuals, 27K eng. Brand commerce fused with community values — triggers Belonging + Love emotional responses."
+    glossier_play: "Your bottle painting activation (28K eng) proved art + product + community works. <strong>Scale into a named quarterly collab series</strong> with emerging artists — limited packaging + in-store + social. Extends your experiential strength into a franchise."
+
+  - num: 5
+    name: "Cross-Category Lifestyle Collabs"
+    thumb_b64: "data:image/jpeg;base64,..."
+    proof: "Sephora x Call Her Daddy 171K · e.l.f. x Dutch Bros 37K · Sephora SEPHORiA hyper-local 18K — beauty brands breaking into culture"
+    links:
+      - brand: "Sephora x Big Al Beauty Bar · 171K"
+        url: "https://www.instagram.com/p/DWO9k8eiosN/"
+      - brand: "e.l.f. x Dutch Bros road trip · 37K"
+        url: "https://www.tiktok.com/@elfyeah/video/7620488575636884767"
+      - brand: "Sephora SEPHORiA LA · 18K"
+        url: "https://www.instagram.com/p/DWY4f1zldAn/"
+    desc: "Sephora x Call Her Daddy giveaway hit 171K merging podcast fandom with beauty retail. e.l.f. x Dutch Bros \"bestie road trip\" (37K) fused coffee culture with Gen Z beauty. Pattern: borrow another audience by meeting them in their context."
+    glossier_play: "You Soie's \"vacation state of mind\" is all product-on-sand. <strong>Partner with a lifestyle brand</strong> (boutique hotel, surf brand, indie bookshop) for a co-branded \"Glossier Getaway\" kit. Zero cross-category collabs in your last 60 days."
+
+# ── Coaching Posts (3 items) ──
+# Primary brand posts with specific optimization tweaks.
+# Each includes the data signal driving the recommendation.
+coaching:
+  - headline: "\"This is your sign to book the trip\" — You Soie launch"
+    eng: "23.9K"
+    url: "https://www.instagram.com/p/DWEvmyNleqo/"
+    current_hook: "Sensory Appeal"
+    signal: "Nostalgia Hook at 1.8x vs your Sensory Appeal at 0.5x"
+    signal_color: "#e74c3c"        # Red = significant underperformance
+    thumb_b64: "data:image/jpeg;base64,..."
+    tweak: "Same golden-hour visual, but <strong>lead with emotional memory instead of product description</strong>. Reframe caption from \"book the trip\" to <strong>\"The scent that takes you back to that summer.\"</strong> One line change moves you from Sensory Appeal (0.5x) to Nostalgia Hook (1.8x). The visual is already there — the hook framing is the unlock."
+
+  - headline: "\"Important research in progress\" — office meme"
+    eng: "27.4K"
+    url: "https://www.instagram.com/p/DVtm7AJgX__/"
+    current_hook: "Pattern Interrupt"
+    signal: "High engagement (27K) but zero product integration"
+    signal_color: "#d4d069"        # Yellow = missed opportunity
+    thumb_b64: "data:image/jpeg;base64,..."
+    tweak: "This is your <strong>highest-performing format</strong> — low-fi, meme-native humor. But it's pure awareness with no product bridge. <strong>Add a P.S. slide: \"Also we're testing a new shade — vote in Stories.\"</strong> Question hooks are at 1.6x and underused. Convert this engagement energy into product consideration without killing the vibe."
+
+  - headline: "Chrome Mirror \"perfect souvenir\" — product on beach"
+    eng: "22.7K"
+    url: "https://www.instagram.com/p/DWW_gOvAW-c/"
+    current_hook: "Curiosity Gap"
+    signal: "No human element — Founder demos driving 102K–187K for competitors"
+    signal_color: "#e74c3c"
+    thumb_b64: "data:image/jpeg;base64,..."
+    tweak: "Beautiful product styling but it's <strong>object-on-sand in a feed of object-on-sand</strong>. Your competitors' founder demos hit 102K–187K. <strong>Same mirror, same beach — but held by your CMO doing a quick \"what's in my bag\" reel.</strong> Adds the human element that turns product photography into personality-driven content. Engagement ceiling goes from 22K to 50K+."
+
+# CONSTRAINTS:
+# - trends: exactly 5, each with 3 clickable source links
+# - trend desc + glossier_play: COMPACT, max ~60 words each (page space is tight)
+# - coaching: exactly 3 primary brand posts
+# - All URLs must be real, clickable permalinks
+# - All thumb_b64 must be real downloaded + encoded images (not placeholders)
+# - signal_color: #e74c3c (red) for underperformance, #d4d069 (yellow) for missed opportunity
+# - tweak text must include <strong> tags for key phrases
+# - Trend thumbnails: 72px-wide container, portrait preferred
+# - Coaching thumbnails: 140px-tall container, portrait preferred
+# - Both use object-fit:contain with #1a1a1a dark background (letterboxing)

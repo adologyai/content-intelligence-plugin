@@ -1,0 +1,211 @@
+# Page 1: Visual Scoreboard + Intel Strip — Output Schema
+# This is an EXAMPLE produced from the Beauty Brands knowledge set.
+# Field names and structure must be followed exactly.
+
+# ── Inputs ──
+ks_id: "692e37511fab217cd6735188"
+ks_name: "Beauty Brands"
+primary_brand: "Glossier"
+week_start: "2026-03-24"
+week_end: "2026-03-30"
+week_label: "Week of March 24, 2026"
+generated_date: "March 31, 2026"
+
+# ── Aggregate Stats (Stat Pills) ──
+total_posts: "855"
+organic_mentions: "1,595"
+top_engagement: "187K"
+leader_vs_you: "7x"
+brand_count: 10
+platform_count: 5
+
+# ── Insight Bar ──
+# Uses threshold logic from STEP 9 of prompt.
+# winning_hook_mult >= 1.5 → tier 1 headline
+insight_text: "<strong>Celebrity face + seasonal moment</strong> is the winning formula. Nostalgia hooks at <strong>1.8x</strong>, live-action at <strong>1.7x</strong>. <strong>Glossier's Sensory Appeal sits at 0.5x</strong> — resonating but needs amplification."
+
+# ── Scoreboard — Top 6 Posts ──
+# Deduplicated: one post per brand, ranked by engagement descending.
+# EXCLUDE the primary brand (it goes in the spotlight instead).
+scoreboard:
+  - rank: 1
+    brand: "Rhode Skin"
+    platform: "IG"           # Short code: IG, TT, YT, TW, FB
+    headline: "masking, glowing, rhode-ing — Hailey Bieber"
+    eng: "187K"
+    eng_raw: 187000          # Raw number for gap computation
+    hook: "Curiosity Gap · Celebrity"
+    url: "https://www.instagram.com/p/DWUCOdjFGzx/"
+    thumb_b64: "data:image/jpeg;base64,/9j/4AAQ..."   # GENERATED: download thumbnailUrl → base64
+    comments:
+      - user: "@kelseybidelniyat"
+        text: "Love love love love love this shoot"
+        likes: "249"
+      - user: "@gabrielacgd"
+        text: "Are we not going to talk about how her kids did her lipliner?"
+        likes: "223"
+      - user: "@brucekasser"
+        text: "Combing the face? Please explain that one"
+        likes: "186"
+
+  - rank: 2
+    brand: "Sephora"
+    platform: "IG"
+    headline: "Big Al's Beauty Bar — 100 x $100 giveaway"
+    eng: "171K"
+    eng_raw: 171000
+    hook: "Direct Offer · Creator Collab"
+    url: "https://www.instagram.com/p/DWO9k8eiosN/"
+    thumb_b64: "data:image/jpeg;base64,..."
+    comments:
+      - user: "@mrskellysuarez"
+        text: "Sooo Big Al is @alixearle only and forever"
+        likes: "304"
+      - user: "@a_demmm"
+        text: "Wasn't big al @alixearle"
+        likes: "172"
+      - user: "@seximehehe"
+        text: "Big Al is known as @alixearle not you"
+        likes: "169"
+
+  - rank: 3
+    brand: "Fenty Beauty"
+    platform: "IG"
+    headline: "Shake 'N Play Liquid Blushes — Rihanna"
+    eng: "102K"
+    eng_raw: 102000
+    hook: "Bold Statement · Product Launch"
+    url: "https://www.instagram.com/p/DWWvNtslC-f/"
+    thumb_b64: "data:image/jpeg;base64,..."
+    comments:
+      - user: "@sayfayo"
+        text: "You just be doing anything lmao"
+        likes: "189"
+      - user: "@gabrielacgd"
+        text: "Her kids did her lipliner though"
+        likes: "223"
+      - user: "@hvley"
+        text: "give credit to @carmenbado"
+        likes: "48"
+
+  - rank: 4
+    brand: "Rare Beauty"
+    platform: "IG"
+    headline: "True to Myself — 48 shades foundation"
+    eng: "51K"
+    eng_raw: 51000
+    hook: "Inclusivity · Shade Range"
+    url: "https://www.instagram.com/p/DV_dKI5lN0A/"
+    thumb_b64: "data:image/jpeg;base64,..."
+    comments:
+      - user: "@glamzilla"
+        text: "SO MANY BEAUTIFUL FACES"
+        likes: "336"
+      - user: "@taraashafiei"
+        text: "Lovvvee the inclusivity bestieee"
+        likes: "148"
+      - user: "@princess.yaaki"
+        text: "Omgggg that's me!! 42 Deep Cool!!!"
+        likes: "85"
+
+  - rank: 5
+    brand: "MAC Cosmetics"
+    platform: "IG"
+    headline: "Which 90s MAC products are you still dreaming about?"
+    eng: "35K"
+    eng_raw: 35000
+    hook: "Nostalgia · Community Ask"
+    url: "https://www.instagram.com/p/DWEmuamiO8B/"
+    thumb_b64: "data:image/jpeg;base64,..."
+    comments:
+      - user: "@og_cakeface"
+        text: "And nothing was orange"
+        likes: "942"
+      - user: "@la.palomasanchez"
+        text: "Don't be shy. Bring back the gelees"
+        likes: "254"
+      - user: "@matty_gamboa"
+        text: "WE NEED 90's LIPS PLSSSS"
+        likes: "246"
+
+  - rank: 6
+    brand: "e.l.f. Beauty"
+    platform: "TT"
+    headline: "Flaujae 'Show Yourse.l.f.' — athlete x beauty"
+    eng: "35K"
+    eng_raw: 35000
+    hook: "Curiosity Gap · Hero's Journey"
+    url: "https://www.tiktok.com/@elfyeah/video/7621223240375012638"
+    thumb_b64: "data:image/jpeg;base64,..."
+    comments:
+      - user: "@rolltheclip._"
+        text: "Exactly what the fans want to see"
+        likes: "365"
+      - user: "@usproducts"
+        text: "We love you elf"
+        likes: "75"
+      - user: "@gretchenolson24"
+        text: "This is on point!"
+        likes: "36"
+
+# ── Primary Brand Spotlight ──
+spotlight:
+  brand: "Glossier"
+  headline: "Custom bottle painting — in-store artist collab"
+  eng: "28K"
+  eng_raw: 28000
+  platform: "IG"
+  hook: "Sensory Appeal · Experiential"
+  url: "https://www.instagram.com/p/DWedv61Ef8w/"
+  thumb_b64: "data:image/jpeg;base64,..."
+  rank_this_week: 7                  # Position if included in full ranked list
+  gap_to_leader: "6.7x"             # Round(leader_eng_raw / spotlight_eng_raw, 1)
+  active_ads: 31                     # Count of active Meta ads for primary brand
+  hook_performance: "0.5x"           # Primary brand's dominant hook multiplier
+  insight: "Your Sensory Appeal hook sits at 0.5x avg — the content is resonating locally but needs TikTok amplification to close the celebrity-founder gap."
+  comments:
+    - user: "@kookkiedoddles"
+      text: "Wish to be there and get my custom bottle"
+      likes: "1"
+    - user: "@alexislovesme"
+      text: "Oh I need my OG bottle done"
+      likes: "1"
+    - user: "@ashleyema"
+      text: "love it"
+      likes: "2"
+
+# ── Intel Strip (3 columns) ──
+intel_hook_label: "Hook That's Winning"
+intel_hook_stat: "1.8x"
+intel_hook_text: "<strong>Nostalgia Hook</strong> drives 43% of all engagement at 1.8x category average."
+
+intel_creative_label: "Creative Momentum"
+intel_creative_stat: "1.7x"
+intel_creative_text: "<strong>Live-Action</strong> at 1.7x avg. <strong>Question hooks</strong> at 1.6x despite only 4% usage."
+
+intel_brief_label: "AI Brief"
+intel_brief_text: "Celebrity face + seasonal moment wins. Brands without celebrity break through via giveaways and experiential. <strong>Glossier's Sensory Appeal at 0.5x</strong> needs amplification."
+
+# ── Label Data (used for computation, not directly rendered on P1) ──
+winning_hook: "Nostalgia Hook"
+winning_hook_mult: 1.8
+winning_format: "Live-Action"
+winning_format_mult: 1.7
+primary_hook: "Sensory Appeal"
+primary_hook_mult: 0.5
+underused_hook: "Question"
+underused_hook_mult: 1.6
+underused_hook_pct: 4.0
+
+# CONSTRAINTS:
+# - scoreboard: exactly 6 entries, one per brand, EXCLUDING primary_brand
+# - Comments: exactly 3 per post, sorted by likes descending
+# - thumb_b64: MUST be real base64 from downloaded thumbnailUrl (not a placeholder)
+# - eng: Human-readable format ("187K", "1.2M", "35K")
+# - eng_raw: Integer for computation
+# - platform: 2-letter short code (IG, TT, YT, TW, FB)
+# - hook: Extracted from Adology labels, formatted as "Hook · Format"
+# - url: Direct permalink to the post (clickable in PDF)
+# - insight_text: Uses 3-tier threshold from prompt STEP 9
+# - intel strip: 3 columns, each with label + stat + text
+# - All post URLs must be real, clickable links to Instagram/TikTok/etc

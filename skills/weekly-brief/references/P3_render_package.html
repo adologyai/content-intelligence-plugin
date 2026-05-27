@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>P3 Render Package — Social Trends + Coaching</title>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   PAGE 3: SOCIAL TRENDS TO JUMP ON + COACHING
+   Energy V4 Design System
+   Page: 8.5in × 11in (portrait)
+   Rendered via WeasyPrint (no JavaScript)
+   ═══════════════════════════════════════════════════════════════ */
+
+@page { size: 8.5in 11in; margin: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  background: #f0ead6; color: #1a1a1a; font-size: 9pt; line-height: 1.35;
+}
+
+/* ── NAV ── */
+.nav { background: #1a1a1a; color: #f0ead6; padding: 10px 32px; display: flex; justify-content: space-between; align-items: center; font-size: 7.5pt; letter-spacing: 0.5px; }
+.nav .logo { font-weight: 700; font-size: 10pt; letter-spacing: 2px; color: #c8e64a; }
+.nav .meta { color: #c5d5b5; }
+
+.page { width: 8.5in; height: 11in; padding: 0; position: relative; overflow: hidden; }
+.page-body { padding: 10px 32px 8px 32px; }
+
+.header-band { background: #1b4332; color: #f0ead6; padding: 10px 32px 7px 32px; }
+.header-band h1 { font-size: 11pt; font-weight: 700; letter-spacing: 1px; margin-bottom: 1px; }
+.header-band .primary-brand { display: inline-block; background: #c8e64a; color: #1a1a1a; padding: 2px 10px; border-radius: 3px; font-weight: 700; font-size: 7pt; letter-spacing: 1px; margin-left: 8px; }
+.header-band .subtitle { font-size: 6.5pt; color: #c5d5b5; letter-spacing: 0.5px; }
+
+.section-head { font-size: 6.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #6b8c1a; border-bottom: 2px solid #6b8c1a; padding-bottom: 2px; margin-bottom: 5px; margin-top: 3px; }
+
+/* ══════════ TREND CARDS (compact) ══════════ */
+.trend-grid { display: flex; flex-direction: column; gap: 5px; }
+.trend-card {
+  display: flex; gap: 6px; background: white; border: 1px solid #e4dfc8;
+  border-radius: 5px; overflow: hidden; padding: 0;
+}
+
+/* ── TREND THUMBNAIL ──
+   72px wide, dark bg, object-fit:contain for portrait images.
+   Numbered badge overlaid in top-left corner.
+*/
+.trend-thumb-wrap {
+  width: 72px; flex-shrink: 0; background: #1a1a1a; position: relative;
+  overflow: hidden;
+}
+.trend-thumb-wrap img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.trend-thumb-wrap .trend-number {
+  position: absolute; top: 3px; left: 3px;
+  background: #c8e64a; color: #1a1a1a; font-weight: 700;
+  font-size: 6pt; width: 15px; height: 15px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.trend-body { flex: 1; padding: 3px 6px 3px 0; }
+.trend-body .trend-name { font-size: 6.5pt; font-weight: 700; color: #1b4332; margin-bottom: 1px; }
+.trend-body .trend-proof { font-size: 4.5pt; color: #8fbc8f; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 1px; }
+.trend-body .trend-desc { font-size: 5.5pt; color: #555; line-height: 1.2; margin-bottom: 2px; }
+
+/* ── TREND SOURCE LINKS (clickable pill badges) ── */
+.trend-body .trend-links { display: flex; gap: 2px; flex-wrap: wrap; margin-bottom: 2px; }
+.trend-body .trend-links a {
+  font-size: 4.5pt; font-weight: 700; color: #6b8c1a;
+  text-decoration: none; background: #e4dfc8; padding: 1px 4px;
+  border-radius: 2px; white-space: nowrap;
+}
+
+/* ── GLOSSIER'S PLAY (dark green box) ── */
+.trend-body .glossier-play { background: #1b4332; border-radius: 3px; padding: 3px 6px; }
+.trend-body .glossier-play .play-tag { font-size: 3.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #c8e64a; margin-bottom: 1px; }
+.trend-body .glossier-play .play-text { font-size: 5pt; color: #c5d5b5; line-height: 1.2; }
+.trend-body .glossier-play .play-text strong { color: #f0ead6; }
+
+/* ══════════ COACHING CARDS ══════════ */
+.coach-grid { display: flex; gap: 6px; }
+.coach-card { flex: 1; background: white; border: 1px solid #e4dfc8; border-radius: 6px; overflow: hidden; }
+
+/* ── COACHING THUMBNAIL ──
+   140px tall, dark bg, object-fit:contain for portrait images.
+   Clickable — links to the actual post.
+*/
+.coach-card .coach-img-wrap { width: 100%; height: 140px; background: #1a1a1a; overflow: hidden; }
+.coach-card .coach-img-wrap img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+.coach-card .coach-body { padding: 4px 6px 5px 6px; }
+.coach-card .coach-headline { font-size: 5.5pt; font-weight: 700; color: #1a1a1a; line-height: 1.2; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.coach-card .coach-eng { font-size: 5pt; color: #8fbc8f; margin-bottom: 3px; }
+.coach-card .coach-signal { font-size: 4.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; padding: 1px 5px; border-radius: 2px; display: inline-block; margin-bottom: 3px; }
+.coach-card .coach-tweak { background: #1b4332; border-radius: 3px; padding: 4px 6px; }
+.coach-card .coach-tweak .tweak-label { font-size: 4pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #c8e64a; margin-bottom: 1px; }
+.coach-card .coach-tweak .tweak-text { font-size: 5.5pt; color: #c5d5b5; line-height: 1.25; }
+.coach-card .coach-tweak .tweak-text strong { color: #f0ead6; }
+
+.footer { position: absolute; bottom: 0; left: 0; right: 0; padding: 6px 32px; display: flex; justify-content: space-between; font-size: 5.5pt; color: #8fbc8f; letter-spacing: 0.5px; border-top: 1px solid #e4dfc8; }
+.footer .powered { font-weight: 700; letter-spacing: 1.5px; color: #6b8c1a; }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ── Navigation ── -->
+  <div class="nav">
+    <div class="logo">ADOLOGY</div>
+    <div class="meta">SOCIAL TRENDS &nbsp;&middot;&nbsp; {{primary_brand}} &nbsp;&middot;&nbsp; {{week_label}}</div>
+  </div>
+
+  <!-- ── Header Band ── -->
+  <div class="header-band">
+    <h1 style="font-size:11pt;">SOCIAL TRENDS TO JUMP ON <span class="primary-brand" style="font-size:7pt;">PERSONALIZED FOR {{primary_brand}}</span></h1>
+    <div class="subtitle">Analyzed via Adology Content Intelligence &nbsp;&middot;&nbsp; Top posts from across the platform &nbsp;&middot;&nbsp; Contextualized against {{primary_brand}}&rsquo;s last 60 days</div>
+  </div>
+
+  <div class="page-body" style="padding-top:8px;">
+
+    <!-- ── Methodology Box (compact, 2-column dark) ── -->
+    <div style="background:#1a1a1a; border-radius:4px; padding:4px 10px; margin-bottom:5px; display:flex; gap:8px; color:#f0ead6;">
+      <div style="flex:1;">
+        <div style="font-size:4pt; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:#c8e64a; margin-bottom:1px;">How We Found These</div>
+        <p style="font-size:5pt; line-height:1.2; color:#c5d5b5;">Scanned <strong style="color:#f0ead6;">{{total_posts}}+ posts</strong> across all brands for {{week_label}}, grouped by creative pattern, filtered for trends {{primary_brand}} hasn&rsquo;t tested, cross-referenced against <strong style="color:#f0ead6;">{{primary_brand}}&rsquo;s last 60 days</strong>.</p>
+      </div>
+      <div style="width:1px; background:rgba(255,255,255,0.1);"></div>
+      <div style="flex:0.4;">
+        <div style="font-size:4pt; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:#c8e64a; margin-bottom:1px;">Creative Profile</div>
+        <p style="font-size:5pt; line-height:1.2; color:#c5d5b5;">
+          <strong style="color:#f0ead6;">Hook:</strong> {{dominant_hook}} &middot; <strong style="color:#f0ead6;">Format:</strong> {{dominant_format}}<br>
+          <strong style="color:#f0ead6;">Gaps:</strong> {{creative_gaps}}
+        </p>
+      </div>
+    </div>
+
+    <!-- ── Trend Cards (5 compact cards) ── -->
+    <div class="trend-grid">
+      {{trends_html}}
+      <!-- REPEATING STRUCTURE FOR EACH TREND:
+      ──────────────────────────────────────
+      <div class="trend-card">
+        <div class="trend-thumb-wrap">
+          <div class="trend-number">{{num}}</div>
+          <!-- THUMBNAIL: Insert the RESIZED base64 data URI from thumbnails.json.
+               Every trend card MUST have a real thumbnail image. No fallbacks. -->
+          <img src="{{thumb_b64}}" style="width:100%;height:100%;object-fit:contain;" />
+        </div>
+        <div class="trend-body">
+          <div class="trend-name">{{name}}</div>
+          <div class="trend-proof">{{proof}}</div>
+          <div class="trend-links">
+            <a href="{{link.url}}">↗ {{link.brand}}</a>
+            [repeat for each link — typically 3 per trend]
+          </div>
+          <div class="trend-desc">{{desc}}</div>
+          <div class="glossier-play">
+            <div class="play-tag">🎯 {{primary_brand}}'s Play</div>
+            <div class="play-text">{{glossier_play}}</div>
+          </div>
+        </div>
+      </div>
+
+      THUMBNAIL: Real base64 data URI from thumbnails.json (MANDATORY).
+      Run scripts/download_thumbnails.py to get resized base64 images.
+      Insert the data URI directly into <img src="...">.
+      72px-wide container, dark bg. Trend-number badge overlays on image.
+
+      LINK NOTES:
+      - Each trend has 2-3 clickable source links
+      - Links are pill-shaped badges with ↗ prefix
+      - URL = direct permalink to the source post
+
+      TEXT NOTES:
+      - desc: max ~60 words (compact to fit page)
+      - glossier_play: max ~60 words, uses <strong> for emphasis
+      -->
+    </div>
+
+    <!-- ── Coaching Section ── -->
+    <div style="margin-top:8px;">
+      <div class="section-head" style="font-size:7pt; margin-bottom:4px;">HOW WE&rsquo;D OPTIMIZE IT &mdash; 3 {{primary_brand}} Posts, Coached</div>
+      <div class="coach-grid">
+        {{coaching_html}}
+        <!-- REPEATING STRUCTURE FOR EACH COACHING CARD:
+        ───────────────────────────────────────────────
+        <div class="coach-card">
+          <a href="{{url}}"><div class="coach-img-wrap">
+            <!-- THUMBNAIL: Insert the RESIZED base64 data URI from thumbnails.json.
+                 Every coaching card MUST have a real thumbnail image. No fallbacks. -->
+            <img src="{{thumb_b64}}" style="width:100%;height:100%;object-fit:contain;" />
+          </div></a>
+          <div class="coach-body">
+            <div class="coach-headline"><a href="{{url}}" style="color:inherit; text-decoration:none;">{{headline}}</a></div>
+            <div class="coach-eng">{{eng}} eng · {{current_hook}}</div>
+            <div class="coach-signal" style="background:{{signal_color}}; color:white;">⚡ {{signal}}</div>
+            <div class="coach-tweak">
+              <div class="tweak-label">The Tweak</div>
+              <div class="tweak-text">{{tweak}}</div>
+            </div>
+          </div>
+        </div>
+
+        THUMBNAIL: Real base64 data URI from thumbnails.json (MANDATORY).
+        Run scripts/download_thumbnails.py to get resized base64 images.
+        Insert the data URI directly into <img src="...">.
+        140px-tall container, clickable via <a href> wrapper.
+
+        SIGNAL BADGE:
+        - signal_color: #e74c3c (red) for underperformance, #d4d069 (yellow) for missed opportunity
+        - ⚡ prefix + signal text in uppercase
+
+        TWEAK BOX:
+        - Dark green (#1b4332) background
+        - "THE TWEAK" label in lime (#c8e64a)
+        - Tweak text with <strong> tags (rendered as white on dark green)
+        -->
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Footer ── -->
+  <div class="footer">
+    <div class="powered">POWERED BY ADOLOGY</div>
+    <div>Generated {{generated_date}} &nbsp;&middot;&nbsp; Page 3 of 3</div>
+  </div>
+
+</div>
+
+</body>
+</html>

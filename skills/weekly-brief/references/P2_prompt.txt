@@ -1,0 +1,138 @@
+BLOCK RECIPE: Market Signals (Page 2)
+======================================
+Page Type: Portrait 8.5×11in — Market intelligence dashboard with news headlines,
+           community sentiment, hook/brand analytics charts, paid activity, and action board.
+Layout: Nav → Header Band → [News (L) + Community (R)] → [Hook Chart + Combos (L) +
+        Brand Leaderboard + Paid Activity (R)] → Action Board (3 cards) → Footer
+
+INPUTS
+------
+  ks_id          = [Knowledge Set ID]
+  primary_brand  = [Primary brand name, e.g. "Glossier"]
+  ks_name        = [Knowledge Set display name, e.g. "Beauty Brands"]
+  week_start     = [Monday date, e.g. "2026-03-24"]
+  week_end       = [Sunday date, e.g. "2026-03-30"]
+
+ANALYSIS PROMPT
+---------------
+
+STEP 1 — PULL NEWS HEADLINES (5 items)
+  Use web search to find 4–6 industry news headlines from the past 7 days
+  relevant to the competitive set. Search queries:
+    - "{ks_name} industry news {week_start}"
+    - "{primary_brand} news"
+    - Each competitor brand name + "news"
+
+  For each headline, classify the strategic signal:
+    - "Threat"      → Competitor gaining ground (red badge, signal-threat)
+    - "Your Brand"  → News about the primary brand (green badge, signal-internal)
+                      If "Your Brand" → mark alert=true for dark-bg card
+    - "Watch"       → Industry shift to monitor (yellow badge, signal-watch)
+    - "Opportunity" → Opening for primary brand (lime badge, signal-opportunity)
+
+  Each news item:
+    { headline, source, signal_class, signal_label, url, alert (bool), so_what }
+
+  so_what = One sentence: "Why this matters for {primary_brand}. Strategic implication."
+
+STEP 2 — PULL COMMUNITY INTELLIGENCE (4 items)
+  Call Adology MCP `get_items` with:
+    - knowledgeSetId = ks_id
+    - feedTypes = ["discussion"]
+    - sortBy = "engagement"
+    - limit = 20
+
+  Scan results for discussion posts (Reddit, forums) mentioning the primary brand
+  or relevant product categories. Select the top 4 most strategically relevant.
+
+  For each clipping:
+    { theme, quote, source, so_what }
+
+  theme = Short label (3-5 words, e.g. "Your product is being duped")
+  quote = Verbatim excerpt in quotes from the post
+  source = "r/{subreddit} · {upvotes} upvotes"
+  so_what = Strategic implication for the primary brand (1 sentence)
+
+STEP 3 — COMPUTE HOOK PERFORMANCE CHART (6 rows)
+  Call Adology MCP `get_table_data` with:
+    - knowledgeSetId = ks_id
+    - startDate = week_start
+    - endDate = week_end
+    - focalBrandName = primary_brand
+    - feedTypes = ["brand"]
+    - topLabelsPerDimension = 8
+
+  From the hook distribution in the response, extract:
+    For each hook type (up to 6, sorted by median engagement descending):
+      - name: Hook type name
+      - median_likes: Median engagement for this hook
+      - usage_pct: % of posts using this hook
+      - bar_width_pct: Round(median_likes / max_median * 100, 1) — largest = 100%
+      - signal: IF usage_pct < 5 AND median_likes > category_median × 1.3:
+                  "UNDERUSED · HIGH ROI" (highlighted badge)
+                ELSE: null
+
+STEP 4 — COMPUTE HOOK × FORMAT COMBOS (4 rows)
+  From the same get_table_data response, cross-reference hook labels with
+  format labels. Identify the top 4 combinations by median engagement:
+    { combo_name, median_likes, post_count }
+
+  combo_name = "{Hook} + {Format}" (e.g. "Curiosity Gap + Branded Montage")
+  bar_width_pct = relative to the largest combo (largest = 100%)
+
+STEP 5 — COMPUTE BRAND ENGAGEMENT LEADERBOARD (up to 8 brands)
+  Call Adology MCP `aggregate_items` with:
+    - knowledgeSetId = ks_id
+    - groupBy = "brand"
+    - feedTypes = ["brand"]
+
+  For each brand, compute median likes per post (or use avg if median unavailable).
+  Sort descending. Take top 8.
+    { rank, name, median_likes, post_count, bar_width_pct, is_primary }
+
+  is_primary = true for the primary brand (highlighted row)
+  bar_width_pct = relative to largest brand (largest = 100%)
+  Header note: "This week · Organic only"
+
+STEP 6 — PULL PAID ACTIVITY (5 brands)
+  Call Adology MCP `get_items` with:
+    - knowledgeSetId = ks_id
+    - feedTypes = ["adLibrary"]
+    - sortBy = "date"
+    - limit = 50
+
+  Group by brand, count ads per brand. For each of top 5 brands by ad count:
+    { brand, count, msg, persist_label }
+
+  msg = Brief description of ad themes (from ad captions/titles)
+  persist_label = Estimated persistence:
+    IF earliest ad > 30 days old → "30+ days" (persist-high)
+    ELIF earliest ad > 7 days old → "14 days" (persist-med)
+    ELSE → "3 days" or "7 days" (persist-new)
+
+STEP 7 — GENERATE ACTION BOARD (3 cards)
+  Using all intelligence from Steps 1–6, generate three strategic actions:
+
+  Card 1 — DEFEND (forest green background):
+    What threat requires immediate response?
+    play_action = Imperative sentence (e.g. "Own 'gentle skincare' on TikTok before Rhode claims it")
+    play_detail = 2-3 sentences with specific data points from the analysis
+
+  Card 2 — ATTACK (olive background):
+    What opportunity can the brand seize this week?
+    play_action = Imperative sentence
+    play_detail = 2-3 sentences with supporting data
+
+  Card 3 — WATCH (dark background):
+    What signal should the brand monitor?
+    play_action = Imperative sentence
+    play_detail = 2-3 sentences with context
+
+STEP 8 — BUILD HTML BLOCKS
+  For repeating elements (news cards, clippings, chart rows, brand rows, ad rows,
+  play cards), generate the HTML per the patterns in the render package comments,
+  then substitute the full blocks into their placeholders.
+
+OUTPUT: Fill the Output Schema (P2_output_schema.yaml) with all computed fields.
+RENDER: Substitute values into the Render Package (P2_render_package.html).
+        Render final HTML via WeasyPrint to produce the page.
