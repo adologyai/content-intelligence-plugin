@@ -2,7 +2,7 @@
   "$schema": "https://claude.ai/schemas/plugin.json",
   "name": "content-intelligence",
   "displayName": "Adology — Content Intelligence",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Competitive ad intelligence inside Claude and other AI agents — discover brands, build knowledge sets, analyze content, coach creators, vet influencers, and run audience deep-dives powered by Adology's data platform.",
   "shortDescription": "Competitive ad intelligence + creator coaching for marketers, powered by Adology.",
   "author": {
