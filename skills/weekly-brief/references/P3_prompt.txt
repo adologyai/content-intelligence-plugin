@@ -1,0 +1,124 @@
+BLOCK RECIPE: Social Trends + Coaching (Page 3)
+================================================
+Page Type: Portrait 8.5×11in — Trend intelligence + content optimization coaching.
+Layout: Nav → Header Band → Methodology Box → 5 Trend Cards (compact) →
+        "How We'd Optimize It" Coaching Section (3 cards) → Footer
+
+INPUTS
+------
+  ks_id          = [Knowledge Set ID]
+  primary_brand  = [Primary brand name, e.g. "Glossier"]
+  ks_name        = [Knowledge Set display name, e.g. "Beauty Brands"]
+  week_start     = [Monday date, e.g. "2026-03-24"]
+  week_end       = [Sunday date, e.g. "2026-03-30"]
+
+ANALYSIS PROMPT
+---------------
+
+STEP 1 — PULL LABEL DISTRIBUTION (Primary Brand Creative Profile)
+  Call Adology MCP `get_table_data` with:
+    - knowledgeSetId = ks_id
+    - startDate = week_start
+    - endDate = week_end
+    - focalBrandName = primary_brand
+    - feedTypes = ["brand"]
+    - topLabelsPerDimension = 8
+
+  Extract primary brand's creative profile:
+    - dominant_hook: Most-used hook type (e.g. "Sensory Appeal (80%+)")
+    - dominant_format: Most-used format (e.g. "Product Photo")
+    - creative_gaps: Hook/format types with 0% usage by primary brand but >0 in category
+      (e.g. "No nostalgia, animation, founder demos, collabs")
+
+STEP 2 — IDENTIFY 5 SOCIAL TRENDS
+  Call Adology MCP `get_items` with:
+    - knowledgeSetId = ks_id
+    - sortBy = "engagement"
+    - limit = 50
+    - feedTypes = ["brand"]
+
+  Group top posts by creative pattern (hook type, format, or thematic approach).
+  Identify 5 trends that meet ALL criteria:
+    a) Multiple brands are using this pattern (not brand-specific)
+    b) The primary brand has NOT tested this pattern recently (gap from Step 1)
+    c) Posts using this pattern show above-average engagement
+    d) Each trend has 2-3 example posts with specific engagement numbers
+
+  For each trend:
+    - num: 1–5
+    - name: Short trend name (e.g. "Nostalgia Bait at Scale")
+    - proof: One-line data proof with brand names + engagement numbers
+    - desc: 2-3 sentences explaining the pattern (compact — max 60 words)
+    - glossier_play: 2-3 sentences of specific recommendation for primary brand
+      (compact — max 60 words). Must include <strong> tags for emphasis.
+    - links: Array of 3 source posts [{ brand: "Brand · eng", url: "permalink" }]
+
+STEP 3 — DOWNLOAD TREND THUMBNAILS → BASE64
+  For each of the 5 trends, pick the most visually compelling example post.
+  Download its thumbnailUrl and base64-encode it.
+    trend.thumb_b64 = "data:image/jpeg;base64,{encoded}"
+
+  NOTE: Trend thumbnails appear in small 72px-wide containers with dark bg +
+  object-fit:contain. Portrait images work best.
+
+STEP 4 — IDENTIFY 3 PRIMARY BRAND POSTS FOR COACHING
+  Call Adology MCP `get_items` with:
+    - knowledgeSetId = ks_id
+    - sortBy = "engagement"
+    - limit = 10
+    - feedTypes = ["brand"]
+    - brandFilter = [primary_brand]
+
+  Select 3 posts that have optimization potential. Ideal candidates:
+    a) High engagement but underperforming vs. what the hook/format COULD do
+    b) Missing a key element (human face, product bridge, trending hook)
+    c) A format that competitors are using more effectively
+
+  For each coaching post:
+    - headline: Post description in quotes + context
+    - eng: Engagement formatted (e.g. "23.9K")
+    - url: Direct permalink (clickable)
+    - current_hook: What hook the post currently uses
+    - signal: The data signal driving the recommendation (1 sentence)
+      e.g. "Nostalgia Hook at 1.8x vs your Sensory Appeal at 0.5x"
+    - signal_color: Badge color based on severity
+      Red (#e74c3c) = significant underperformance
+      Yellow (#d4d069) = missed opportunity
+    - tweak: Specific creative optimization (3-5 sentences with <strong> tags)
+      Must reference specific data from the analysis and give concrete creative direction.
+
+STEP 5 — DOWNLOAD COACHING THUMBNAILS → BASE64
+  For each of the 3 coaching posts, download thumbnailUrl → base64.
+    coach.thumb_b64 = "data:image/jpeg;base64,{encoded}"
+
+  NOTE: Coaching thumbnails appear in 140px-tall containers with dark bg +
+  object-fit:contain. Portrait images (1080×1350 or 1080×1440) work best.
+
+STEP 6 — WRITE METHODOLOGY BOX
+  Two-column dark box at the top of the page:
+    Left — "How We Found These":
+      "Scanned <strong>{total_posts}+ posts</strong> across all brands for
+       {week_range}, grouped by creative pattern, filtered for trends
+       {primary_brand} hasn't tested, cross-referenced against
+       <strong>{primary_brand}'s last 60 days</strong>."
+    Right — "Creative Profile":
+      "Hook: {dominant_hook} · Format: {dominant_format}
+       Gaps: {creative_gaps}"
+
+STEP 7 — BUILD HTML BLOCKS
+  For repeating elements (trend cards with links, coaching cards), generate
+  the HTML per the patterns in the render package comments, then substitute
+  the full blocks into their placeholders.
+
+  TREND CARD LINK FORMAT:
+    For each source link in a trend:
+      <a href="{{url}}">↗ {{brand · eng}}</a>
+    These appear as small pill-shaped clickable badges.
+
+  COACHING CARD FORMAT:
+    Each card has: thumbnail (clickable) → headline → eng + hook →
+    signal badge (colored) → tweak box (dark green with lime label)
+
+OUTPUT: Fill the Output Schema (P3_output_schema.yaml) with all computed fields.
+RENDER: Substitute values into the Render Package (P3_render_package.html).
+        Render final HTML via WeasyPrint to produce the page.

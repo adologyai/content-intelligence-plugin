@@ -1,0 +1,251 @@
+# Page 2: Market Signals — Output Schema
+# This is an EXAMPLE produced from the Beauty Brands knowledge set.
+# Field names and structure must be followed exactly.
+
+# ── Inputs ──
+ks_id: "692e37511fab217cd6735188"
+ks_name: "Beauty Brands"
+primary_brand: "Glossier"
+week_start: "2026-03-24"
+week_end: "2026-03-30"
+week_label: "March 24–30, 2026"
+generated_date: "March 31, 2026"
+
+# ── News Headlines (5 items) ──
+# Each tagged with strategic signal. alert=true → dark card style.
+news_items:
+  - headline: "Rhode's Sephora Debut Hits $15M in First Month"
+    source: "Global Cosmetics News · Mar 27"
+    signal_class: "signal-threat"          # CSS class for badge color
+    signal_label: "Threat"                 # Badge text
+    url: "https://www.globalcosmeticsnews.com/rhodes-sephora-debut/"
+    alert: false                           # true → dark card (signal-internal)
+    so_what: "Outpaces Rare Beauty & Fenty launch velocity. Celebrity-founder distribution is accelerating."
+
+  - headline: "Glossier Closes 9 of 12 Stores, Pivots to Hero SKU Strategy"
+    source: "Business of Fashion · Mar 25"
+    signal_class: "signal-internal"
+    signal_label: "Your Brand"
+    url: "#"
+    alert: true
+    so_what: "Re-founding playbook: fewer SKUs, fewer doors, deeper community. Execution window is now."
+
+  - headline: "Glossier Hires Nicole Solórzano (ex-Ouai) as CMO"
+    source: "Cosmetics Business · Mar 26"
+    signal_class: "signal-internal"
+    signal_label: "Your Brand"
+    url: "#"
+    alert: true
+    so_what: "New CMO with DTC + prestige experience. First 90 days = brand narrative reset."
+
+  - headline: "Estée Lauder in Talks with Puig on Combination"
+    source: "Industry Wire · Mar 28"
+    signal_class: "signal-watch"
+    signal_label: "Watch"
+    url: "#"
+    alert: false
+    so_what: "Could reshape prestige beauty ownership. MAC and Charlotte Tilbury may shift strategy."
+
+  - headline: "Sephora Opens Sephoria 2026 Brand Applications"
+    source: "Cosmetics Business · Mar 24"
+    signal_class: "signal-opportunity"
+    signal_label: "Opportunity"
+    url: "#"
+    alert: false
+    so_what: "Experiential brand moment. Glossier's bottle painting activation is a perfect fit."
+
+# ── Community Intelligence (4 items) ──
+# From discussion feeds (Reddit, forums). Strategically relevant to primary brand.
+clippings:
+  - theme: "Your product is being duped"
+    quote: "\"I immediately think of Glossier Futuredew because of the packaging.\""
+    source: "r/SkincareAddiction · 103 upvotes"
+    so_what: "Futuredew is being commoditized at Trader Joe's. Your Meta campaign is running into this headwind."
+
+  - theme: "Gentle skincare is winning"
+    quote: "\"Once you start double cleansing, you'll never go back.\""
+    source: "r/SkincareAddiction · 2,163 upvotes"
+    so_what: "The \"less is more\" ethos Glossier was built on is more relevant than ever."
+
+  - theme: "Harsh actives backlash"
+    quote: "\"I used The Ordinary BHA and my face swelled up.\" \"ICU RN here — dangerous.\""
+    source: "r/SkincareAddiction · 554 + 416 upvotes"
+    so_what: "Safety scare for The Ordinary. Glossier's gentle formulations become a trust asset."
+
+  - theme: "Culture shifting your way"
+    quote: "\"I just want you to know you look good and having fine lines at 27 is normal.\""
+    source: "r/SkincareAddiction · 435 upvotes"
+    so_what: "\"You look good\" is literally Glossier's brand thesis. Mood swinging toward acceptance."
+
+# ── Hook Performance Chart (up to 6 rows) ──
+# Sorted by median_likes descending.
+hooks:
+  - name: "Curiosity Gap"
+    median_likes: 3515
+    usage_pct: 55.6
+    bar_width_pct: 71.9            # relative to max (Nostalgia = 4889 = 100%)
+    signal: null
+  - name: "Nostalgia Hook"
+    median_likes: 4889
+    usage_pct: 4.7
+    bar_width_pct: 100.0
+    signal: "UNDERUSED · HIGH ROI" # usage < 5% AND median > 1.3x avg
+  - name: "Pattern Interrupt"
+    median_likes: 2100
+    usage_pct: 18.1
+    bar_width_pct: 42.9
+    signal: null
+  - name: "Direct Offer"
+    median_likes: 1800
+    usage_pct: 17.0
+    bar_width_pct: 36.8
+    signal: null
+  - name: "Action Command"
+    median_likes: 1400
+    usage_pct: 4.1
+    bar_width_pct: 28.6
+    signal: null
+  - name: "Urgency"
+    median_likes: 1152
+    usage_pct: 0.6
+    bar_width_pct: 23.6
+    signal: null
+
+# ── Hook × Format Combos (4 rows) ──
+# Top combinations by median engagement.
+combos:
+  - name: "Curiosity Gap + Branded Montage"
+    median_likes: 18925
+    post_count: 37
+    bar_width_pct: 100.0           # largest = 100%
+  - name: "Nostalgia Hook + Live-Action"
+    median_likes: 4889
+    post_count: 8
+    bar_width_pct: 25.8
+  - name: "Nostalgia Hook + Branded Montage"
+    median_likes: 4485
+    post_count: 7
+    bar_width_pct: 23.7
+  - name: "Curiosity Gap + Live-Action"
+    median_likes: 4050
+    post_count: 76
+    bar_width_pct: 21.4
+
+# ── Brand Engagement Leaderboard (up to 8 brands) ──
+# Median likes per post, organic only.
+brands:
+  - rank: 1
+    name: "e.l.f. Beauty"
+    median_likes: 27900
+    post_count: 50
+    bar_width_pct: 100.0           # largest = 100%
+    is_primary: false
+  - rank: 2
+    name: "Rhode Skin"
+    median_likes: 18925
+    post_count: 40
+    bar_width_pct: 67.8
+    is_primary: false
+  - rank: 3
+    name: "Sephora"
+    median_likes: 4298
+    post_count: 30
+    bar_width_pct: 15.4
+    is_primary: false
+  - rank: 4
+    name: "Glossier"
+    median_likes: 3752
+    post_count: 127
+    bar_width_pct: 13.4
+    is_primary: true               # Highlighted row
+  - rank: 5
+    name: "Charlotte Tilbury"
+    median_likes: 3398
+    post_count: 15
+    bar_width_pct: 12.2
+    is_primary: false
+  - rank: 6
+    name: "Rare Beauty"
+    median_likes: 2800
+    post_count: 73
+    bar_width_pct: 10.0
+    is_primary: false
+  - rank: 7
+    name: "NYX"
+    median_likes: 28
+    post_count: 57
+    bar_width_pct: 0.1
+    is_primary: false
+  - rank: 8
+    name: "MAC Cosmetics"
+    median_likes: 18
+    post_count: 5
+    bar_width_pct: 0.1
+    is_primary: false
+
+# ── Paid Activity (5 brands) ──
+# From Meta Ad Library. Sorted by ad count descending.
+paid:
+  - brand: "Ulta Beauty"
+    count: "279"
+    msg: "Spring sale, rewards, brand exclusives"
+    persist: "high"                # high / med / new
+    persist_label: "30+ days"
+  - brand: "Rare Beauty"
+    count: "38"
+    msg: "True to Myself, Find Comfort body care"
+    persist: "med"
+    persist_label: "14 days"
+  - brand: "Glossier"
+    count: "31"
+    msg: "Futuredew oil-serum, You Soie fragrance"
+    persist: "new"
+    persist_label: "7 days"
+  - brand: "NYX"
+    count: "24"
+    msg: "Butter Gloss vault, Fat Oil lip drip"
+    persist: "med"
+    persist_label: "14 days"
+  - brand: "Fenty Beauty"
+    count: "18"
+    msg: "Shake 'N Play launch, Fenty Fam 30% off"
+    persist: "new"
+    persist_label: "3 days"
+
+# ── Action Board (3 cards) ──
+plays:
+  - type: "Defend"
+    color_bg: "#1b4332"            # Forest green
+    color_text: "white"
+    color_accent: "#c8e64a"        # Lime
+    number: 1
+    action: "Own \"gentle skincare\" on TikTok before Rhode claims it"
+    detail: "Rhode's \"mask before makeup\" is gaining. Your Milky Jelly + Futuredew are built for this narrative. Post a \"less is more\" hero series this week — Question hooks are at 1.6x and underused."
+
+  - type: "Attack"
+    color_bg: "#6b8c1a"            # Olive
+    color_text: "white"
+    color_accent: "#c8e64a"
+    number: 2
+    action: "Submit Sephoria 2026 application with bottle painting activation"
+    detail: "Your in-store bottle painting drove 28K engagement as a local IG post. Sephoria scales that to 15K+ attendees. Applications close in 2 weeks. Experiential is your edge over celebrity-led brands."
+
+  - type: "Watch"
+    color_bg: "#1a1a1a"            # Dark
+    color_text: "white"
+    color_accent: "#c8e64a"
+    number: 3
+    action: "Monitor The Ordinary safety backlash for positioning opportunity"
+    detail: "ICU-level reactions to TO's BHA are trending on Reddit (554+ upvotes). Consumers are questioning harsh actives. Your gentle formulations become a trust asset — but only if you speak to it."
+
+# CONSTRAINTS:
+# - news_items: 4–6 items, each with signal classification
+# - clippings: 4 items from discussion feeds
+# - hooks: up to 6, sorted by median_likes descending
+# - combos: 4 rows, sorted by median_likes descending
+# - brands: up to 8, primary brand marked with is_primary: true
+# - paid: 5 brands from Meta Ad Library
+# - plays: exactly 3 (Defend, Attack, Watch)
+# - All bar_width_pct values relative to largest in their category (largest = 100%)
+# - Signal badges use CSS classes: signal-threat, signal-watch, signal-opportunity, signal-internal
+# - persist badges use CSS classes: persist-high, persist-med, persist-new

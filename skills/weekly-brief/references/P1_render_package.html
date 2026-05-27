@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>P1 Render Package — Visual Scoreboard + Intel Strip</title>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   PAGE 1: VISUAL SCOREBOARD + INTEL STRIP
+   Energy V4 Design System
+   Page: 8.5in × 11in (portrait)
+   Rendered via WeasyPrint (no JavaScript)
+   ═══════════════════════════════════════════════════════════════ */
+
+@page { size: 8.5in 11in; margin: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  background: #f0ead6; color: #1a1a1a; font-size: 9pt; line-height: 1.35;
+}
+
+/* ── NAV ── */
+.nav {
+  background: #1a1a1a; color: #f0ead6; padding: 10px 32px;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 7.5pt; letter-spacing: 0.5px;
+}
+.nav .logo { font-weight: 700; font-size: 10pt; letter-spacing: 2px; color: #c8e64a; }
+.nav .meta { color: #c5d5b5; }
+
+/* ── PAGE ── */
+.page {
+  width: 8.5in; height: 11in; padding: 0;
+  position: relative; overflow: hidden;
+}
+.page-body { padding: 10px 32px 8px 32px; }
+
+/* ── HEADER BAND ── */
+.header-band {
+  background: #1b4332; color: #f0ead6; padding: 10px 32px 7px 32px;
+}
+.header-band h1 { font-size: 12pt; font-weight: 700; letter-spacing: 1px; margin-bottom: 1px; }
+.header-band .subtitle { font-size: 6.5pt; color: #c5d5b5; letter-spacing: 0.5px; }
+.header-band .primary-brand {
+  display: inline-block; background: #c8e64a; color: #1a1a1a;
+  padding: 2px 10px; border-radius: 3px; font-weight: 700;
+  font-size: 8pt; letter-spacing: 1px; margin-left: 8px;
+}
+
+/* ── STAT PILLS ── */
+.stat-row { display: flex; gap: 6px; margin: 6px 0 6px 0; }
+.stat-pill {
+  flex: 1; background: #1a1a1a; color: #f0ead6;
+  border-radius: 5px; padding: 4px 6px; text-align: center;
+}
+.stat-pill .num { font-size: 10pt; font-weight: 700; color: #c8e64a; display: block; line-height: 1.1; }
+.stat-pill .label { font-size: 4.5pt; text-transform: uppercase; letter-spacing: 1px; color: #c5d5b5; margin-top: 0px; }
+
+/* ── SECTION HEADERS ── */
+.section-head {
+  font-size: 6.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;
+  color: #6b8c1a; border-bottom: 2px solid #6b8c1a; padding-bottom: 2px;
+  margin-bottom: 5px; margin-top: 3px;
+}
+
+/* ══════════ VISUAL SCOREBOARD — Portrait images ══════════ */
+.score-grid {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.score-card {
+  background: white;
+  border: 1px solid #e4dfc8; border-radius: 6px; overflow: hidden;
+  position: relative;
+  width: calc(33.33% - 4px);
+}
+
+/* ── PORTRAIT IMAGE CONTAINER ──
+   Thumbnails are typically 1080×1350 or 1080×1440 (portrait 4:5 or 3:4).
+   object-fit:contain with dark background creates letterboxing for
+   any aspect ratio while preserving the full image.
+*/
+.score-card a.card-img {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 180px;
+  background: #1a1a1a;
+  overflow: hidden;
+}
+.score-card a.card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center top;
+  display: block;
+}
+
+.score-card .rank-badge {
+  position: absolute; top: 6px; left: 6px;
+  background: #1a1a1a; color: #c8e64a; font-weight: 700;
+  font-size: 9pt; width: 22px; height: 22px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  z-index: 2;
+}
+.score-card .card-body { padding: 3px 6px 2px 6px; }
+.score-card .card-top-row {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.score-card .card-brand {
+  font-size: 6pt; font-weight: 700; color: #6b8c1a;
+  text-transform: uppercase; letter-spacing: 0.8px;
+}
+.score-card .card-plat {
+  font-size: 5pt; font-weight: 700; color: white; background: #6b8c1a;
+  border-radius: 2px; padding: 1px 4px; text-transform: uppercase;
+}
+.score-card .card-headline {
+  font-size: 5.5pt; color: #555; margin-top: 1px; line-height: 1.15;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.score-card .card-headline a { color: inherit; text-decoration: none; }
+.score-card .card-bottom-row {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 1px; padding-top: 1px; border-top: 1px solid #e4dfc8;
+}
+.score-card .card-eng { font-size: 8pt; font-weight: 700; color: #6b8c1a; }
+.score-card .card-hook {
+  font-size: 4.5pt; color: #8fbc8f; text-transform: uppercase; letter-spacing: 0.4px;
+}
+
+/* ── COMMENT ROWS ── */
+.card-comments {
+  padding: 2px 6px 3px 6px; border-top: 1px solid #e4dfc8;
+  background: #fafaf5;
+}
+.card-comment {
+  display: flex; align-items: baseline; gap: 3px;
+  font-size: 5pt; line-height: 1.25; margin-bottom: 0px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.card-comment:last-child { margin-bottom: 0; }
+.card-comment .cm-user { font-weight: 700; color: #6b8c1a; flex-shrink: 0; }
+.card-comment .cm-text { color: #555; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.card-comment .cm-likes { flex-shrink: 0; font-size: 4pt; color: #8fbc8f; }
+
+/* ══════════ YOUR BRAND SPOTLIGHT ══════════ */
+.brand-spotlight {
+  display: flex; gap: 8px; margin-top: 5px;
+  background: #1b4332; border: 2px solid #c8e64a; border-radius: 6px;
+  padding: 6px 8px; color: #f0ead6;
+}
+.brand-spotlight .spot-img-wrap {
+  width: 70px; height: 90px; flex-shrink: 0; background: #1a1a1a;
+  border-radius: 4px; overflow: hidden;
+}
+.brand-spotlight .spot-img-wrap img { width: 100%; height: 100%; object-fit: contain; }
+.brand-spotlight .spot-content { flex: 1; min-width: 0; }
+.brand-spotlight .spot-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
+.brand-spotlight .spot-brand { font-size: 6.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #c8e64a; }
+.brand-spotlight .spot-headline { font-size: 6pt; color: #c5d5b5; margin-bottom: 3px; }
+.brand-spotlight .spot-headline a { color: #c5d5b5; text-decoration: none; }
+.brand-spotlight .spot-stats { display: flex; gap: 10px; margin-bottom: 3px; }
+.brand-spotlight .spot-stat-num { font-size: 10pt; font-weight: 700; color: #c8e64a; }
+.brand-spotlight .spot-stat-label { font-size: 4pt; text-transform: uppercase; letter-spacing: 0.8px; color: #c5d5b5; }
+.brand-spotlight .spot-gap { font-size: 5.5pt; color: #c5d5b5; }
+.brand-spotlight .spot-gap strong { color: #f0ead6; }
+.brand-spotlight .spot-comments { margin-top: 2px; padding-top: 2px; border-top: 1px solid rgba(255,255,255,0.15); }
+.brand-spotlight .spot-comments .card-comment .cm-user { color: #c8e64a; }
+.brand-spotlight .spot-comments .card-comment .cm-text { color: #c5d5b5; }
+.brand-spotlight .spot-comments .card-comment .cm-likes { color: #8fbc8f; }
+
+/* ══════════ CREATIVE INTELLIGENCE STRIP ══════════ */
+.intel-strip {
+  background: #1a1a1a; border-radius: 6px; padding: 6px 10px;
+  display: flex; gap: 10px; margin-top: 5px; color: #f0ead6;
+}
+.intel-col { flex: 1; }
+.intel-col .intel-label {
+  font-size: 4.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+  color: #c8e64a; margin-bottom: 2px;
+}
+.intel-col p { font-size: 6pt; line-height: 1.25; color: #c5d5b5; }
+.intel-col p strong { color: #f0ead6; }
+.intel-col .intel-stat {
+  font-size: 9pt; font-weight: 700; color: #c8e64a; display: block; margin-bottom: 1px;
+}
+
+.footer {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 6px 32px; display: flex; justify-content: space-between;
+  font-size: 5.5pt; color: #8fbc8f; letter-spacing: 0.5px; border-top: 1px solid #e4dfc8;
+}
+.footer .powered { font-weight: 700; letter-spacing: 1.5px; color: #6b8c1a; }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ── Navigation ── -->
+  <div class="nav">
+    <div class="logo">ADOLOGY</div>
+    <div class="meta">COMPETITIVE INTELLIGENCE BRIEF &nbsp;&middot;&nbsp; CONFIDENTIAL</div>
+  </div>
+
+  <!-- ── Header Band ── -->
+  <div class="header-band">
+    <h1>WEEKLY COMPETITIVE RECAP <span class="primary-brand">{{primary_brand}}</span></h1>
+    <div class="subtitle">{{ks_name}} &nbsp;&middot;&nbsp; {{week_label}} &nbsp;&middot;&nbsp; {{brand_count}} brands &nbsp;&middot;&nbsp; {{platform_count}} platforms</div>
+  </div>
+
+  <div class="page-body">
+
+    <!-- ── Stat Pills ── -->
+    <div class="stat-row">
+      <div class="stat-pill"><span class="num">{{total_posts}}</span><span class="label">Brand Posts</span></div>
+      <div class="stat-pill"><span class="num">{{organic_mentions}}</span><span class="label">Organic Mentions</span></div>
+      <div class="stat-pill"><span class="num">{{top_engagement}}</span><span class="label">Top Engagement</span></div>
+      <div class="stat-pill"><span class="num">{{leader_vs_you}}</span><span class="label">Leader vs. You</span></div>
+    </div>
+
+    <!-- ── Insight Bar ──
+         {{insight_text}}: Generated via 3-tier threshold logic from prompt STEP 9.
+         Contains <strong> tags for emphasis. Rendered as raw HTML.
+    -->
+    <div style="background:#1b4332; border-radius:5px; padding:5px 10px; margin-bottom:5px; display:flex; align-items:center; gap:8px;">
+      <div style="font-size:8pt; font-weight:700; color:#c8e64a; white-space:nowrap;">THIS WEEK&rsquo;S INSIGHT</div>
+      <div style="font-size:6.5pt; color:#c5d5b5; line-height:1.25;">{{insight_text}}</div>
+    </div>
+
+    <!-- ── Section Header ── -->
+    <div class="section-head">This Week&rsquo;s Winners &mdash; Top 6 Across Brands</div>
+
+    <!-- ── Scoreboard Grid (2×3) ──
+         {{scoreboard_html}}: GENERATED block — 6 score-cards, one per brand.
+         Deduplicated (one post per brand), ranked by engagement descending.
+         Primary brand is EXCLUDED (goes in spotlight below).
+
+         REPEATING STRUCTURE FOR EACH CARD:
+         ─────────────────────────────────
+         <div class="score-card">
+           <div class="rank-badge">{{rank}}</div>
+           <a href="{{url}}" class="card-img">
+             <!-- THUMBNAIL: Insert the RESIZED base64 data URI from thumbnails.json.
+                  Run scripts/download_thumbnails.py FIRST to produce the JSON.
+                  Look up this post's thumbnail URL in the JSON to get the data URI.
+                  The image is already resized to ~150x188px and ~5-15KB. -->
+             <img src="{{thumb_b64}}" />
+           </a>
+           <div class="card-body">
+             <div class="card-top-row">
+               <div class="card-brand">{{brand}}</div>
+               <div class="card-plat">{{platform}}</div>
+             </div>
+             <div class="card-headline"><a href="{{url}}">{{headline}}</a></div>
+             <div class="card-bottom-row">
+               <div class="card-eng">{{eng}}</div>
+               <div class="card-hook">{{hook}}</div>
+             </div>
+           </div>
+           <div class="card-comments">
+             <div class="card-comment">
+               <span class="cm-user">{{comment.user}}</span>
+               <span class="cm-text">{{comment.text}}</span>
+               <span class="cm-likes">&#x2764; {{comment.likes}}</span>
+             </div>
+             [repeat for 3 comments]
+           </div>
+         </div>
+
+         THUMBNAILS:
+         - {{thumb_b64}} = base64 data URI from thumbnails.json (already resized)
+         - Run scripts/download_thumbnails.py before building this page
+         - Every card MUST have a real thumbnail image — no placeholders
+
+         COMMENTS:
+         - Try Apify scrapers first (IG: louisdeconinck/instagram-comments-scraper,
+           TT: clockworks/tiktok-comments-scraper)
+         - If Apify unavailable: use first 80 chars of post caption as comment text
+    -->
+    <div class="score-grid">
+      {{scoreboard_html}}
+    </div>
+
+    <!-- ── Primary Brand Spotlight ──
+         {{spotlight_html}}: GENERATED block for the primary brand's top post.
+
+         STRUCTURE:
+         ──────────
+         <div class="brand-spotlight">
+           <div class="spot-img-wrap">
+             <!-- THUMBNAIL: base64 data URI from thumbnails.json (already resized) -->
+             <img src="{{spotlight.thumb_b64}}" style="width:100%;height:100%;object-fit:contain;" />
+           </div>
+           <div class="spot-content">
+             <div class="spot-top">
+               <div class="spot-brand">Your Brand &mdash; {{primary_brand}}</div>
+               <div style="font-size:5pt; font-weight:700; background:#c8e64a; color:#1a1a1a; padding:1px 6px; border-radius:2px;">#{{spotlight.rank_this_week}} THIS WEEK</div>
+             </div>
+             <div class="spot-headline"><a href="{{spotlight.url}}">{{spotlight.headline}}</a> &nbsp;&middot;&nbsp; {{spotlight.hook}}</div>
+             <div class="spot-stats">
+               <div><div class="spot-stat-num">{{spotlight.eng}}</div><div class="spot-stat-label">Engagement</div></div>
+               <div><div class="spot-stat-num">{{spotlight.gap_to_leader}}</div><div class="spot-stat-label">Gap to Leader</div></div>
+               <div><div class="spot-stat-num">{{spotlight.active_ads}}</div><div class="spot-stat-label">Active Meta Ads</div></div>
+               <div><div class="spot-stat-num">{{spotlight.hook_performance}}</div><div class="spot-stat-label">Hook Performance</div></div>
+             </div>
+             <div class="spot-gap"><strong>Insight:</strong> {{spotlight.insight}}</div>
+             <div class="spot-comments">
+               [3 comment rows using .card-comment pattern — same as scoreboard]
+             </div>
+           </div>
+         </div>
+    -->
+    {{spotlight_html}}
+
+    <!-- ── Intel Strip (3 columns) ──
+         Generated from label analysis (prompt STEP 10).
+         Two columns have a big stat number; the third (AI Brief) does not.
+    -->
+    <div class="intel-strip">
+      <div class="intel-col">
+        <div class="intel-label">{{intel_hook_label}}</div>
+        <span class="intel-stat">{{intel_hook_stat}}</span>
+        <p>{{intel_hook_text}}</p>
+      </div>
+      <div class="intel-col">
+        <div class="intel-label">{{intel_creative_label}}</div>
+        <span class="intel-stat">{{intel_creative_stat}}</span>
+        <p>{{intel_creative_text}}</p>
+      </div>
+      <div class="intel-col">
+        <div class="intel-label">{{intel_brief_label}}</div>
+        <p>{{intel_brief_text}}</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Footer ── -->
+  <div class="footer">
+    <div class="powered">POWERED BY ADOLOGY</div>
+    <div>Generated {{generated_date}} &nbsp;&middot;&nbsp; Page 1 of 3</div>
+  </div>
+
+</div>
+
+</body>
+</html>
