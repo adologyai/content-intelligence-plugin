@@ -33,6 +33,23 @@ small base64 data URIs. Then you insert those data URIs into the HTML `<img>` ta
 There is no alternative to this. Do not skip thumbnails. Do not use CSS placeholders.
 Do not use colored rectangles with initials. Download the real images.
 
+## Path Conventions
+
+This skill's shell examples use two literal placeholders that you must substitute
+before running any command:
+
+- `{skill_path}` — the absolute path to this skill's directory (the directory
+  containing this `SKILL.md`). At runtime this resolves to something like
+  `/Users/<you>/.../skills/weekly-brief`. Use it to invoke bundled scripts under
+  `scripts/` and to read reference files under `references/`.
+- `{output_dir}` — the working/output directory for this brief's HTML, JSON,
+  and final PDF artifacts. Pick a fresh directory per run (e.g.
+  `outputs/<ks_name>-<week_end>/`) and substitute it consistently across the
+  whole workflow.
+
+If you see either placeholder in a command, **replace it with the actual path
+before executing**. Do not pass the literal string `{skill_path}` to a shell.
+
 ## Overview
 
 The brief has three pages:
@@ -143,6 +160,18 @@ From the Phase 1A data, collect all thumbnail URLs you need:
 - 5 trend example posts (P3) + 3 coaching posts (P3) = 8 images
 - Total: up to 15 images
 
+> **Why this skill ships its own thumbnail script (instead of using
+> `content-intelligence:thumbnails`):** the PDF assembly step embeds images
+> inline as base64 data URIs in `@page`-bounded CSS so WeasyPrint can render
+> them without re-fetching at print time. The bundled script resizes to a
+> uniform 150×188px and encodes at JPEG quality 60 specifically to fit the
+> per-page file-size budget enforced by `qa_check.py`. Use this script for the
+> standard 3-page brief. **If it fails for more than half of the URLs (Python
+> `requests` can be blocked in some sandboxes the same way `curl` is),
+> fall back to `content-intelligence:thumbnails` for the remaining URLs** and
+> manually base64-encode and resize the returned images before stitching them
+> into `thumbnails.json` in the same format the renderer expects.
+
 **Run the bundled download script:**
 
 ```bash
@@ -174,6 +203,15 @@ any `null` entries, go back to the Adology data and try an alternative thumbnail
 from the same post (some posts have multiple image URLs). If there truly is no image
 available for a post, swap that post out for the next-highest-engagement post that
 does have a thumbnail. Every card in the final report must have a real image.
+
+**Sandbox-failure fallback:** if more than half of the URLs come back `null`
+across the entire batch (likely indicates outbound HTTP is blocked, not
+per-asset failures), invoke `content-intelligence:thumbnails` for the still-
+unresolved URLs, base64-encode and resize the returned images to match the
+150×188px / quality 60 JPEG format, and merge them into `thumbnails.json`
+manually before continuing to Phase 2. Do not continue with a half-empty
+`thumbnails.json` — `qa_check.py` will FAIL the run on missing images
+(see Phase 6).
 
 ### Phase 2 — Build Page 1 (Visual Scoreboard + Intel Strip)
 
@@ -306,10 +344,15 @@ Present the final PDF with a brief summary:
 | `references/P3_output_schema.yaml` | Field names + example values for P3 | Before building P3 |
 | `references/P3_render_package.html` | HTML/CSS template for P3 | While building P3 |
 
-**Important**: The schemas contain EXAMPLE data from a "Beauty Brands" knowledge set
-(Glossier, Rhode, etc.). These are illustrative only — showing field names, formats,
-and structure. You must pull fresh data from the actual knowledge set. Never copy
-example values from the schema into the output.
+**Important — DO NOT COPY ANYTHING FROM THE EXAMPLE SCHEMAS VERBATIM.** The
+structural fields at the top of each YAML (`ks_id`, `ks_name`, `primary_brand`)
+have been deliberately replaced with `EXAMPLE_*` placeholders so it is
+syntactically obvious when they leak. The *prose* in the example outputs
+(headlines, hooks, "so what" lines, coaching narratives) still uses real brand
+names like Glossier, Rhode, MAC, and Fenty — those are kept for pedagogical
+value to show what good output prose reads like, but every word of that prose
+is fabricated. Pull all values from the actual knowledge set; never copy a
+sentence, headline, quote, or number from a schema into a real brief.
 
 ## Scripts
 

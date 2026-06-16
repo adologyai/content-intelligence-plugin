@@ -1,11 +1,18 @@
 # Page 3: Social Trends + Coaching — Output Schema
-# This is an EXAMPLE produced from the Beauty Brands knowledge set.
+#
+# !! FABRICATED EXAMPLE — every value below (brand names, headlines, quotes,
+# numbers, ks_id) is illustrative only. DO NOT copy any value verbatim into a
+# real brief. The brand names in the prose (Glossier, Rhode, MAC, Fenty,
+# Charlotte Tilbury, Rare Beauty, etc.) are part of a worked example to show
+# *voice and structure* — replace them with the actual primary brand and KS
+# competitors pulled from the live data.
+#
 # Field names and structure must be followed exactly.
 
 # ── Inputs ──
-ks_id: "692e37511fab217cd6735188"
-ks_name: "Beauty Brands"
-primary_brand: "Glossier"
+ks_id: "EXAMPLE_KS_ID"
+ks_name: "EXAMPLE_KS_NAME"
+primary_brand: "EXAMPLE_PRIMARY_BRAND"
 week_start: "2026-03-24"
 week_end: "2026-03-30"
 week_label: "Week of March 24, 2026"

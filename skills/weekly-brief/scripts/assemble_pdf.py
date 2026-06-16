@@ -75,8 +75,7 @@ def render_html_to_pdf(html_file: str, working_dir: str) -> bytes:
     Raises:
         Exception: If WeasyPrint is not available or rendering fails
     """
-    weasyprint = import_with_fallback("weasyprint", "weasyprint", "--break-system-packages")
-    if weasyprint is None:
+    if import_with_fallback("weasyprint", "weasyprint", "--break-system-packages") is None:
         raise RuntimeError(
             "Failed to install weasyprint. This likely means system dependencies are missing.\n"
             "On macOS, try: brew install cairo pango gdk-pixbuf libffi\n"
@@ -126,23 +125,24 @@ def merge_pdfs(pdf_bytes_list: list) -> bytes:
     Raises:
         Exception: If pypdf is not available or merging fails
     """
-    pypdf = import_with_fallback("pypdf", "pypdf", "--break-system-packages")
-    if pypdf is None:
+    if import_with_fallback("pypdf", "pypdf", "--break-system-packages") is None:
         raise RuntimeError("Failed to install pypdf. Cannot merge PDFs.")
 
     try:
-        from pypdf import PdfMerger
+        # PdfWriter().append(...) is the recommended API in pypdf >= 5.0.
+        # `PdfMerger` is deprecated and may be removed in a future major.
+        from pypdf import PdfWriter
         from io import BytesIO
 
-        merger = PdfMerger()
+        writer = PdfWriter()
 
         for pdf_bytes in pdf_bytes_list:
             pdf_file = BytesIO(pdf_bytes)
-            merger.append(pdf_file)
+            writer.append(pdf_file)
 
         output = BytesIO()
-        merger.write(output)
-        merger.close()
+        writer.write(output)
+        writer.close()
 
         return output.getvalue()
     except Exception as e:

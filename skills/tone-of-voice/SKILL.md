@@ -29,7 +29,7 @@ A short, vivid, useable tone of voice guide that captures *how this brand speaks
 - User is doing a brand refresh, new positioning, or relaunch and verbal identity is part of it.
 - User wants archetype work for a brand (archetypes are the foundation of this skill — treat archetype requests as voice requests).
 
-If the request is purely about writing one piece of copy (a single tagline, one email), redirect to `marketing:draft-content` or `marketing:content-creation`. This skill builds the *system*, not the artefact.
+If the request is purely about writing one piece of copy (a single tagline, one email), redirect to a content-drafting skill if one is available in the user's installed plugins (e.g. a `marketing:*` content-creation skill), or simply draft the copy directly. This skill builds the *system*, not the artefact — don't run the full archetype workflow for a one-off line of copy.
 
 ## Scope — this is a brand-wide voice guide, not a paid-social voice guide
 
@@ -159,7 +159,7 @@ This translation step matters because the archetypes are the bridge between user
 
 7. **Show your work — visual references per archetype.** For each of the top 6, include:
    - 2–3 verbatim copy examples with platform, date, and item URL
-   - At least 1 thumbnail per archetype, embedded (see `references/thumbnail_handling.md` — use the `anthropic-skills:adology-thumbnails` skill)
+   - At least 1 thumbnail per archetype, embedded (see `references/thumbnail_handling.md` — use the `content-intelligence:thumbnails` skill)
    - A one-line classification rationale ("classified as Creator because: process-talk, named technique, first-person 'we made'")
 
 **Output format for this step (present in chat, then carry into the deliverable's appendix):**

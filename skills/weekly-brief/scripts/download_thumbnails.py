@@ -48,6 +48,13 @@ def ensure_packages():
             )
 
 
+# Module-level handles populated by `main()` after `ensure_packages()` succeeds.
+# Kept as module globals (rather than per-call imports) so each call to
+# `download_and_resize` doesn't re-resolve them.
+requests = None  # type: ignore[assignment]
+Image = None     # type: ignore[assignment]
+
+
 def download_and_resize(url, max_width=150, max_height=188, quality=60):
     """
     Download an image from URL, resize it, and return a base64 data URI.
@@ -64,10 +71,11 @@ def download_and_resize(url, max_width=150, max_height=188, quality=60):
 
     Raises:
         Nothing — catches all exceptions and returns None on failure.
-    """
-    import requests
-    from PIL import Image
 
+    Note:
+        Requires `ensure_packages()` to have been called first (so that
+        the module-level `requests` and `Image` globals are populated).
+    """
     try:
         # Download with timeout
         resp = requests.get(url, timeout=15, headers={
@@ -131,8 +139,15 @@ def main():
 
     args = parser.parse_args()
 
-    # Install dependencies
+    # Install dependencies (idempotent — no-op if already installed) and
+    # bind the imports to module-level globals so `download_and_resize`
+    # doesn't have to re-import on every call.
     ensure_packages()
+    global requests, Image
+    import requests as _requests  # noqa: E402 — must come after ensure_packages
+    from PIL import Image as _Image  # noqa: E402
+    requests = _requests
+    Image = _Image
 
     results = {}
     succeeded = 0

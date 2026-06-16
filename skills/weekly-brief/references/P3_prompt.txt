@@ -7,8 +7,8 @@ Layout: Nav → Header Band → Methodology Box → 5 Trend Cards (compact) →
 INPUTS
 ------
   ks_id          = [Knowledge Set ID]
-  primary_brand  = [Primary brand name, e.g. "Glossier"]
-  ks_name        = [Knowledge Set display name, e.g. "Beauty Brands"]
+  primary_brand  = [Primary brand name, e.g. "EXAMPLE_PRIMARY_BRAND"]
+  ks_name        = [Knowledge Set display name, e.g. "EXAMPLE_KS_NAME"]
   week_start     = [Monday date, e.g. "2026-03-24"]
   week_end       = [Sunday date, e.g. "2026-03-30"]
 

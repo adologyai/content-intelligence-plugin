@@ -139,7 +139,7 @@ The audit appendix (in .docx and .pptx) must include:
 
 **Page setup:** Standard letter or A4 (ask user). Body 11pt, headings step up from there. Footer with page numbers.
 
-**Thumbnails:** include Adology source thumbnails in the audit appendix at least. Use the `anthropic-skills:adology-thumbnails` skill — bash can't fetch them directly.
+**Thumbnails:** include Adology source thumbnails in the audit appendix at least. Use the `content-intelligence:thumbnails` skill — bash can't fetch them directly.
 
 ---
 
