@@ -36,10 +36,26 @@ URL_PATTERN = re.compile(r'<a[^>]*href="([^"]*)"[^>]*>')
 PLACEHOLDER_PATTERN = re.compile(r'{{|}}')
 
 # Engagement metric patterns
-ENGAGEMENT_PATTERN = re.compile(r'\b\d+[KM]\b|\b\d{1,3}(?:,\d{3})*\b')
+# Match either:
+#   - a number with K/M suffix (optionally with a decimal): 12K, 1.2M, 800K
+#   - a number with at least one thousands separator: 1,234 or 12,345,678
+# Plain integers (font sizes like "11pt", years like "2024", structural digits
+# like <th>1</th>) are intentionally NOT matched.
+ENGAGEMENT_PATTERN = re.compile(r'\b\d+(?:\.\d+)?[KM]\b|\b\d{1,3}(?:,\d{3})+\b')
 
 # Page CSS pattern
 PAGE_CSS_PATTERN = re.compile(r'@page\s*{\s*size:\s*8\.5in\s+11in')
+
+# Page-key extractor — anchored to a `^P[1-3]_` prefix so files named
+# `Pickle1.html` or `Project1.html` do NOT inherit P1's image/size budget.
+PAGE_KEY_RE = re.compile(r'^(P[123])_', re.IGNORECASE)
+
+
+def page_key_from(filename: str) -> str | None:
+    """Return 'P1' / 'P2' / 'P3' if `filename` starts with that prefix + '_', else None."""
+    basename = os.path.basename(filename)
+    match = PAGE_KEY_RE.match(basename)
+    return match.group(1).upper() if match else None
 
 
 class QAValidator:
@@ -91,14 +107,8 @@ class QAValidator:
         Returns:
             Dict with 'status' (PASS/WARN/FAIL), image count, and validation details
         """
-        # Extract page number from filename
-        page_key = None
-        if "P1" in filename or filename.startswith("P1"):
-            page_key = "P1"
-        elif "P2" in filename or filename.startswith("P2"):
-            page_key = "P2"
-        elif "P3" in filename or filename.startswith("P3"):
-            page_key = "P3"
+        # Extract page number from filename (anchored, not substring)
+        page_key = page_key_from(filename)
 
         expected_count = EXPECTED_IMAGES.get(page_key, -1)
 
@@ -123,8 +133,21 @@ class QAValidator:
         if tiny_images > 0:
             status = "WARN"
 
-        if expected_count >= 0 and found_count != expected_count:
-            status = "WARN" if found_count > 0 else "FAIL"
+        # SKILL.md declares "Thumbnails are MANDATORY". A page that's missing
+        # any expected image is a FAIL, not a WARN. Extra images (found_count
+        # > expected_count) stay at WARN — it's a soft mismatch, not a contract
+        # violation.
+        if expected_count > 0 and found_count < expected_count:
+            status = "FAIL"
+            issues.append(
+                {
+                    "type": "count_mismatch",
+                    "expected": expected_count,
+                    "found": found_count,
+                }
+            )
+        elif expected_count >= 0 and found_count != expected_count:
+            status = "WARN" if status != "FAIL" else status
             issues.append(
                 {
                     "type": "count_mismatch",
@@ -217,15 +240,12 @@ class QAValidator:
         size_bytes = len(html_content.encode('utf-8'))
         size_kb = size_bytes / 1024
 
-        page_key = None
-        if "P1" in filename:
-            page_key = "P1"
+        page_key = page_key_from(filename)
+        if page_key == "P1":
             max_kb = 200  # Has 7 resized thumbnails (~5-15KB each)
-        elif "P2" in filename:
-            page_key = "P2"
+        elif page_key == "P2":
             max_kb = 50   # No images
-        elif "P3" in filename:
-            page_key = "P3"
+        elif page_key == "P3":
             max_kb = 200  # Has 8 resized thumbnails (~5-15KB each)
         else:
             max_kb = 200
@@ -291,6 +311,7 @@ class QAValidator:
             results["checks"]["placeholders"]["status"] == "FAIL",
             results["checks"]["page_css"]["status"] == "FAIL",
             results["checks"]["file_size_budget"]["status"] == "FAIL",
+            results["checks"]["images"]["status"] == "FAIL",
         ]
 
         if any(critical_issues):
