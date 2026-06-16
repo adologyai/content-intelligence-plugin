@@ -16,7 +16,7 @@ register one remote URL, then let the user authenticate via OAuth.
 | Transport | Remote, Streamable HTTP |
 | Endpoint | `https://mcp.adologyai.com/mcp` |
 | Auth | OAuth 2.1 (browser-based, prompted on first tool call) |
-| Prerequisite | A free Adology account — sign up at `https://adologyai.com` |
+| Prerequisite | An Adology account — sign up at `https://dash.adologyai.com` |
 | Local deps | None |
 
 ## Installation steps
