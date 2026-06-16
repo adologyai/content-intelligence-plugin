@@ -1,0 +1,17 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.json",
+  "name": "io.github.adologyai/content-intelligence-plugin",
+  "description": "Perplexity for social: competitive ad and creative intelligence, grounded in real data.",
+  "version": "0.2.0",
+  "websiteUrl": "https://adologyai.com",
+  "repository": {
+    "url": "https://github.com/adologyai/content-intelligence-plugin",
+    "source": "github"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.adologyai.com/mcp"
+    }
+  ]
+}
