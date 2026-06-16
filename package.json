@@ -1,6 +1,6 @@
 {
   "name": "content-intelligence",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "Adology Content Intelligence plugin for AI agents",
   "license": "Apache-2.0",
