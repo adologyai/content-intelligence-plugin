@@ -6,9 +6,9 @@ Layout: Nav → Header Band → Methodology Box → 5 Trend Cards (compact) →
 
 INPUTS
 ------
-  ks_id          = [Knowledge Set ID]
+  project_id     = [Project ID, from list_projects]
   primary_brand  = [Primary brand name, e.g. "EXAMPLE_PRIMARY_BRAND"]
-  ks_name        = [Knowledge Set display name, e.g. "EXAMPLE_KS_NAME"]
+  project_name   = [Project display name, e.g. "EXAMPLE_PROJECT_NAME"]
   week_start     = [Monday date, e.g. "2026-03-24"]
   week_end       = [Sunday date, e.g. "2026-03-30"]
 
@@ -16,69 +16,84 @@ ANALYSIS PROMPT
 ---------------
 
 STEP 1 — PULL LABEL DISTRIBUTION (Primary Brand Creative Profile)
-  Call Adology MCP `get_table_data` with:
-    - knowledgeSetId = ks_id
-    - startDate = week_start
-    - endDate = week_end
-    - focalBrandName = primary_brand
-    - feedTypes = ["brand"]
-    - topLabelsPerDimension = 8
+  Call `list_labels` with projectId = project_id to learn the scope's dimension
+  names, then call `get_table_data` with:
+    - projectId  = project_id
+    - rows       = [the hook dimension name]
+    - columns    = "focalVsRest"
+    - focalBrand = primary_brand
+    - feedTypes  = ["brand"]
+    - metrics    = ["count", "useRate", "medianLikes"]
+    - startDate  = week_start
+    - endDate    = week_end
+    - topN       = 15
+  Repeat with rows = [the creative/format dimension name].
 
-  Extract primary brand's creative profile:
-    - dominant_hook: Most-used hook type (e.g. "Sensory Appeal (80%+)")
-    - dominant_format: Most-used format (e.g. "Product Photo")
-    - creative_gaps: Hook/format types with 0% usage by primary brand but >0 in category
-      (e.g. "No nostalgia, animation, founder demos, collabs")
+  Extract the primary brand's creative profile from the focal column:
+    - dominant_hook: highest-useRate hook value (e.g. "Sensory Appeal (80%+)")
+    - dominant_format: highest-useRate format value (e.g. "Product Photo")
+    - creative_gaps: values where the focal column's useRate is 0 but the rest
+      column's is not (e.g. "No nostalgia, animation, founder demos, collabs")
 
 STEP 2 — IDENTIFY 5 SOCIAL TRENDS
-  Call Adology MCP `get_items` with:
-    - knowledgeSetId = ks_id
-    - sortBy = "engagement"
-    - limit = 50
-    - feedTypes = ["brand"]
+  Call `query_items` with:
+    - projectId          = project_id
+    - feedType           = ["brand"]
+    - startDate          = week_start
+    - endDate            = week_end
+    - sortBy             = "likesMultiple"
+    - outlierMetric      = "likes"
+    - minOutlierMultiple = 2
+    - limit              = 50
+  Then call `analyze` with projectId + itemIds = the ids you want to read, and
+  fields = ["hookMechanism","creativeConcept","oneLineInsight","narrativeFormat"]
+  to get the creative read plus each item's `url` and `thumbnail`.
 
-  Group top posts by creative pattern (hook type, format, or thematic approach).
+  Group those posts by creative pattern (hook value, format, or thematic approach).
   Identify 5 trends that meet ALL criteria:
     a) Multiple brands are using this pattern (not brand-specific)
     b) The primary brand has NOT tested this pattern recently (gap from Step 1)
-    c) Posts using this pattern show above-average engagement
-    d) Each trend has 2-3 example posts with specific engagement numbers
+    c) Posts using this pattern clear their source baselines (likesMultiple > 1)
+    d) Each trend has 2-3 example posts with engagement numbers AND the
+       sourceMedianLikes baseline those numbers are measured against
 
   For each trend:
     - num: 1–5
     - name: Short trend name (e.g. "Nostalgia Bait at Scale")
-    - proof: One-line data proof with brand names + engagement numbers
+    - proof: One-line data proof with brand names, lift, and the baseline behind it
     - desc: 2-3 sentences explaining the pattern (compact — max 60 words)
-    - glossier_play: 2-3 sentences of specific recommendation for primary brand
+    - brand_play: 2-3 sentences of specific recommendation for primary brand
       (compact — max 60 words). Must include <strong> tags for emphasis.
     - links: Array of 3 source posts [{ brand: "Brand · eng", url: "permalink" }]
+      using the real `url` values from the analyze response
 
 STEP 3 — DOWNLOAD TREND THUMBNAILS → BASE64
   For each of the 5 trends, pick the most visually compelling example post.
-  Download its thumbnailUrl and base64-encode it.
+  Download its `thumbnail` and base64-encode it.
     trend.thumb_b64 = "data:image/jpeg;base64,{encoded}"
+  If a post's `thumbnail` is empty, use the next example post in that trend.
 
   NOTE: Trend thumbnails appear in small 72px-wide containers with dark bg +
   object-fit:contain. Portrait images work best.
 
 STEP 4 — IDENTIFY 3 PRIMARY BRAND POSTS FOR COACHING
-  Call Adology MCP `get_items` with:
-    - knowledgeSetId = ks_id
-    - sortBy = "engagement"
-    - limit = 10
-    - feedTypes = ["brand"]
-    - brandFilter = [primary_brand]
+  Call `query_items` with the same window and sort, plus:
+    - brand = [primary_brand]
+    - limit = 20
+  Then hydrate the shortlist through `analyze` by itemIds as in Step 2.
 
   Select 3 posts that have optimization potential. Ideal candidates:
-    a) High engagement but underperforming vs. what the hook/format COULD do
+    a) Real engagement but a likesMultiple below what the hook/format achieves
+       elsewhere in the scope
     b) Missing a key element (human face, product bridge, trending hook)
     c) A format that competitors are using more effectively
 
   For each coaching post:
     - headline: Post description in quotes + context
     - eng: Engagement formatted (e.g. "23.9K")
+    - lift: likesMultiple, printed with its sourceMedianLikes baseline
     - url: Direct permalink (clickable)
-    - current_hook: What hook the post currently uses
+    - current_hook: The hook value this post carries
     - signal: The data signal driving the recommendation (1 sentence)
       e.g. "Nostalgia Hook at 1.8x vs your Sensory Appeal at 0.5x"
     - signal_color: Badge color based on severity
@@ -88,7 +103,7 @@ STEP 4 — IDENTIFY 3 PRIMARY BRAND POSTS FOR COACHING
       Must reference specific data from the analysis and give concrete creative direction.
 
 STEP 5 — DOWNLOAD COACHING THUMBNAILS → BASE64
-  For each of the 3 coaching posts, download thumbnailUrl → base64.
+  For each of the 3 coaching posts, download `thumbnail` → base64.
     coach.thumb_b64 = "data:image/jpeg;base64,{encoded}"
 
   NOTE: Coaching thumbnails appear in 140px-tall containers with dark bg +
@@ -97,10 +112,11 @@ STEP 5 — DOWNLOAD COACHING THUMBNAILS → BASE64
 STEP 6 — WRITE METHODOLOGY BOX
   Two-column dark box at the top of the page:
     Left — "How We Found These":
-      "Scanned <strong>{total_posts}+ posts</strong> across all brands for
-       {week_range}, grouped by creative pattern, filtered for trends
-       {primary_brand} hasn't tested, cross-referenced against
-       <strong>{primary_brand}'s last 60 days</strong>."
+      "Scanned <strong>{total_posts}+ posts</strong> across all tracked brands for
+       {week_range}, ranked by lift against each source's own baseline, grouped by
+       creative pattern, filtered for trends {primary_brand} hasn't tested."
+      Add the coverage line from get_project: which tracked sources are current
+      through the window, and which are covered only through an earlier date.
     Right — "Creative Profile":
       "Hook: {dominant_hook} · Format: {dominant_format}
        Gaps: {creative_gaps}"

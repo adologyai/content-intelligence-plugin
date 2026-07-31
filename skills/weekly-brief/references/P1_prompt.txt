@@ -7,118 +7,123 @@ Layout: Nav → Header Band → Stat Pills → Insight Bar → 2×3 Scoreboard G
 
 INPUTS
 ------
-  ks_id          = [Knowledge Set ID]
+  project_id     = [Project ID, from list_projects]
   primary_brand  = [Primary brand name, e.g. "EXAMPLE_PRIMARY_BRAND"]
-  ks_name        = [Knowledge Set display name, e.g. "EXAMPLE_KS_NAME"]
+  project_name   = [Project display name, e.g. "EXAMPLE_PROJECT_NAME"]
   week_start     = [Monday date, e.g. "2026-03-24"]
   week_end       = [Sunday date, e.g. "2026-03-30"]
 
 ANALYSIS PROMPT
 ---------------
 
-STEP 1 — PULL TOP POSTS (Scoreboard)
-  Call Adology MCP `get_items` with:
-    - knowledgeSetId = ks_id
-    - sortBy = "engagement"
-    - limit = 20
-    - compact = true
-    - feedTypes = ["brand"]
-  This returns an array of posts sorted by engagement descending.
-  Each item contains: brand, platform, engagement, caption, thumbnailUrl, url, labels.
+STEP 1 — RANK THE WINDOW'S OUTLIERS (Scoreboard)
+  Call `query_items` with:
+    - projectId          = project_id
+    - feedType           = ["brand"]
+    - startDate          = week_start
+    - endDate            = week_end
+    - sortBy             = "likesMultiple"
+    - outlierMetric      = "likes"
+    - minOutlierMultiple = 2
+    - limit              = 50
+  Each row carries: itemId, brand, platform, externalUrl, headline, mediaType,
+  likes/views/comments/shares, likesMultiple + sourceMedianLikes (the baseline the
+  multiple was computed against), isOutlier, boosted.
+
+  Ranking by lift rather than raw likes is deliberate: it surfaces the post that
+  beat its OWN source's baseline, so a small brand's breakout can outrank a large
+  brand's routine post — which is the point of a competitive scoreboard.
 
   DEDUP LOGIC: Walk the list top-down. For each post, skip if that brand already has
   an entry. Stop when you have 6 unique brands (excluding primary_brand).
   Result: scoreboard[] with 6 entries, rank 1–6.
 
 STEP 2 — PULL PRIMARY BRAND TOP POST (Spotlight)
-  Call Adology MCP `get_items` with:
-    - knowledgeSetId = ks_id
-    - sortBy = "engagement"
-    - limit = 3
-    - compact = true
-    - feedTypes = ["brand"]
-    - brandFilter = [primary_brand]
-  Take the #1 result as the spotlight post.
+  Call `query_items` with the same window and sort, plus:
+    - brand = [primary_brand]
+    - limit = 10
+  Take the #1 result as the spotlight post. If the brand is not tracked in this
+  project, the response comes back with an `entityScope` gap listing what IS
+  tracked — resolve the name against that list rather than reporting a zero.
 
-STEP 3 — DOWNLOAD THUMBNAILS → BASE64
-  For each of the 7 posts (6 scoreboard + 1 spotlight):
-    a) Get the thumbnailUrl from the Adology response.
+STEP 3 — HYDRATE THE 7 POSTS (thumbnails + creative)
+  Call `analyze` with:
+    - projectId   = project_id
+    - itemIds     = [the 6 scoreboard itemIds + the spotlight itemId]
+    - fields      = ["hookMechanism","creativeConcept","oneLineInsight","mediaType"]
+    - labelFields = [the hook + creative dimension names from list_labels]
+  Every returned item carries the base set, including `url` and `thumbnail`
+  (a poster image — video items resolve to their still frame).
+
+  For each of the 7 posts:
+    a) Take `thumbnail` from the analyze response.
     b) Download the image bytes (HTTP GET).
     c) Base64-encode: "data:image/jpeg;base64,{encoded}"
     d) Store as thumb_b64 on the post object.
-  NOTE: All thumbnails are typically 1080×1350 or 1080×1440 (portrait 4:5 or 3:4).
+  If `thumbnail` comes back empty, drop that post for the next-ranked one from
+  Step 1 that has an image, and re-hydrate.
+  NOTE: Thumbnails are typically 1080×1350 or 1080×1440 (portrait 4:5 or 3:4).
   The render package uses object-fit:contain with dark background for letterboxing.
 
-STEP 4 — SCRAPE COMMENTS (3 per post)
-  For Instagram posts:
-    Call Apify MCP `call-actor` with:
-      - actor = "louisdeconinck/instagram-comments-scraper"
-      - input = { "urls": [array of IG post URLs], "maxComments": 10 }
-    Then call `get-actor-output` to retrieve results.
-    Sort comments by likes descending, take top 3 per post.
-
-  For TikTok posts:
-    Call Apify MCP `call-actor` with:
-      - actor = "clockworks/tiktok-comments-scraper"
-      - input = { "postURLs": [array of TT post URLs], "commentsPerPost": 10 }
-    Then call `get-actor-output` to retrieve results.
-    Sort by likes descending, take top 3 per post.
-
+STEP 4 — COMMENT AREA
+  Use the first 80 characters of each post's `headline` as the preview text.
+  If the audience conversation for these sources is already in the pool (a
+  `fetch_comments` run has landed), read it instead with `analyze` using
+  feedTypes ["discussion"], includeComments true, and platformFilter set to the
+  post's platform — and take the highest-engagement comments per post.
   Each comment: { user: "@handle", text: "comment text", likes: "249" }
 
 STEP 5 — COMPUTE AGGREGATE STATS
-  a) Call Adology MCP `aggregate_items` with:
-       - knowledgeSetId = ks_id
-       - groupBy = "brand"
-       - feedTypes = ["brand"]
-     Sum all brand counts → total_posts.
-     Count number of brands → brand_count.
+  a) Call `aggregate` with:
+       - projectId = project_id
+       - groupBy   = ["brand"]
+       - measures  = [{ field: "*", fn: "count", as: "n" },
+                      { field: "likes", fn: "median", as: "medianLikes" }]
+       - filters   = { feedType: ["brand"], from: week_start, to: week_end }
+     Sum `n` across rows → total_posts. Count the rows → brand_count.
+     Rank only from `rows`; `directionalRows` sat below the reliability floor.
 
-  b) Call Adology MCP `aggregate_items` with:
-       - knowledgeSetId = ks_id
-       - groupBy = "platform"
-       - feedTypes = ["brand"]
-     Count platforms with count > 0 → platform_count.
+  b) Same call with groupBy = ["platform"] → platform_count (rows with n > 0).
 
-  c) top_engagement = scoreboard[0].engagement (formatted: "187K", "1.2M", etc.)
+  c) top_engagement = scoreboard[0].likes (formatted: "187K", "1.2M", etc.)
 
-  d) leader_vs_you = Round(scoreboard[0].engagement_raw / spotlight.engagement_raw, 0)
+  d) leader_vs_you = Round(scoreboard[0].likes_raw / spotlight.likes_raw, 0)
      Format as "{N}x"
 
-  e) organic_mentions: Call `aggregate_items` with feedTypes = ["search","discussion"].
-     Sum all counts. Format with commas.
+  e) organic_mentions: same `aggregate` call with
+     filters.feedType = ["search","discussion"]. Sum `n`. Format with commas.
 
 STEP 6 — PULL LABEL DISTRIBUTIONS (for Insight + Intel)
-  Call Adology MCP `get_table_data` with:
-    - knowledgeSetId = ks_id
-    - startDate = week_start
-    - endDate = week_end
-    - focalBrandName = primary_brand
-    - feedTypes = ["brand"]
-    - topLabelsPerDimension = 8
-  This returns label breakdowns including:
-    - Hook type distribution (with median engagement per hook)
-    - Creative format distribution
-    - Emotion distribution
-    - Per-brand performance vs category average
+  First call `list_labels` with projectId = project_id to learn which dimensions
+  this scope carries. Then call `get_table_data` with:
+    - projectId   = project_id
+    - rows        = [the hook dimension name]
+    - columns     = "focalVsRest"
+    - focalBrand  = primary_brand
+    - feedTypes   = ["brand"]
+    - metrics     = ["count", "useRate", "medianLikes", "viralRate"]
+    - startDate   = week_start
+    - endDate     = week_end
+    - topN        = 15
+  Repeat with rows = [the creative/format dimension name].
 
   COMPUTE MULTIPLIERS:
-    For each hook type: multiplier = median_engagement / overall_median
+    For each hook value: multiplier = medianLikes / overall median.
     Sort by multiplier descending.
-    winning_hook = highest multiplier hook
+    winning_hook      = highest multiplier hook
     winning_hook_mult = its multiplier (e.g. "1.8x")
-    primary_hook = primary_brand's most-used hook
+    primary_hook      = primary_brand's most-used hook (its focal column useRate)
     primary_hook_mult = that hook's multiplier
-    underused_hook = hook with multiplier > 1.3x but usage < 5%
+    underused_hook    = hook with multiplier > 1.3x but useRate < 5%
 
 STEP 7 — EXTRACT HOOK LABEL FOR EACH POST
-  From each post's labels array, find the label in dimension "Hook" or "hook_type".
-  Combine with any creative format label.
+  From each hydrated post's `labels`, take the value under the hook dimension.
+  Combine with the creative/format label value.
   Format as "Hook · Format" (e.g. "Curiosity Gap · Celebrity")
 
 STEP 8 — FORMAT PLATFORM LABELS
   Map platform names to short codes:
-    Instagram → "IG", TikTok → "TT", YouTube → "YT", Twitter → "TW", Facebook → "FB"
+    instagram → "IG", tiktok → "TT", youtube → "YT", twitter → "TW", facebook → "FB"
 
 STEP 9 — WRITE INSIGHT BAR TEXT
   Three tiers based on winning hook:
@@ -158,19 +163,20 @@ STEP 10 — WRITE INTEL STRIP (3 columns)
     - How brands without celebrity/authority are breaking through
     - Where primary_brand sits and what needs to change
 
-STEP 11 — COUNT ACTIVE ADS
-  Call Adology MCP `get_items` with:
-    - knowledgeSetId = ks_id
-    - feedTypes = ["adLibrary"]
-    - brandFilter = [primary_brand]
-    - limit = 1
-  The total count in the response header = active_ads for primary brand.
+STEP 11 — PAID PRESENCE FOR THE PRIMARY BRAND
+  Call `aggregate` twice over the window with groupBy ["brand"] and
+  filters.brand = [primary_brand] — once plain, once with
+  filters.excludeBoosted = true. The difference is the count of posts the brand
+  declared boosted. Report it as boosted_posts, and say the organic figures
+  exclude them.
 
 STEP 12 — COMPUTE SPOTLIGHT METRICS
-  spotlight_eng = spotlight post engagement (formatted)
-  gap_to_leader = leader_vs_you (same as stat pill)
-  active_ads = from Step 11
-  hook_performance = primary_hook_mult (e.g. "0.5x")
+  spotlight_eng     = spotlight post engagement (formatted)
+  spotlight_lift    = spotlight.likesMultiple, always printed with
+                      spotlight.sourceMedianLikes as its baseline
+  gap_to_leader     = leader_vs_you (same as stat pill)
+  boosted_posts     = from Step 11
+  hook_performance  = primary_hook_mult (e.g. "0.5x")
   spotlight_insight = "Your {primary_hook} hook sits at {primary_hook_mult} avg —
                       {assessment_sentence}"
 

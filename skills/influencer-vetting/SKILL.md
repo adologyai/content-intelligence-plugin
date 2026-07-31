@@ -2,13 +2,13 @@
 name: influencer-vetting
 description: >
   Vet, score, and select influencer/creator partners for brand campaigns using content
-  intelligence analysis. Covers the full pipeline: campaign brief intake, creator sourcing
-  (web search + Adology content intelligence), deep content analysis, evidence-based scoring,
-  and personalized brief adaptation for top picks. Use this skill whenever the user wants to
-  vet creators, evaluate influencers, find partnership candidates, score creator-brand fit,
-  build a creator shortlist, adapt a brief for specific creators, or assess whether a creator
-  is right for a campaign. Trigger on: "vet creators", "influencer vetting", "score these
-  creators", "find influencers", "creator partnerships", "is this creator a good fit",
+  intelligence. Covers the full pipeline: campaign brief intake, creator sourcing (web
+  search + handle resolution), deep content analysis in an Adology project, evidence-based
+  scoring, and personalized brief adaptation for top picks. Use this skill whenever the user
+  wants to vet creators, evaluate influencers, find partnership candidates, score creator-brand
+  fit, build a creator shortlist, adapt a brief for specific creators, or assess whether a
+  creator is right for a campaign. Trigger on: "vet creators", "influencer vetting", "score
+  these creators", "find influencers", "creator partnerships", "is this creator a good fit",
   "adapt brief for creator", "creator shortlist", "influencer scorecard", "partnership
   candidates", "vet these handles", "creator analysis", "influencer audit". Also trigger
   when someone pastes a list of social handles and wants them evaluated, or when they describe
@@ -41,7 +41,8 @@ This is the foundation. Be honest about it throughout.
 - How they integrate products and brands into content (naturally vs. forced)
 - Creative range — do they have one trick or many?
 - Posting consistency and content volume
-- Engagement patterns as a proxy for audience quality (not audience identity)
+- Engagement lift against the creator's own baseline as a proxy for audience quality
+  (not audience identity)
 - What their audience says back in comments — the texture of the community
 - How their content compares to the broader landscape in their category
 
@@ -111,16 +112,13 @@ Phase 3 with their list.
 
 ### Path B: Discovery Mode
 
-When the user wants you to find candidates, use **web search at scale** as the primary
-sourcing engine. The goal is a longlist of **30-50 candidates** — cast a wide net, then
-let Adology's content intelligence narrow it down.
+When the user wants you to find candidates, use **web search at scale** as the sourcing
+engine. The goal is a longlist of **30-50 candidates** — cast a wide net, then let the
+content analysis narrow it down.
 
-**IMPORTANT: Do NOT use Adology for sourcing.** Adology is for *studying* creators after
-you've found them. Web search finds the candidates. Adology reads their content.
-
-**1. Web search at scale (primary sourcing tool — run in parallel)**
+**1. Web search at scale (run in parallel)**
 Launch 4-6 parallel web search agents simultaneously, each targeting a different angle:
-- "[category] influencers [platform] 2025 2026"
+- "[category] influencers [platform] 2026"
 - "best [niche] creators on [platform]"
 - "[brand vertical] content creators to watch"
 - "[category] TikTok/Instagram/YouTube creators brand partnerships"
@@ -131,22 +129,66 @@ Launch 4-6 parallel web search agents simultaneously, each targeting a different
 Each parallel agent should return 10-15 candidates with handles. The model's training data
 also contains substantial knowledge about prominent creators across categories — use it.
 Think about who you know in the space. The goal is raw volume: 30-50 names with handles
-before any Adology analysis begins.
+before analysis begins.
 
-**2. User's existing knowledge set (supplement only)**
-If the user has an Adology knowledge set with influencer feeds already configured, pull
-those names from the feed list — but this supplements web search, it doesn't replace it.
+**2. Resolve names to real handles**
+A name without a verified handle is a dead end — the wrong handle silently tracks the
+wrong account. `lookup_brands` resolves a name against Adology's central directory and
+returns the platform handles it holds (Instagram / TikTok / YouTube / X / LinkedIn),
+already normalized to the shape the tracking tools accept. It's free and read-only. For
+creators the directory doesn't carry, confirm the handle from the web-search result
+itself before tracking it.
+
+**3. What the portfolio already tracks**
+Read the current tracked universe with `read_portfolio_context` — influencers already on
+the list are candidates you can analyze immediately, often without spending anything.
 
 **Discovery output:** A longlist of 30-50 candidates with handles and platforms. Present
 this to the user for a quick gut check before proceeding — they might immediately cut
 some based on context you don't have. But don't block on approval; the first-pass analysis
-(Phase 3) is designed to handle large lists efficiently with only 10 posts per creator.
+(Phase 3) is designed to handle large lists efficiently.
 
 ## Phase 3: Content Intelligence Analysis
 
 This is where the real value lives. For each candidate creator, you're reading their
 content the way a strategist reads a brand — not counting metrics, but understanding
 how they communicate and whether that communication fits the campaign.
+
+### Set Up the Working Scope
+
+Orient first: `whoami` → `list_portfolios` → `list_projects({ portfolioId })`. Reuse a
+project that already covers this campaign's space, or `create_project` for a fresh one
+("Creator Vetting: [Campaign]"). `get_project` shows exactly what a project currently
+covers — read it before you analyze, so you know whether the creators you care about are
+in scope.
+
+Track the candidates on the portfolio with `author_portfolio_context`, one item per
+creator with `kind: "influencer"` and a handles object keyed by platform:
+
+```
+upsertItems: [
+  { id: "fitcoachjess", kind: "influencer", name: "Fit Coach Jess",
+    handles: { tiktok: "fitcoachjess", instagram: "fitcoachjess" } }
+]
+```
+
+Then bring their content in with `pull_data({ projectId, candidates: [{ kind: "influencer",
+handleOrTerm: "fitcoachjess", platform: "tiktok" }, …], dateRangeDays: 90, limit: 50 })`.
+
+**`pull_data` costs nothing — it plans.** It splits your candidates into `readyNow`
+(the pool's coverage is already current; those sources are attached to the project for
+free, right now) and a gap that has to be fetched, and it quotes that gap as
+`estimatedCostCredits` with a `previewId`. Show the user both halves and the credit
+number, in plain language: "22 of your 40 creators are already covered and ready to
+analyze. The other 18 cost N credits to fetch. Want me to pull them?"
+
+**Only `confirm_pull({ previewId, projectId })` spends.** Call it only after the user
+says yes to that number. It returns a `runId` and streams in over the next minute or
+two — you don't wait for it. Analyze the ready sources meanwhile and use
+`check_pull({ runId })` when you want to report progress.
+
+If the user declines the fetch, say plainly which candidates you can score and which
+you can't, and score only the covered ones.
 
 ### Two-Pass Analysis Model
 
@@ -156,28 +198,33 @@ user decide who deserves a deeper look.
 
 #### First Pass (default — all candidates, ~10 posts each)
 
-1. **Add all 30-50 candidates as influencer feeds** in an Adology knowledge set.
-   Use `batch_add_feeds` to add them all at once.
+`analyze` is the primary tool. Run it against the project with
+`feedTypes: ["influencer"]` so brand accounts don't crowd the sample:
 
-2. **Trigger a fetch** to collect their content.
+1. **A balanced read across every creator** — `distribution: "balanced"` gives equal
+   per-feed representation, which is exactly what a fair first pass needs. Set `limit`
+   to the page size you want (max 80); read `itemsReturned`, `hasMore`, and `nextOffset`
+   and loop with `offset: nextOffset` until you've covered everyone.
+2. **Their best work** — `distribution: "top"` (tune with `sortMetric`) shows what each
+   creator does when it lands, including how they handle brand integrations.
+3. **Sponsored content specifically** — `search_all({ projectId, query: "sponsored
+   partnership ad" })` or `analyze({ mode: "semantic", query: "sponsored brand
+   partnership disclosure" })` surfaces how they've handled past deals.
+4. **Their outliers** — `outlierFilter: { metric: "likes", multipleGreaterThan: 3 }`
+   keeps only the posts that beat the creator's own baseline. This is the fastest read
+   on what actually works for them.
 
-3. **Analyze with a balanced distribution** pulling ~10 posts per creator. Use `analyze`
-   with `distribution: "balanced"` and set `limit` to roughly (number_of_creators × 10).
-
-4. **Also pull top-performing content** with `distribution: "top"` to see each creator's
-   best work and any brand integrations.
-
-5. **Also search specifically for sponsored content** using `search_items` with queries
-   like "#ad sponsored brand partnership" to assess brand integration patterns.
+Narrow to one creator at any point with `feedNames: ["Fit Coach Jess"]`.
 
 **Tell the user this is a first pass.** Say something like: "I'm doing a first-pass vet
 across all [N] creators — analyzing ~10 posts each to score everyone at a consistent
 depth. Once you see the rankings, let me know if you want me to go deeper on any
-specific creators (I can pull 30-50+ posts for a more thorough read)."
+specific creators."
 
-**CRITICAL: Request the FULL field set for every post, even on the first pass.** 10 posts
-is a small sample — you need maximum signal from each one. Don't cut corners on fields
-to save tokens. Every post gets the complete analysis:
+**Request the FULL field set for every post, even on the first pass.** Ten posts is a
+small sample — you need maximum signal from each one. Every item already carries the base
+set (id, brand, feedType, platform, headline, likes, views, shares, comments, isOutlier,
+outlierType, likesMultiple, createdAt, url, thumbnail); ask for the rest:
 
 ```
 fields: [
@@ -192,8 +239,9 @@ fields: [
   "oneLineInsight", "noteworthy",
   "targetAudienceAge", "targetAudienceGender", "targetAudienceLifestyle",
   "ctaText", "ctaFraming", "offerType", "offerDelivery",
-  "transcript", "adDescription",
-  "mediaType", "thumbnail", "url"
+  "transcript", "adDescription", "mediaType",
+  "viewsMultiple", "commentsMultiple", "sharesMultiple",
+  "sourceMedianLikes", "sourceMedianViews", "sourceItemCount"
 ]
 ```
 
@@ -210,6 +258,9 @@ you whether they're storytellers, educators, entertainers, or commentators. The
 `productDisplayStyle` tells you how they integrate brands. Read these like a portfolio
 review, not a data table.
 
+The `sourceMedian*` fields are the denominators behind the `*Multiple` lift numbers.
+Never cite a "4x" without the baseline it's 4x of.
+
 **10 posts with full fields is enough to:** identify their dominant content style, read
 their actual voice and vocabulary, spot brand integration patterns, assess engagement
 consistency, and evaluate voice/aesthetic fit. It's NOT enough to catch rare content types
@@ -219,19 +270,47 @@ or build high-confidence engagement statistics — that's what the deep-dive is 
 
 When the user says "go deeper on [creator]" or "I want more detail on [creator]":
 
-1. Pull 30-50 posts using `analyze` with `feedNames: ["Creator Name"]` and higher `limit`.
-2. Pull label distributions via `get_table_data` for that creator specifically.
-3. Use `get_item_detail` for their top 3-5 posts to get full transcripts and descriptions.
-4. Search for all their sponsored content specifically.
+1. Page the creator's full set: `analyze({ feedNames: ["Creator Name"], distribution:
+   "exhaustive", sortBy: "likesMultiple" })` — the deterministic ranked page over
+   everything that matches, with `totalEstimated` and `nextOffset` so you can walk it all.
+2. Quantify their label patterns with `get_table_data` — `rows` set to the dimensions
+   that matter (Hook, Creative, Production, Narrative, Emotion, CTA), `columns:
+   "focalVsRest"` with `focalBrand` set to the creator, which shows where their choices
+   diverge from everyone else in the project. Discover the available dimensions with
+   `get_table_data({ projectId, listDimensions: true })` or `list_labels`.
+3. Deep-dive individual posts with `analyze({ itemIds: [...] })` — full creative, labels,
+   and performance for specific items.
+4. Ask what structurally drives their performance with `get_creative_dna({ projectId,
+   feedTypes: ["influencer"], feedNames: ["Creator Name"] })` — it returns which label
+   combinations carry real lift once the marginal averages are controlled, plus emerging
+   and fading patterns when you pass a date range.
 5. Produce a richer scorecard with more evidence citations and higher confidence scores.
 
 Don't dump label distributions into the scorecard. Labels are the scaffolding, not the
 insight.
 
-**If Adology is not available or the creator isn't tracked:**
-Use web search to find and assess their content. You can evaluate content quality, brand
-voice, and creative approach from what you observe directly — it's less structured but
-still valuable.
+### Audience Voice (Optional, Costs Credits)
+
+Comment texture is the strongest available read on whether an audience is real and
+engaged. To get it for tracked TikTok/Instagram creators, run `fetch_comments`.
+
+It is a two-step, consent-gated spend. Call it FIRST without `confirmedByUser` — it
+returns a real quote (`estimatedCredits`, `quoteToken`, the sources it would cover) and
+charges nothing. Relay that exact number; never guess one. Only after the user approves,
+call again with `confirmedByUser: true`, the `quoteToken` echoed verbatim, `maxCredits`
+set to exactly the amount they approved, and the identical `sources`/`maxComments`.
+
+By default it targets every commentable source in the project's scope and charges for
+all of them. To fetch comments for just two creators, narrow with `sources`, or pin the
+project first with `update_project_scope({ projectId, replace: [...] })`.
+
+The run is async. A couple of minutes later, read the landed comments with
+`analyze({ projectId, feedTypes: ["discussion"], includeComments: true, platformFilter:
+["tiktok"] })` — one call per platform. Without `includeComments: true` the default read
+fences social comments out and returns nothing.
+
+If the user doesn't want to spend on comments, say so in the scorecard and lean on
+engagement consistency instead.
 
 ### What You're Reading For
 
@@ -291,9 +370,9 @@ You can't see audience demographics from content data alone. But you can read pr
 - **Comment quality** — Are comments specific and personal ("I tried this after your last
   video and it actually worked for my skin type"), or generic ("Love this!" "Fire 🔥")?
   Specific comments indicate real humans who actually watch and care.
-- **Engagement consistency** — Steady engagement across posts suggests a real audience.
-  Wild swings (some posts get 50 comments, others get 2) may indicate algorithmic
-  dependence or engagement manipulation.
+- **Engagement consistency** — Steady lift across posts (`likesMultiple`, `viewsMultiple`
+  clustering near 1x with occasional spikes) suggests a real audience. Wild swings may
+  indicate algorithmic dependence or engagement manipulation.
 - **Community feel** — Does the creator respond to comments? Do commenters talk to each
   other? A real community is a powerful distribution asset.
 - **Posting consistency** — Regular posting cadence suggests a creator who takes this
@@ -476,8 +555,12 @@ The final deliverable is an HTML report (rendered in browser or converted to PDF
    other means.
 
 **Design:** Clean, editorial, scannable. Think Notion document, not PowerPoint deck.
-Thumbnails should be embedded (base64) so the file is self-contained. Use the same
-aesthetic approach as the weekly brief — warm, professional, readable.
+Use the `content-intelligence:thumbnails` skill to embed post thumbnails so the file is
+self-contained. Same aesthetic approach as the weekly brief — warm, professional, readable.
+
+Offer to save the shortlist's reference posts with `save_to_collection({ projectId,
+collectionName: "Creator Shortlist — [Campaign]", itemIds })` so the evidence stays
+attached to the portfolio after the report ships.
 
 ## Handling Edge Cases
 
@@ -499,33 +582,46 @@ each for all candidates) → present rankings → user picks who to deep-dive �
 deep-dive on selected creators → Phase 4-5 on the final set.
 
 **"Go deeper on [creator]"** — After the first-pass rankings, the user can request a
-deep-dive on specific creators. Pull 30-50+ posts, full label distributions, and detailed
-transcripts. Re-score with higher confidence.
+deep-dive on specific creators. Page their full set, pull label distributions, run
+`get_creative_dna`. Re-score with higher confidence.
 
 **Limited data (first pass)** — The first pass uses ~10 posts per creator. This is
 intentional — it's enough for a directional score but not enough for high confidence.
 Note this explicitly on every first-pass scorecard: "First-pass score based on ~10 posts.
 Confidence: directional. Request a deep-dive for higher-confidence assessment."
 
-**Limited data (fetch returned few posts)** — If a creator has fewer than 5 posts in
-the fetch, flag it: "Only [N] posts available. Score confidence: low. This creator may
-be inactive, new, or have a very low posting cadence."
+**Limited data (few posts available)** — If a creator has fewer than 5 posts in the
+project, flag it: "Only [N] posts available. Score confidence: low. This creator may
+be inactive, new, or have a very low posting cadence." Check `get_project` — the creator
+may be tracked with coverage that ended a while ago, in which case a `pull_data` refresh
+(quoted, user-approved) brings in newer activity.
 
-## Tool Roles (Important — Use the Right Tool for the Right Job)
+**A creator the project doesn't track** — every read answers about the project's
+scope. If a name comes back unresolved, that creator isn't tracked yet: add
+them with `author_portfolio_context`, then `pull_data`. Never present an empty result
+as "this creator has no good content."
 
-### Web Search — SOURCING (finding candidates)
-Web search is the **only** tool for sourcing creators. Run 4-6 parallel search agents
-to find 30-50 candidates. Adology does NOT source creators.
+## Tool Roles (Use the Right Tool for the Right Job)
 
-### Adology — STUDYING (analyzing candidates' content)
-Adology is the tool for studying creators AFTER web search has found them. The workflow:
-1. `batch_add_feeds` — Add all sourced creators as influencer feeds in a knowledge set
-2. `trigger_fetch` — Collect their content
-3. `analyze` — First-pass analysis (~10 posts per creator, balanced distribution)
-4. `analyze` (distribution: "top") — See each creator's best-performing content
-5. `search_items` — Find sponsored/brand integration content specifically
-6. `get_item_detail` — Deep dive on specific posts (deep-dive phase only)
-7. `get_table_data` — Label distributions for specific creators (deep-dive phase only)
+**Web search — sourcing.** Finds candidate names and handles. Run 4-6 parallel search
+agents for 30-50 candidates.
 
-### WeasyPrint — OUTPUT
-HTML-to-PDF conversion if PDF output is requested.
+**`lookup_brands` — handle resolution.** Free, read-only. Turns a name into the real
+platform handles before you track anything.
+
+**Adology project tools — studying.** After candidates are sourced:
+1. `whoami` / `list_portfolios` / `list_projects` / `get_project` — orient and see scope
+2. `author_portfolio_context` — track the creators as `kind: "influencer"`
+3. `pull_data` → (user approves the quote) → `confirm_pull` → `check_pull` — acquire content
+4. `analyze` — the workhorse: balanced/top/recent sampling, `exhaustive` for ranked pages,
+   `mode: "semantic"` for meaning-based recall, `itemIds` for per-post deep dives
+5. `search_all` — keyword search across the project's scope
+6. `get_table_data` / `list_labels` — quantify label patterns, `focalVsRest` per creator
+7. `get_creative_dna` — what structurally drives a creator's performance
+8. `aggregate` — volume, cadence, and platform mix over time
+9. `fetch_comments` — audience voice, quoted and user-approved before it charges
+10. `save_to_collection` — keep the evidence set
+
+**`content-intelligence:thumbnails` — visuals.** Embeds post thumbnails in the report.
+
+**WeasyPrint — output.** HTML-to-PDF conversion if PDF output is requested.

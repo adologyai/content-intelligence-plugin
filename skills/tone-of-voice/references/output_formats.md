@@ -72,7 +72,7 @@ The audit appendix (in .docx and .pptx) must include:
 ```
 
 **Design principles:**
-- Restrained palette — two accent colours plus neutrals. Let the writing be the visual.
+- Restrained palette — two accent colors plus neutrals. Let the writing be the visual.
 - Typography matters. A sans-serif headline and a readable body face. Don't use the brand's actual fonts unless the user supplies them — use sensible defaults (Inter, Söhne, Söhne Buch, or system stack).
 - Generous whitespace. A voice guide that looks crammed reads as not-thought-through.
 - One screen scroll should reveal one major section — pacing matters.
@@ -206,7 +206,7 @@ The audit appendix (in .docx and .pptx) must include:
 - **Cite Adology sources** for every "before" example used in the reworked copy section. A short footnote or link is enough.
 - **Show the archetype, don't just name it.** Every claim about how the brand should sound needs a concrete verbal example.
 - **Length discipline.** A great voice guide fits on 3–6 pages of document, one HTML scroll, or 20–25 slides. Longer than that and it won't be read.
-- **Test before delivery.** Read the guide aloud. If a principle is hard to apply ("be authentic"), rewrite it as a behaviour ("use 'I' when speaking on behalf of the founder").
+- **Test before delivery.** Read the guide aloud. If a principle is hard to apply ("be authentic"), rewrite it as a behavior ("use 'I' when speaking on behalf of the founder").
 
 ---
 

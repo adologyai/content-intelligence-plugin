@@ -2,7 +2,7 @@
 name: creative-toolkit
 description: >
   Builds a living creative toolkit for a campaign or brand — a curated library of hooks, angles,
-  copy lines, scripts, and content concepts sourced from competitor analysis, Reddit/audience
+  copy lines, scripts, and content concepts sourced from competitor analysis, audience
   conversations, and top-performing content. First extracts the brand's voice DNA so every item
   is written in the brand's actual voice. Outputs a CSV toolkit + companion HTML browser. Each
   item has data proof and an inspiration source tag. Trigger on: "creative toolkit", "build me
@@ -122,28 +122,45 @@ Read these before building:
 Before pulling any data, clarify: the brand, the campaign/goal, the audience, 2-4 competitors,
 target platforms, and any existing top performers or brand guidelines.
 
-### Step 2: Get the Data Ready
+### Step 2: Get the Scope Right
 
-1. Check existing knowledge sets with `list_knowledge_sets`
-2. If needed, create a KS and add feeds:
-   - The focal brand (feedType: "brand" or "influencer")
-   - 2-4 competitor brands/creators
-   - 1-2 search feeds for niche keywords
-   - 1-2 discussion feeds for relevant subreddits
-3. Trigger fetch with `trigger_fetch`
-4. Poll `get_workflow_status` every 3 minutes until it returns "completed"
+Every read is about a **project** — a tracked set of sources inside a **portfolio**. Orient
+first, then work in a project whose scope covers the focal brand, 2-4 competitors or creators,
+and the communities the audience talks in.
 
-The toolkit is only as good as the data behind it. If the fetch is still running, wait.
-Tell the user "Still fetching — I'll continue once data is ready" and poll again in 3
-minutes. Fetches typically take 5-15 minutes. Once `get_workflow_status` returns "completed"
-for all workflows, proceed.
+1. `whoami` → `list_portfolios` → `list_projects({ portfolioId })`
+2. Reuse a project, or `create_project({ portfolioId, name })` for this campaign
+3. `get_project({ projectId })` — a project *is* its scope, so read what it currently covers
+   before you trust a result. An empty-scope project reads the whole portfolio universe.
+4. Add sources the pool already covers with `update_project_scope({ projectId, add: [...] })` —
+   free and instant. `add` always extends; use `replace` to pin the project to exactly the
+   sources you want.
+5. For sources the pool has never covered, plan with
+   `pull_data({ projectId, candidates: [{ kind: "brand", handleOrTerm: "<handle>", platform: "instagram" }] })`.
+   It attaches the already-covered sources for free and quotes only the gap. Show the user
+   `estimatedCostCredits`, and call `confirm_pull({ previewId, projectId })` **only after they
+   approve** — that is the step that spends. Track it with `check_pull({ runId })`.
+
+Resolve a brand the user names to its real handles with `lookup_brands({ query })` before
+proposing to track it.
+
+The toolkit is only as good as the data behind it. A pull streams in over a minute or two;
+read what has landed rather than waiting on the whole run, and say so if the toolkit is built
+on partial coverage.
 
 ### Step 3: Extract the Brand's Voice DNA
 
-Pull 15-25 of the focal brand's posts using `analyze` with `distribution: "balanced"`:
+Pull 15-25 of the focal brand's posts with `analyze`, narrowing to the brand with `feedNames`:
+
 ```
-fields: ["transcript", "adDescription", "hookMechanism", "emotionalStrategy",
-         "narrativeStyle", "ctaText", "mainMessage"]
+analyze({
+  projectId,
+  query: "how this brand writes and speaks",
+  distribution: "balanced",
+  feedNames: ["<focal brand>"],
+  fields: ["transcript", "adDescription", "hookMechanism", "emotionalStrategy",
+           "narrativeStyle", "ctaText", "mainMessage"]
+})
 ```
 
 From this content, extract:
@@ -168,25 +185,49 @@ This becomes Section 1 of the toolkit and the voice filter for everything else.
 Run these five streams to gather raw material. Each produces toolkit items tagged by source.
 
 **Stream 1: Category Top Performers → "Category Performer"**
-Pull competitors' highest-performing content with `analyze` (distribution="top"). Read full
-transcripts via `get_item_detail`. Extract hooks, angles, structures, CTAs. Rewrite each in
-the focal brand's voice.
+Rank the competitors' best content with
+`analyze({ projectId, query, distribution: "exhaustive", sortBy: "likesMultiple" })` — that
+sorts by lift against each source's own baseline, so a small creator's breakout doesn't get
+buried under a big account's floor. Take the item ids off that page and deep-dive them with
+`analyze({ projectId, itemIds: [...] })` for full transcripts and creative fields. Extract
+hooks, angles, structures, CTAs. Rewrite each in the focal brand's voice.
 
 **Stream 2: Brand's Own Top Performers → "Your Top Performer"**
-Pull the focal brand's best content. For each, generate iterations — new angles on the same
-winning pattern, not just "do more of this."
+Same read narrowed with `feedNames` to the focal brand, or
+`distribution: "top"` with `sortMetric` when you want raw engagement rather than lift. For
+each winner, generate iterations — new angles on the same winning pattern, not just "do more
+of this."
 
 **Stream 3: Audience Voice → "Audience Gap"**
-Pull discussion/search feeds. Read Reddit threads. Find questions nobody answers, complaints,
-language people use. Adapt audience language to the brand's voice.
+Read the discussion class:
+`analyze({ projectId, query, feedTypes: ["discussion"], includeComments: true })`, or
+`query_items({ projectId, feedType: ["discussion"], platform: "reddit" })` for the raw
+threads. Find questions nobody answers, complaints, and the language people actually use.
+Adapt audience language to the brand's voice.
+
+If the audience voice is thin, it can be fetched — `fetch_comments` and `fetch_reviews` both
+charge credits and both quote first. Call each once without `confirmedByUser` to get the real
+cost, relay that number to the user, and only confirm with `confirmedByUser: true` plus
+`maxCredits` set to exactly what they approved (`fetch_comments` also needs its `quoteToken`
+echoed verbatim). Both run asynchronously; read the landed items a couple of minutes later.
 
 **Stream 4: Whitespace → "Whitespace"**
-Use `get_table_data` to map what the category does. Find what's missing: unused hook types,
-absent formats, untried emotional strategies. Higher risk, higher upside.
+`list_labels({ projectId })` shows which label dimensions the scope carries. Map what the
+category does with
+`get_table_data({ projectId, rows: ["Hook"], columns: "focalVsRest", focalBrand: "<brand>" })` —
+cells full for the rest and empty for the focal brand are gaps; cells empty for everyone are
+open territory. `get_creative_dna({ projectId, focusCategories: ["Hook", "Emotion"] })` goes
+further, separating what merely appears often from what actually drives performance, and its
+OPPORTUNITY LABELS section names the lean-in and cut-back moves outright. Whitespace is higher
+risk, higher upside — say so in the item's notes.
 
 **Stream 5: Trends → "Trend"**
-Pull recent high performers and compare to historical patterns. Use `get_table_data` with
-`columns="timePeriod"` to spot momentum.
+`get_table_data({ projectId, rows: ["Hook"], columns: "timePeriod", timePeriod: { granularity: "month" } })`
+shows which patterns are climbing and which are fading; confirm with
+`aggregate({ projectId, groupBy: ["time"], timeBucket: "month", measures: [{ field: "likes", fn: "median" }] })`
+so a rising label isn't just a rising post count. Give `get_creative_dna` a `startDate` and
+`endDate` and its TRAJECTORY section compares that window against the equal-length prior one,
+naming what is emerging, fading, or accelerating.
 
 ### Step 5: Generate the 9 Sections
 
@@ -223,7 +264,21 @@ taglines < 8), generate targeted replacements that pass all three sweeps.
 3. Write the HTML with all 9 sections, sticky nav, proper card layouts
 4. Save both to the outputs directory
 5. Present both files to the user
-6. Offer to save inspiration source posts to an Adology collection
+6. Save the posts that inspired the toolkit with
+   `save_to_collection({ projectId, collectionName, itemIds, note })` so the team can open the
+   originals later. Item ids must come from reads in the same project.
+
+## Reading the Numbers Honestly
+
+Lift multiples (`likesMultiple` and its siblings) compare a post against its own source's
+baseline, so "23.6x" means nothing until you say 23.6x *what*. The `sourceMedian*` fields are
+those denominators — ask for them in `fields` when the data proof is going into the toolkit.
+
+Aggregated rows carry `n`, the item count behind them, and a ranking call comes back split
+between groups that clear the reliability floor and directional ones below it. Build items off
+the first set; if you cite the second, cite its `n`. Some sources have structural gaps —
+Facebook Ad Library items carry no engagement data, Reddit view counts read as zero — and the
+response says so when they appear. Don't turn a missing metric into a finding.
 
 ## Adapting to Brief Type
 
@@ -235,8 +290,8 @@ in your brand's voice. Include whitespace to differentiate.
 
 ## The Content-First Principle
 
-Read actual content before labeling it. Build the toolkit from real transcripts, real Reddit
+Read actual content before labeling it. Build the toolkit from real transcripts, real
 threads, real ad descriptions. "UGC-style hooks perform 2.1x" is not a toolkit item. "A
 creator in her car says 'okay I'm genuinely obsessed' while holding the product at eye level —
-enthusiasm, no transitions. 23.6x average." — that's a toolkit item you can build a concept
-from and rewrite in the brand's voice.
+enthusiasm, no transitions. 23.6x her account's median likes." — that's a toolkit item you can
+build a concept from and rewrite in the brand's voice.

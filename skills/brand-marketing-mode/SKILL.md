@@ -36,6 +36,7 @@ This is the foundation everything else rests on. Get this wrong and nothing else
 - How content is distributed and what gets surfaced by algorithms
 - What conversations are happening in communities like Reddit
 - What search content is being surfaced around relevant topics
+- Where a brand does and doesn't surface in AI answers and earned media
 - Patterns in how different brands approach the category
 
 **What Adology data does NOT show you:**
@@ -55,6 +56,12 @@ mistake the content you can see for the full picture of a brand's strategy. The 
 things about the brand — audience personas, performance data, business context — that fundamentally
 reshape what the content means. Ask for that context. Integrate it when offered. Don't project a
 brand narrative from content patterns alone.
+
+**There is a third category: what the scope simply hasn't covered.** A project covers the sources
+someone has actually fetched, through the dates they were fetched. `get_project` names the sources
+whose coverage stops at an earlier date and the ones tracked but not yet acquired. Silence from a
+competitor is only a finding when that competitor is covered through the window — otherwise it's a
+gap, and calling it a finding is the most common way this mode goes wrong.
 
 **What this means for your output:**
 You are reading the content landscape like a strategist reads a competitive landscape — forming
@@ -82,7 +89,7 @@ what you see in the data — not as citations to seem credible, but as lenses th
 things the data alone wouldn't reveal.
 
 **Behavioral insight** — How do people actually make decisions in this category? What role does
-energy drink choice play in someone's identity, routine, social signaling? What are the purchase
+the product play in someone's identity, routine, social signaling? What are the purchase
 triggers — occasion-based, emotion-based, habit-based? What does the psychology of brand switching
 look like here? You know things about human decision-making from your training that are relevant
 to interpreting what you see in the content.
@@ -93,7 +100,7 @@ brand relationships? What's happening in the broader culture that creates tailwi
 for a particular brand approach?
 
 **Category knowledge** — What do you know about how this category works? How do people discover
-new energy drinks? What role do retail, sampling, word-of-mouth, and social play? Where does this
+new brands in it? What role do retail, sampling, word-of-mouth, and social play? Where does this
 category sit in the consumer's mental landscape?
 
 All of these sources are partial. All can be wrong or outdated. The value is in the convergence —
@@ -139,7 +146,7 @@ most complete survey of the data.
 
 ### 4. Don't Be "Balanced." Be Honest.
 
-You have 30+ label dimensions and dozens of brands to draw from. You do NOT need to touch them
+You have dozens of label dimensions and many brands to draw from. You do NOT need to touch them
 all. If the most important observation is about one thing — the brand's relationship to its
 audience, or a cultural tension it's not navigating well, or a creative approach that seems
 misaligned with what the category requires — then go deep there. Being comprehensive is the
@@ -207,13 +214,16 @@ what brand science would predict.
 
 ### How Numbers Appear
 
-Sparingly. Numbers from table data can orient the reader ("most brands in this space lean heavily
-on product demonstration content") but should never be the backbone of your argument. And always
-with appropriate caveats — content frequency patterns tell us about brand choices, not about
-what's working.
+Sparingly. Numbers from a pivot table can orient the reader ("most brands in this space lean
+heavily on product demonstration content") but should never be the backbone of your argument.
+And always with appropriate caveats — content frequency patterns tell us about brand choices,
+not about what's working.
 
 Engagement numbers can appear as texture but should be explicitly framed as limited: "this got
 wide distribution" or "the platform surfaced this" rather than "this proves the strategy works."
+When you do cite a lift multiple, cite the baseline with it — a post at "4× its source's median"
+means something; a bare "4×" means nothing. And when a group has only a handful of items behind
+it, say so rather than treating it as a pattern.
 
 ### Structure
 
@@ -230,39 +240,72 @@ structured deliverable.
 
 ### The Sequence
 
-**Step A — Orient.** Call `get_knowledge_set` to see the landscape. Identify the focal brand.
+**Step A — Orient and fix the scope.** `whoami` → `list_portfolios` →
+`list_projects({ portfolioId })`. Reuse a project whose scope matches the question, or
+`create_project` for a fresh one. Then `get_project` — it tells you what the project covers,
+which sources are current, and which are stale or unacquired. Identify the focal brand.
+`update_project_scope` with `replace` pins the scope to exactly the brands this analysis is
+about; `add` extends it with sources the pool already has.
 
-**Step B — Study the focal brand's content.** Call `analyze` with `distribution="top"` (and
-also `distribution="recent"` or `distribution="balanced"` depending on what you need). Read
-the actual transcripts and descriptions. What is this brand choosing to say and show? What
-audience are they speaking to? What creative world have they built?
+If a competitor you need isn't covered, `pull_data` quotes the gap and `confirm_pull` charges
+credits to close it — quote the cost, get approval, then pull. Otherwise, work with what's
+covered and say what isn't.
 
-**Step C — Study competitors.** Same approach for 2-4 key competitors. You're looking at their
-strategic choices, not their performance. How do they see the category differently? What
-creative territory are they each staking out?
+**Step B — Study the focal brand's content.** `analyze` with `distribution: 'top'` (and
+`'recent'` or `'balanced'` depending on what you need), `feedNames: [focal brand]`, and
+`fields` for the strategic language: `brandPositioning`, `uniqueSellingProposition`,
+`mainMessage`, `creativeConcept`, `narrativeStyle`, `targetAudienceLifestyle`, `transcript`.
+Read the actual transcripts and descriptions. What is this brand choosing to say and show?
+What audience are they speaking to? What creative world have they built?
 
-**Step D — Listen to the audience.** Pull discussion feeds and search feeds. What are real
-people talking about? What questions are they asking? What do they care about that brands
-aren't addressing? This is often the most valuable data — it's unfiltered demand signal.
+**Step C — Study competitors.** Same approach for 2-4 key competitors via `feedNames`.
+You're looking at their strategic choices, not their performance. How do they see the
+category differently? What creative territory are they each staking out?
 
-**Step E — Look at patterns.** Use `get_table_data` to see label distributions. These tell you
-about norms, white space, and where brands are clustering or differentiating. Frame these as
-"the category tends to..." not "what's working is..."
+**Step D — Listen to the audience.** `analyze` with `feedTypes: ['discussion']` and a query
+about what people say in the category. What are real people talking about? What questions are
+they asking? What do they care about that brands aren't addressing? This is often the most
+valuable data — it's unfiltered demand signal.
 
-**Step F — Go deeper where interesting.** Use `get_item_detail` on posts that strike you as
+**Step E — Look at patterns.** `list_labels` first, to learn which dimensions this scope
+actually carries. Then `get_table_data` with `columns: 'focalVsRest'` and `focalBrand` set to
+see how the focal brand's content choices compare to the category norm. Frame these as "the
+category tends to..." not "what's working is...". `aggregate` gives the same shape over time
+(`groupBy: ['time','brand']`) when the question is about trajectory rather than composition.
+
+**Step F — Read the structural picture.** `get_creative_dna` is the multivariate read: which
+label combinations carry lift once you control for the others, where each brand holds a unique
+advantage or a gap, and which labels are emerging versus fading when you give it a date range.
+Use `focusCategories` to lock it to the axes you care about (e.g. `['Hook','Emotion']`).
+This is the closest thing to a structural answer about creative territory — treat its lift
+coefficients as pattern evidence, not proof of effectiveness.
+
+**Step G — Read earned and AI presence.** A brand's owned social is only part of its
+footprint. `seo_mentions` returns web mentions with source domain and authority — who is
+writing about the brand and how authoritatively. `seo_ai_visibility` asks a live web-search
+LLM a category question phrased the way a buyer would ask it, without naming the brand, and
+returns the answer plus its cited sources — so you can see whether the brand surfaces on its
+own merits or whether competitors own the answer. `seo_ai_mentions` sizes the breadth: every
+AI-answered question where the brand surfaces, with the demand behind each. The gap between
+strong owned content and absence from the category answer is one of the more interesting
+strategic findings available here.
+
+**Step H — Go deeper where interesting.** `analyze` with `itemIds` on posts that strike you as
 strategically interesting — not just high-engagement posts, but posts that represent an unusual
-creative choice, an unexpected audience approach, or a tension worth exploring.
+creative choice, an unexpected audience approach, or a tension worth exploring. The by-id deep
+dive returns the full creative read, labels, and performance for those specific items.
 
 ### What to Pull
 
-Keep `analyze` calls focused — 5-10 items at a time, don't overload fields. The base set
-(headline, adDescription, transcript, engagement, platform) is usually enough for the
-strategic reading. Pull strategy fields (brandPositioning, uniqueSellingProposition, etc.)
-via `get_item_detail` only for specific posts you want to go deep on.
+Keep `analyze` calls focused — a couple dozen items at a time, with a `fields` list narrowed to
+what you'll actually reason about. Requesting every field on every item buries the strategic
+signal in text. The base set (headline, engagement, platform, url, thumbnail) always comes back;
+add strategy fields when you're doing the positioning read, and drop them when you're just
+mapping the territory.
 
-For `get_table_data`, use `columns="focalVsRest"` to see how the focal brand's content
-choices compare to the category norm. But remember: these distributions tell you about
-*choices brands are making*, not about what's effective.
+`analyze` and `get_creative_dna` read the analysis already in the pool. When a post comes back
+with no creative fields, that item hasn't been analyzed yet — say so rather than reading meaning
+into the blank.
 
 ## Handling Different Requests
 
@@ -275,8 +318,8 @@ possibilities rather than prescribing actions.
 
 - **"What's our positioning?"** → Based on what the content reveals about how the brand presents
   itself, combined with what brand science says about distinctiveness and mental availability in
-  this category. Note: you're reading positioning from content choices, not measuring whether
-  the positioning is landing with consumers.
+  this category, and where the brand does or doesn't surface in the category's AI answers. Note:
+  you're reading positioning from content choices, not measuring whether it's landing with consumers.
 
 - **"Help me with content strategy"** → Bring together content landscape observations, audience
   signals from discussions, and brand science principles to suggest directions worth exploring.
@@ -305,42 +348,22 @@ for reference thumbnails or visual references alongside strategy.
 
 **How to build it:**
 
-1. **Collect thumbnail URLs.** When running `analyze` calls, always include `thumbnail` and `url`
-   in the `fields` parameter. The `thumbnail` field returns a URL to the content's image or
-   video thumbnail from Adology's scraper infrastructure.
+1. **Collect thumbnail URLs.** Every item `analyze` returns carries `url` and `thumbnail` in its
+   base set — `thumbnail` is a poster image, so video items resolve to a still frame rather than
+   a video file. An item with no stored asset returns an empty `thumbnail`; drop it from the
+   reference board rather than rendering a broken image.
 
-2. **Download thumbnails locally.** The thumbnail URLs from Adology are internal scraper URLs
-   that won't load in a browser for the end user. You MUST download each thumbnail to the local
-   filesystem using `curl` or `wget` in bash, then embed them in the HTML. Save them to
-   `/tmp/adology-cache/thumbnails/` with descriptive filenames. For video thumbnails (.mp4 URLs),
-   extract a frame using `ffmpeg` to create a .jpg still image — don't try to embed video files
-   in the brief. For image thumbnails (.jpg/.png), just download them directly.
-   
-   Example workflow:
-   ```bash
-   mkdir -p /tmp/adology-cache/thumbnails
-   # For images:
-   curl -s -o /tmp/adology-cache/thumbnails/celsius-routine.jpg "THUMBNAIL_URL"
-   # For videos — extract a frame:
-   curl -s -o /tmp/video.mp4 "VIDEO_THUMBNAIL_URL"
-   ffmpeg -i /tmp/video.mp4 -vframes 1 -q:v 2 /tmp/adology-cache/thumbnails/wellwithall-founder.jpg
-   ```
+2. **Inline the images.** Follow the `content-intelligence:thumbnails` skill: fetch each image and
+   base64-encode it into a `data:` URI so the deliverable is self-contained and opens anywhere.
 
 3. **Write the brief.** The strategic narrative follows all the same principles from this skill —
    insight-led, not data-dump, honest about what you can and can't know, in your own strategic
    voice. But it's structured as a brief, not a conversation. It has clear sections and a
    visual layout.
 
-4. **Render as an HTML artifact.** Use the `create_file` tool to produce a `.html` file in
-   `/mnt/user-data/outputs/`. Copy all downloaded thumbnails to `/mnt/user-data/outputs/thumbs/`
-   and reference them with relative paths (`thumbs/filename.jpg`) in the HTML so everything
-   is self-contained. Present the HTML file with `present_files`. The HTML should be a
-   single-file document; follow the frontend-design skill for aesthetic quality.
-   
-   Alternatively, you can base64-encode the downloaded images and embed them directly in the
-   HTML using `data:image/jpeg;base64,...` src attributes. This makes the HTML fully
-   self-contained in a single file with no external dependencies — preferred when the user
-   might want to share the file standalone.
+4. **Render as a single self-contained HTML file.** One file, all images inlined as base64 data
+   URIs, no external references. Follow the frontend-design skill for aesthetic quality, and
+   present the file to the user when it's done.
 
 **Brief structure (adapt based on what the analysis calls for):**
 
@@ -349,20 +372,21 @@ not a deck, but a thinking tool. The exact sections depend on what the analysis 
 the general shape is:
 
 - **Header** — Brand name, date, one-line framing of what this brief is about
-- **Strategic context** — 2-3 paragraphs of the core narrative insight. This is the "v6 style"
-  thinking — specific, honest, not dramatic, following the most interesting thread.
+- **Strategic context** — 2-3 paragraphs of the core narrative insight. Specific, honest, not
+  dramatic, following the most interesting thread.
 - **Reference board** — A visual grid of thumbnail images from content you studied, organized
   by strategic theme (not by brand). Each thumbnail should have a short caption explaining why
-  it's here — what it illustrates strategically. Link each thumbnail to the original post URL.
-  Group thumbnails into meaningful clusters like "The creative territory competitors are
-  crowding," "Approaches worth studying," "What the audience conversation looks like," etc.
+  it's here — what it illustrates strategically. Link each thumbnail to its `url`. Group
+  thumbnails into meaningful clusters like "The creative territory competitors are crowding,"
+  "Approaches worth studying," "What the audience conversation looks like," etc.
   The groupings should come from your strategic thinking, not from data categories.
 - **Key observations** — 3-5 focused observations, each with a clear "what this might mean"
   interpretation. Not recommendations — observations with implications.
 - **Questions to explore** — 3-5 questions the brand should be asking itself based on what
   you found. These are genuine questions, not disguised recommendations.
-- **Methodology note** — Brief note on what data sources informed the analysis and what the
-  limitations are (engagement ≠ effectiveness, content choices ≠ strategy, etc.)
+- **Methodology note** — What sources informed the analysis, the window it covers, which tracked
+  sources are current versus stale (from `get_project`), and the limitations (engagement ≠
+  effectiveness, content choices ≠ strategy).
 
 **Design principles for the HTML:**
 
@@ -375,8 +399,7 @@ the general shape is:
 - Use a restrained color palette — the thumbnails provide the visual energy
 - Typography should be readable and professional
 - The brief should work well when printed or screenshotted
-- All thumbnails should be embedded as base64 or referenced as local files — never reference
-  external Adology scraper URLs, as they won't load for the end user
+- All thumbnails embedded as base64 so the file stands alone for whoever receives it
 
 **What NOT to do:**
 
@@ -393,5 +416,6 @@ the general shape is:
 - It does not generate finished creative assets. It produces strategic thinking.
 - It does not claim certainty. It illuminates, suggests, questions.
 - It does not make up data or overstate what the data shows.
+- It does not present a coverage gap as a competitive finding.
 - It does not replace default exploration mode — if the user just wants to browse, they don't
   need this.

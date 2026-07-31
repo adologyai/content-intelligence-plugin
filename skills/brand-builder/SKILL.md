@@ -1,100 +1,95 @@
 ---
 name: brand-builder
 description: >
-  Guides knowledge set construction including feed management and brand discovery.
-  Use when creating knowledge sets, adding or removing brands, influencers, search terms,
-  or discussion feeds. Triggers on: "create knowledge set", "add brand", "add influencer",
-  "track competitor", "monitor", "build a KS".
+  Builds out a portfolio's tracked universe and the project scopes analysis reads from.
+  Use when setting up a brand workspace, adding or removing brands, influencers, search
+  terms, or discussions, narrowing a project, or acquiring data for new sources.
+  Triggers on: "track competitor", "add brand", "add influencer", "monitor", "set up",
+  "new project", "pull data".
 ---
 
-# Building Knowledge Sets
+# Building a Tracked Universe
 
-## Step 1: Discovery
+Two layers, and keeping them straight is most of the job.
 
-Start by running `discover_brands` to find brands by name, category, or URL. This gives you a picture of the competitive landscape before building anything.
+A **portfolio** declares what a brand tracks — the focal brand, competitors, influencers, searches, discussions. You edit it with `author_portfolio_context`.
 
-## Step 2: Credit Awareness
+A **project** is the working scope analysis reads from. A fresh project reads the portfolio's whole tracked universe; `update_project_scope` narrows or grows it. You analyze in projects, never in the portfolio directly.
 
-After discovery, call `whoami` to check the user's available credits. Before calling `trigger_fetch`, estimate the cost based on the number of feeds being fetched. Inform the user of the expected credit usage before proceeding. Never trigger a fetch without the user understanding the cost.
+## Step 1: Resolve the brands
 
-## Step 3: Create and Populate the Knowledge Set
+`lookup_brands({ query })` searches the central brand directory and returns each match's category, website, and whatever handles are on file — Instagram, TikTok, YouTube, X, LinkedIn, and the Meta Ad Library page id — already normalized to the shape `author_portfolio_context` accepts. A brand may have only one or two channels on file.
 
-Use `create_knowledge_set` with a descriptive name ("DTC Skincare Competitors", "Q2 Campaign Benchmarks", "Protein Brand Landscape").
+It costs nothing and changes nothing, so run it for every name the user gives you, in parallel. When a brand is not in the directory, ask the user for the handles directly; explicit handles work exactly as well as directory ones.
 
-**When adding 3+ feeds, use `batch_add_feeds` instead of individual `add_feed` calls.** This is faster and reduces round-trips. Only use individual `add_feed` for single additions or when you need to handle each feed's response separately.
+## Step 2: Land in a portfolio
 
-### Conditional Logic by Input Type
+`list_portfolios` first — the brand may already have a workspace. `create_portfolio({ name, websiteUrl })` starts a new one; if a portfolio with that name exists it returns the existing id with `reused: true`, so never call it twice for the same brand.
 
-**User gives a brand name:**
-1. Run `discover_brands` to find it and resolve platform handles
-2. Check `list_knowledge_sets` to see if the brand already exists in another KS
-3. If found elsewhere, inform the user before duplicating
+## Step 3: Author the tracked universe
 
-**User gives a URL:**
-1. Extract the platform and handle from the URL
-2. Add directly via `add_feed` -- no discovery step needed
+Read before you write: `read_portfolio_context({ portfolioId })` returns the current items and brand details. Then `author_portfolio_context` merge-writes — `upsertItems` (matched by id), `removeItemIds`, and a shallow `details` patch (category, industry, targetAudience, brandVoice).
 
-**User gives a category (e.g., "energy drinks"):**
-1. Run `discover_brands` by category to get a list of brands
-2. Present the options and let the user pick
-3. Suggest related brands they may not have considered
+Every item needs an `id` and a `kind`, and `kind` is one bare token: `brand`, `influencer`, `search`, `discussion`, `trend-term`, `niche`, or `seo`. Everything else about the item is its own field.
 
-## Step 4: Trigger Data Collection
+- A **brand** also needs `role` — `own` for the focal brand, `competitor`, `adjacent`, or `inspiration` — plus a `handles` object keyed by platform (`instagram`, `tiktok`, `facebook`, `youtube`, `adLibrary`), or `{}` when you found none.
+- An **influencer** carries the same `handles` object.
+- A **search** is a keyword; a **discussion** is a subreddit name without the `r/` prefix.
 
-Call `trigger_fetch` to start scraping. This runs asynchronously via Temporal workflows. You can use the `feedNames` parameter to selectively refresh specific feeds instead of the entire Knowledge Set.
+Confirm the roster with the user before writing it. This is the declaration the cockpit and every analysis read from.
 
-Check progress with `get_workflow_status`. Scraping typically takes a few minutes per feed depending on content volume.
+## Step 4: Open a project
 
-## Step 5: Get Suggestions and Fill Gaps
+`list_projects({ portfolioId })` — reuse an existing project when the user wants to keep working in its scope. `create_project({ portfolioId, name })` starts a fresh one; name it for the question ("Q3 hydration competitive set"), not the brand.
 
-After feeds are added, call `get_suggestions` to identify gaps in the Knowledge Set:
-- Missing platforms for existing brands (e.g., brand has Instagram but not TikTok)
-- Missing feed types (e.g., no search terms, no discussion feeds)
-- Related brands the user might want to track
+`get_project` is the honest picture of what a project covers: its scope, plus `access.expiredSources` (data only through a date) and `access.ungrantedSources` (tracked but never acquired). Read it before analyzing so you know what the numbers rest on.
 
-Review the suggestions with the user and add recommended feeds using `batch_add_feeds`.
+## Step 5: Shape the scope
 
-## Complete Onboarding Flow
+`update_project_scope` edits which sources a project reads, without fetching anything. Sources are `{ scraper, id }` — `instagram-profile`, `tiktok-profile`, `facebook-page`, `youtube-channel`, `reddit-subreddit` — or `{ scraper, id, term }` for a search source like `tiktok-search`.
 
-The full sequence:
+- `add` extends the scope with sources the pool already has coverage for. Free and instant.
+- `remove` trims sources out.
+- `replace` pins the scope to exactly the given sources. This is the way to NARROW a project — `add` only ever widens, so a project still inheriting the whole universe stays wide until you pin it. Pass `replace` alone.
 
-1. **Discover** -- `discover_brands`
-2. **Check credits** -- `whoami`
-3. **Create KS** -- `create_knowledge_set`
-4. **Add feeds** -- `batch_add_feeds` with all selected brands, creators, search terms, discussions
-5. **Fetch data** -- `trigger_fetch` (after confirming credit cost)
-6. **Monitor** -- `get_workflow_status` until complete
-7. **Fill gaps** -- `get_suggestions` to identify missing coverage
-8. **Expand** -- `batch_add_feeds` with suggestions, then `trigger_fetch` again
+The response routes what it could not simply add: `needsRefresh` sources were added and their existing data is fully usable, they just carry nothing newer than `coveredThrough`; `notOwned` sources were never completely fetched by anyone, so they were left out and need a pull.
 
-## Feed Types Reference
+## Step 6: Acquire what's missing — the only step that spends
 
-### Brand Feeds
-Track paid ads and organic social content. Sources: `facebook-ad-library`, `tiktok-ad-library`, `instagram-profile`, `tiktok-profile`, `youtube-channel`, `facebook-page`, `twitter-profile`, `linkedin-profile`, `threads-profile`.
+`pull_data({ projectId, candidates })` plans without spending. Each candidate is `{ kind, handleOrTerm, platform }` where kind is `brand`, `influencer`, `discussion`, or `search`. It splits the targets:
 
-### Influencer Feeds
-Track a specific creator's content. Sources: `instagram-profile`, `tiktok-profile`, `youtube-channel`, `twitter-profile`, `threads-profile`.
+- **readyNow** — coverage is current, so these are attached to the project immediately, free. Analyze them now.
+- **the gap** — never completely fetched, or coverage has gone stale. This is frozen and quoted: `previewId` plus `estimatedCostCredits`.
 
-### Search Feeds
-Monitor keywords across platforms. Sources: `tiktok-search`, `instagram-search`, `youtube-search`.
+Show the user both halves and the exact credit figure the tool returned. Only after they approve, call `confirm_pull({ previewId, projectId })` — that charges and starts the run. When `previewId` is null there is no gap and nothing to approve.
 
-### Discussion Feeds
-Track Reddit subreddits. Provide the subreddit name without the r/ prefix.
+Tune the plan with `dateRangeDays` (default 90), `limit` (posts per source, default 50 — the cost is quoted off this), and `freshWithinDays` (default 14, how recent coverage must be to count as ready). Leave `sort` alone for a coverage ask; set `"top"` only when the user explicitly wants best-performing content.
 
-## Error Recovery
+The run streams in over a minute or two. `check_pull({ runId })` reports progress, but you usually just start reading what has landed.
 
-**Brand not found in discovery DB:**
-Ask the user for the brand's social media handles directly. You can add feeds with explicit handles even if the brand is not in the discovery database.
+## Complete setup flow
 
-**Creator not in discovery database:**
-Creator discovery is not available via MCP. Ask the user for the creator's handle directly and add via `add_feed` with `feedType: 'influencer'`.
+1. `lookup_brands` on every name the user gave, in parallel
+2. `list_portfolios`, then `create_portfolio` if there's no home for this brand
+3. `read_portfolio_context` → `author_portfolio_context` with the agreed roster
+4. `create_project` (or reuse one from `list_projects`)
+5. `pull_data` → show readyNow + the quoted gap → `confirm_pull` on approval
+6. `get_project` to confirm what the project now covers, then analyze
 
-**add_feed with invalid handle:**
-The tool will return an error. Inform the user the handle could not be resolved. Ask them to verify the handle exists on the platform, check for typos, and try again.
+## Error recovery
+
+**Brand not in the directory.** Ask for the handles. `author_portfolio_context` accepts explicit handles for any brand.
+
+**A source comes back `notOwned` from `update_project_scope`.** Nobody has ever completely fetched it, so adding it would show nothing. Route it through `pull_data` instead.
+
+**A handle does not resolve during a pull.** It lands in the gap unresolved. Verify the handle exists on that platform, check for typos, and re-plan — do not confirm a pull built on a handle you are unsure of.
+
+**A pull finished but reads come back empty.** Coverage can be current while the run is still settling. `check_pull` on the runId; a source with a fetch in flight reports as streaming, and re-pulling it buys the same data twice.
 
 ## Tips
 
-- Add at least 2-3 competitors for meaningful competitive benchmarking
-- Search terms work best when specific ("collagen supplement" > "health")
-- Subreddit monitoring captures authentic consumer voice that brand content misses
-- You can update a Knowledge Set at any time to add or remove feeds
+- Two or three competitors is the floor for meaningful benchmarking; five or six reads much better.
+- Specific search terms beat broad ones — "collagen supplement" over "health".
+- Discussion sources carry consumer voice that no brand feed contains.
+- Pin a project with `replace` before a scoped comment fetch, so you pay for one source instead of all of them.
+- `delete_project` archives by default and requires `confirmedByUser: true` — name the project to the user and get an explicit yes first.

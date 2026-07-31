@@ -208,7 +208,7 @@ body {
   <!-- ── Header Band ── -->
   <div class="header-band">
     <h1>WEEKLY COMPETITIVE RECAP <span class="primary-brand">{{primary_brand}}</span></h1>
-    <div class="subtitle">{{ks_name}} &nbsp;&middot;&nbsp; {{week_label}} &nbsp;&middot;&nbsp; {{brand_count}} brands &nbsp;&middot;&nbsp; {{platform_count}} platforms</div>
+    <div class="subtitle">{{project_name}} &nbsp;&middot;&nbsp; {{week_label}} &nbsp;&middot;&nbsp; {{brand_count}} brands &nbsp;&middot;&nbsp; {{platform_count}} platforms</div>
   </div>
 
   <div class="page-body">
@@ -276,9 +276,10 @@ body {
          - Every card MUST have a real thumbnail image — no placeholders
 
          COMMENTS:
-         - Try Apify scrapers first (IG: louisdeconinck/instagram-comments-scraper,
-           TT: clockworks/tiktok-comments-scraper)
-         - If Apify unavailable: use first 80 chars of post caption as comment text
+         - If audience comments for these sources are already in the pool, read them
+           with analyze (feedTypes ["discussion"], includeComments true, platformFilter
+           set to the post's platform) and take the top comments per post
+         - Otherwise: use the first 80 chars of the post's headline as the preview text
     -->
     <div class="score-grid">
       {{scoreboard_html}}
@@ -303,7 +304,7 @@ body {
              <div class="spot-stats">
                <div><div class="spot-stat-num">{{spotlight.eng}}</div><div class="spot-stat-label">Engagement</div></div>
                <div><div class="spot-stat-num">{{spotlight.gap_to_leader}}</div><div class="spot-stat-label">Gap to Leader</div></div>
-               <div><div class="spot-stat-num">{{spotlight.active_ads}}</div><div class="spot-stat-label">Active Meta Ads</div></div>
+               <div><div class="spot-stat-num">{{spotlight.boosted_posts}}</div><div class="spot-stat-label">Boosted Posts</div></div>
                <div><div class="spot-stat-num">{{spotlight.hook_performance}}</div><div class="spot-stat-label">Hook Performance</div></div>
              </div>
              <div class="spot-gap"><strong>Insight:</strong> {{spotlight.insight}}</div>

@@ -18,8 +18,7 @@ description: >
 # Brand Partnership Vetting & Selection
 
 Self-contained skill. Everything you need — methodology, full HTML production
-template with CSS, thumbnail download script, section-by-section guidance — is in
-this file.
+template with CSS, section-by-section guidance — is in this file.
 
 ## What This Skill Does
 
@@ -83,24 +82,60 @@ Two paths.
 Two-pass model. First-pass at consistent depth across all candidates; deep-dive on
 specific brands by request.
 
+### Set Up the Working Scope
+
+Orient first: `whoami` → `list_portfolios` → `list_projects({ portfolioId })`. Reuse
+a project that already covers this space, or `create_project` for a fresh one
+("Partnership Vetting: [Focal]"). `get_project` shows exactly what a project covers
+today — read it before analyzing so you know which candidates are already in scope.
+
+Resolve every candidate name to real handles with `lookup_brands` before tracking it.
+It searches Adology's central brand directory and returns each brand's category plus
+whatever platform handles the directory holds, already normalized. It is free and
+read-only, and it is what keeps `dave` from resolving to a person instead of the
+banking app — take the directory's handle (`davebanking`) over a guessed one.
+
+Track the candidates and the 2–3 competitors on the portfolio with
+`author_portfolio_context`: one item per brand, `kind: "brand"`, a `role` (`"own"`
+for the focal brand, `"competitor"` / `"adjacent"` / `"inspiration"` for the rest),
+and a handles object keyed by platform.
+
+Then bring their content in with `pull_data({ projectId, candidates: [{ kind:
+"brand", handleOrTerm: "davebanking", platform: "instagram" }, …] })`.
+
+**`pull_data` costs nothing — it plans.** It splits candidates into `readyNow`
+(coverage is already current; attached to the project free and instantly) and a gap
+it quotes as `estimatedCostCredits` with a `previewId`. Relay both halves and the
+credit number in plain language before doing anything else.
+
+**Only `confirm_pull({ previewId, projectId })` spends**, and only after the user
+approves that number. It returns a `runId` and streams in over a minute or two;
+analyze the ready sources meanwhile and use `check_pull({ runId })` to report
+progress. If the user declines, score the covered candidates and say plainly which
+ones you could not assess.
+
 ### First Pass (default — all candidates, ~6–8 posts each)
 
-1. `batch_add_feeds` to add all candidate brands + 2–3 competitors as feeds.
-2. `trigger_fetch` to collect content.
-3. For each candidate, run `analyze` with:
+1. For each candidate, run `analyze` with:
    ```
+   projectId: "<project>"
+   query: "how this brand positions itself and who it talks to"
    distribution: "top"
-   limit: 6-8
+   limit: 8
    feedNames: ["BrandName"]
+   feedTypes: ["brand"]
    fields: [
      "adDescription", "mainMessage", "brandPositioning",
      "targetAudienceLifestyle", "creativeConcept", "uniqueSellingProposition",
-     "oneLineInsight", "emotionalStrategy", "thumbnail", "url"
+     "oneLineInsight", "emotionalStrategy"
    ]
    ```
-4. Pull the focal brand at the same depth as a baseline.
-5. Pull each direct competitor for the Precedent dimension, focusing on partnership
-   content.
+   Every item already carries `url`, `thumbnail`, `likes`, `views`, `isOutlier`, and
+   `likesMultiple` in the base set — no need to request them.
+2. Pull the focal brand at the same depth as a baseline.
+3. Pull each direct competitor for the Precedent dimension, focusing on partnership
+   content — `analyze({ mode: "semantic", query: "brand partnership collaboration
+   co-branded launch" })` finds it by meaning rather than exact words.
 
 `adDescription` is the most important field — it's a comprehensive AI-written
 description of each post including visual + narrative + creative choice. Combined
@@ -109,18 +144,21 @@ with `mainMessage`, `brandPositioning`, `targetAudienceLifestyle`, and
 
 ### Deep Dive (on request)
 
-When the user says "go deeper on [brand]": pull 30–50 posts via `analyze` with
-higher `limit`, use `get_table_data` for label distributions, `get_item_detail` for
-top posts with full transcripts, `search_items` for partnership-specific content.
-Re-score with higher confidence.
+When the user says "go deeper on [brand]": page the brand's full set with
+`analyze({ feedNames: ["Brand"], distribution: "exhaustive", sortBy: "likesMultiple" })`,
+looping on `nextOffset` while `hasMore` is true. Use `get_table_data` for label
+distributions (`columns: "focalVsRest"` with `focalBrand` set to that brand),
+`analyze({ itemIds: [...] })` for top posts with full transcripts, `search_all` for
+partnership-specific content, and `get_creative_dna` for what structurally drives
+their performance. Re-score with higher confidence.
 
-### Empty Feeds
+### Candidates With No Content
 
-Some brand handles don't resolve cleanly to active accounts (e.g., `dave` matches
-a person, not Dave the banking app; `step` matches an unrelated account). If a feed
-comes back empty, use `discover_brands` to verify, or pass exact known handles
-(`davebanking`, `stepmobile`, `acorns_app`). Re-add and re-trigger fetch on those
-feeds only.
+If a candidate comes back with nothing, the cause is almost always identity or
+coverage, not absence of content. Check `get_project` for what the project actually
+tracks and each source's coverage state, re-resolve the handle with `lookup_brands`,
+and if the source was never fetched, quote a `pull_data` refresh for that source
+alone rather than re-pulling the whole set.
 
 ## Phase 4: Scoring on Seven Dimensions
 
@@ -143,6 +181,10 @@ candidates hit two utility frames at once (e.g., DoorDash hits both *earn* and
 
 **Cultural Currency (10%)** — Is the brand having a cultural moment? Look at
 `likesMultiple`, `isOutlier`, viral content frequency, cultural-reference density.
+`analyze` with `outlierFilter: { metric: "likes", multipleGreaterThan: 3 }` isolates
+the posts that beat the brand's own baseline. Cite the baseline alongside the
+multiple — `sourceMedianLikes` is the denominator behind `likesMultiple`, and a
+lift figure without it is not a finding.
 
 **Activation Readiness (10%)** — How partnership-prone is the brand? Volume and
 variety of past co-marketing, quality of existing partnership creative,
@@ -163,8 +205,8 @@ partners disengage. Name the value exchange explicitly.
 **Tier thresholds:** 78+ pursue (Tier 1), 62–77 pilot (Tier 2), 48–61 watchlist
 (Tier 3), <48 pass.
 
-**Confidence chip per scorecard:** High (200+ posts in feed, 6+ scored), Medium
-(50–200 posts), Low (<50 posts, treat as preliminary).
+**Confidence chip per scorecard:** High (200+ posts in scope for that brand, 6+
+scored), Medium (50–200 posts), Low (<50 posts, treat as preliminary).
 
 **Brand Safety** is treated as a red-flag callout, not a scored dimension. Flag
 explicitly: voice mismatch severe, audience mismatch severe, lane already occupied
@@ -192,10 +234,11 @@ For each Tier 1 candidate, produce a brief with these sections:
 
 ## Phase 6: Creator Activation Map (Optional)
 
-If the knowledge set has fintok / vertical-relevant creator feeds, add a Creator
-Activation Map to the report. Map each creator to one Tier 1 partnership with a
-casting rationale. Turns the report from "here are some ideas" into "here are some
-ideas and here's the creator who activates each one."
+If the portfolio tracks vertical-relevant creators, add a Creator Activation Map to
+the report. Read them with `analyze({ feedTypes: ["influencer"], distribution: "top" })`
+in the same project, then map each creator to one Tier 1 partnership with a casting
+rationale. Turns the report from "here are some ideas" into "here are some ideas and
+here's the creator who activates each one."
 
 ---
 
@@ -617,7 +660,7 @@ applies one-for-one.
 
   <!-- CREATOR ACTIVATION MAP -->
   <h2>Fintok Creator Activation Map</h2>
-  <div class="section-sub">[Creator count] creators in the knowledge set. Each maps cleanly to one Tier 1 partnership.</div>
+  <div class="section-sub">[Creator count] tracked creators in this portfolio. Each maps cleanly to one Tier 1 partnership.</div>
   <div class="creator-map">
     <div class="creator-row">
       <h4>[Creator name]</h4>
@@ -649,7 +692,7 @@ applies one-for-one.
   </div>
 
   <footer>
-    Prepared by Adology Brand Marketing Mode · Knowledge set: [name] ([id]) · Generated [date]
+    Prepared by Adology Brand Marketing Mode · Project: [name] ([id]) · Generated [date]
   </footer>
 
 </div>
@@ -691,8 +734,8 @@ referenced via `thumbs/<name>.jpg`). Tier 2 same structure without thumbnails. T
 unique to brand-partnership work — every Tier 1 partnership reshapes the focal
 brand's identity differently. Name the tradeoff explicitly.
 
-**Creator activation map** — Optional, only if creator feeds in KS. Map each
-creator to one Tier 1 brand with the casting rationale.
+**Creator activation map** — Optional, only if the portfolio tracks creators. Map
+each creator to one Tier 1 brand with the casting rationale.
 
 **Verify externally** — White card with empty checkbox + bold title + dim
 explanation. Customize the items based on the focal brand's category.
@@ -717,8 +760,7 @@ let it handle image vs. video frame extraction and the sandbox workaround.
 
 **Workflow:**
 
-1. Collect thumbnail URLs from the `thumbnail` field returned by `analyze` /
-   `get_item_detail` calls.
+1. Collect thumbnail URLs from the `thumbnail` field every `analyze` item carries.
 2. Invoke the `content-intelligence:thumbnails` skill with the list of URLs and
    target output directory (e.g. `outputs/thumbs/`).
 3. Reference each saved thumbnail in the HTML as `thumbs/<name>.jpg`.
@@ -743,28 +785,37 @@ first-pass → present rankings → user picks deep-dives → Phase 4–6.
 
 **Go deeper on [brand]** — Trigger deep-dive flow.
 
-**Missing competitor data** — If competitor feeds haven't been ingested, flag in
-disclosures and Verify Externally checklist. The Precedent dimension is the weakest
-without competitor data.
+**Missing competitor data** — If a competitor isn't covered in the project, flag it
+in disclosures and the Verify Externally checklist, and quote a `pull_data` refresh
+for that source. The Precedent dimension is the weakest without competitor data.
 
 **Limited data on a candidate** — Fewer than 20 posts → mark scorecard with low
 confidence and note sample size in disclosures.
 
-**Empty feeds** — Some brand handles don't resolve cleanly. Use `discover_brands`
-or pass exact known handles. Re-add and re-trigger fetch on those feeds only.
+**A candidate with no content** — Re-resolve the handle with `lookup_brands` and
+check `get_project` for that source's coverage before concluding anything. Quote a
+`pull_data` refresh for just that source; never present an empty read as a finding
+about the brand.
 
 ---
 
 ## Tool Roles
 
 **Web Search** — Sourcing. Find candidate brands when the user doesn't provide a
-list, verify competitor partnerships not yet in the KS.
+list, and verify competitor partnerships the project doesn't cover yet.
 
-**Adology** — Studying. After candidates are sourced: `batch_add_feeds`,
-`trigger_fetch`, `analyze` (per brand, full fields), `search_items` (partnership-
-specific), `get_table_data` (deep-dive), `get_item_detail` (deep-dive transcripts).
+**Adology** — Studying. Orient with `whoami` / `list_portfolios` / `list_projects` /
+`get_project`; resolve handles with `lookup_brands`; track brands with
+`author_portfolio_context`; acquire content with `pull_data` → (user approves the
+quote) → `confirm_pull` → `check_pull`. Then read: `analyze` (per brand, full
+fields; `mode: "semantic"` for partnership content; `distribution: "exhaustive"`
+for ranked pages; `itemIds` for full transcripts), `search_all` (keyword),
+`get_table_data` / `list_labels` (label quantification), `get_creative_dna`
+(what drives performance), `aggregate` (volume and cadence over time),
+`save_to_collection` (keep the evidence set).
 
-**Bash + curl + ffmpeg** — Thumbnails. Use the inline download script above.
+**`content-intelligence:thumbnails`** — Thumbnails. Fetches and embeds every
+reference image the report cites.
 
 **Cowork outputs** — Deliverable. Save HTML to outputs folder, thumbs to
 `outputs/thumbs/` referenced via relative paths.

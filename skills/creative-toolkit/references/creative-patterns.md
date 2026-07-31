@@ -1,5 +1,5 @@
 # Creative Pattern Analyzer Brain
-## Derived from 6,503 items in the Central Content Intelligence knowledge set
+## Derived from 6,503 items of Adology content intelligence
 ## Source: Meta Ware Creative Strategy — 360-degree analysis across 38 analytical dimensions
 
 ---

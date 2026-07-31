@@ -1,72 +1,62 @@
 ---
 name: analyze
-description: Run a quick competitive analysis on a brand or topic in your knowledge set
+description: Analyze a brand or topic across a project's tracked scope
 argument-hint: "<brand or topic>"
 ---
 
 When the user invokes `/analyze`, follow this process:
 
-## 1. Establish Context (Parallel)
+## 1. Land in a scope
 
-If no knowledge set has been established in this conversation, call **both in parallel**:
-- `list_knowledge_sets` — to present options
-- `whoami` — to understand the user's team context
+A read is only as good as what it is about. Orient with `whoami`, then `list_portfolios`, then `list_projects({ portfolioId })`. Reuse a project that already covers the subject, or `create_project` for a fresh one — there is no special home project.
 
-Once the user picks a KS, remember it for subsequent commands.
+Call `get_project` before analyzing. It returns the project's `dataScope` (the tracked set of sources it reads) plus per-source access: `expiredSources` have data only through a date, `ungrantedSources` are tracked but not yet acquired. That list is the denominator behind every number you are about to report. A project with an empty scope reads the portfolio's whole tracked universe until it is narrowed.
 
-## 2. Discover Dimensions
+To point the project at exactly the sources this question is about, use `update_project_scope`: `add` extends, `remove` trims, `replace` pins the scope to exactly the sources you name. Adding sources the pool already covers is free and instant.
 
-Call `list_labels` on the KS to see what label categories exist (HookType, ContentFormat, TonalQualities, etc.). This determines which `labelFields` are worth requesting in the analysis call. Do not guess at category names.
+## 2. See which dimensions exist
 
-## 3. Run the Analysis
+Call `list_labels({ projectId })` for the label dimensions and top values actually present in this scope. Use those exact names in `labelFilter` and `get_table_data` rows — a dimension the scope does not carry matches nothing, so an invented name turns the whole read into an empty result. If `list_labels` reports nothing, the scope holds no labeled items yet: analyze on engagement and content instead, and say that labels are unavailable.
 
-Call `analyze` with:
-- The KS ID and user's query
-- **`fields`** tailored to the question — e.g., `fields: ["hookMechanism", "creativeConcept", "viewsMultiple", "likesMultiple"]` for creative analysis, or `fields: ["engagementRate", "longevityMultiple"]` for performance analysis
-- **`labelFields`** based on what `list_labels` revealed — e.g., `labelFields: ["HookType", "ContentFormat"]`
+## 3. Read what is already there
 
-### Adapt Based on What You Find
+`analyze({ projectId, query })` is the workhorse. It returns posts with their creative analysis — `hookMechanism`, `creativeConcept`, `adDescription`, `transcript`, `oneLineInsight` — from the resolved scope. Choose the retrieval that matches the question:
 
-- **Small KS (<50 items):** Every item matters. Don't summarize distributions — walk through the standouts individually.
-- **Large KS (500+ items):** Focus on statistical patterns. Use `get_table_data` for aggregate breakdowns, then pull specific examples.
-- **Sparse labels:** If most items lack labels, rely on engagement metrics and content fields instead. Don't report on label distributions when coverage is low.
-- **Single platform:** Skip platform comparison. Go deeper on format, hook, and execution patterns within that platform.
-- **Multi-platform:** Note platform-specific patterns but don't force comparisons between platforms with wildly different engagement scales — use multiples (`likesMultiple`, `viewsMultiple`) not raw counts.
+- `distribution: "balanced"` (default) for a representative read across sources.
+- `distribution: "top"` (with `sortMetric`) for the highest-engagement content per source.
+- `distribution: "exhaustive"` with `sortBy: "likesMultiple"` (or another `*Multiple`) for a real ranked leaderboard over the full filtered set, with `totalEstimated` and `nextOffset` for paging.
+- `mode: "semantic"` when the ask is a meaning ("posts that make sustainability feel effortless") rather than a filter.
 
-## 4. Dig Into Top Performers
+Narrow before you sample: `feedNames`, `platformFilter`, `startDate`/`endDate`, `mediaTypeFilter`, `labelFilter`, and `outlierFilter: { metric, multipleGreaterThan }` all apply before sampling. Read `itemsReturned`, `hasMore`, and `nextOffset` on the response and page when the answer needs the whole set.
 
-Do not just report label stats. Find what is actually working:
-- Look at items with `isOutlier: true` or high `likesMultiple`/`viewsMultiple`
-- Call `get_item_detail` on 2-3 top items to read the actual creative (transcript, hook, visual description)
-- Understand WHY they worked, not just that they carry a certain label
+For quantities rather than examples, use `get_table_data` (pivot tables over label dimensions, metrics like `count`, `useRate`, `medianLikes`, `viralRate`) or `aggregate` (group by `platform` / `brand` / `feedType` / `format` / `time` with your own measures). Every `aggregate` row carries `n`; a ranking-shaped call comes back split into `rows` (groups that clear the reliability floor) and `directionalRows` (below it). Draw the finding from `rows` and cite `directionalRows` as directional, with their `n`.
 
-## 5. Present Findings
+## 4. When the scope genuinely lacks the data
 
-**What's Working (and Why)** — Lead with breakout content. Describe what the winning creatives actually DO — the hook approach, the narrative, the visual style, the CTA. Back it up with performance numbers (`likesMultiple`, `viewsMultiple`, source baselines). Don't say "Question hooks outperform" — describe what the specific winning question hooks say.
+Only reach for a pull when the subject is missing, not merely thin. `pull_data({ projectId, candidates })` costs nothing: it attaches sources the pool already covers to the project for free, and quotes only the gap — sources never completely fetched, or whose coverage has gone stale. Show the user `readyNow`, the per-source gap, the window it is priced over, and `estimatedCostCredits`. Only after they say yes, call `confirm_pull({ previewId, projectId })` — that is the step that charges credits. The fetch streams in over a minute or two; `check_pull({ runId })` reports progress.
 
-**Category Patterns** — Label distributions for macro context. Which hooks, formats, tones over-index (`timesCategoryAvg > 1.5`). Only include this section if label coverage is sufficient.
+## 5. Dig into the standouts
 
-**Actionable Recommendations** — 3-5 specific, data-backed recommendations. Reference actual items as examples. "Use [this specific approach] because [this specific item] got [X]x — here's what it does: [describe the creative]."
+Do not stop at distributions. Take the items with the highest `likesMultiple` / `viewsMultiple` or `isOutlier: true` and call `analyze({ projectId, itemIds })` for the by-id deep dive — full creative, labels, performance. Read what the winning post actually does before you explain why it won.
 
-## 6. Save and Follow Up
+## 6. Present findings
 
-Offer to save standout items to a collection via `save_to_collection` — share the returned URL so the user can view them in the app.
+**What's working, and why.** Lead with the breakout content and describe what it actually does — the hook, the narrative turn, the visual, the CTA. Back it with lift against the source baseline. "Question hooks over-index" is not a finding; "this hook asks whether the user's morning routine is wrong, and pulled 4.2x its source baseline" is.
 
-Suggest concrete next steps:
-- "Want me to compare this with a competitor? Try `/compare [brand A] vs [brand B]`"
-- "Want to save these standouts as a shareable collection? I can call `save_to_collection`."
-- "Want to dig deeper into a specific pattern I found?"
-- "Want to search across all of Adology's data, not just this KS? I can use `content_intelligence_search`"
+**Category patterns.** Label distributions for macro context, included only when label coverage is real.
 
-## Error Recovery
+**Recommendations.** Three to five, each tied to a specific item and a specific number, each actionable this week.
 
-- **Empty KS (0 items):** Check `get_knowledge_set` for feed configuration. If feeds exist but no items, data hasn't been scraped yet — suggest `trigger_fetch` or waiting.
-- **No labels:** Fall back to engagement-based analysis. Report on performance metrics, platform mix, content fields — skip label distributions entirely.
-- **Insufficient data for the query:** Be honest. "This KS only has 12 items matching that filter — not enough for pattern detection. Here's what I can see from these 12..." is better than fabricating trends.
+Say what the answer covers. If you read 80 of 1,240 matching items, or the scope's coverage ends in May, say so in the same breath as the finding.
 
-## Anti-Patterns
+## 7. Save and follow up
 
-- Do not lead with volume stats ("You have 847 items across 3 platforms"). Get to the insight.
-- Do not echo every label category back to the user. Surface only the dimensions that reveal something non-obvious.
-- Do not compare raw engagement numbers across platforms. Always use multiples.
-- Every claim must trace to specific data returned by the tool. Do not speculate.
+Offer `save_to_collection({ projectId, collectionName, itemIds })` for the standouts so the user can review them in the app. Then suggest the natural next move: a head-to-head with `/compare`, a table with `/export`, or a deeper cut on one pattern.
+
+## Anti-patterns
+
+- Do not open with volume statistics. Get to the insight.
+- Do not compare raw engagement across platforms or across sources of different size — use the multiples.
+- Do not present an empty or thin result as the answer. Check `get_project` for what the scope covers, and say what is missing.
+- Do not spend credits without a quote the user approved in the same turn.
+- Every claim traces to data the tools returned. No speculation.

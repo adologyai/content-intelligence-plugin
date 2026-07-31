@@ -1,246 +1,141 @@
 # Available Fields Reference
 
-Reference for queryable fields, filter options, and data formats when browsing and exporting content from Adology.
+What the server actually serves: the fields on an item, the filters each reader accepts, and the page limits. Every read is scoped by `projectId`.
 
-## Field Selection
+## Item fields
 
-Use `fields` and `labelFields` params on get_items, search_items, analyze, get_item_detail.
+### Base set — always returned by `analyze`
 
-### Base Set (always returned — no need to request)
-`id`, `brand`, `feedType`, `platform`, `headline`, `likes`, `views`, `shares`, `comments`, `engagementScore`, `isOutlier`, `outlierType`, `likesMultiple`, `createdAt`, `adDescription`, `transcript`
+`id`, `brand`, `feedType`, `platform`, `headline`, `likes`, `views`, `shares`, `comments`, `engagementScore`, `isOutlier`, `outlierType`, `likesMultiple`, `createdAt`, `url`, `thumbnail`
 
-### Content Analysis Fields
+Omit `fields` entirely and the item comes back with every analysis field it carries. Pass `fields` and you get the base set plus exactly what you named. Null and near-zero values are stripped, and `headline` is capped at 200 characters.
+
+`engagementScore` is the interactions composite — likes + comments + shares. `createdAt` is the item's last active date. `isOutlier` marks a statistical standout and `outlierType` says whether it was engagement or longevity that made it one.
+
+### Paid vs organic
+
+`query_items` and `aggregate` carry the brand's own boosted declaration: every `query_items` row has a `boosted` flag, and both tools take `excludeBoosted: true` for an organic-only read. The rule is evaluated live from the brand's context, so posts fetched after it was written are classified without re-saving anything. When you exclude boosted posts, say so alongside the numbers.
+
+### Performance and baseline fields (request via `fields`)
+
 | Field | What it tells you |
 |-------|-------------------|
-| `hookMechanism` | How the hook grabs attention |
-| `hookCategory` | Hook type classification |
-| `visualDescription` | What the creative looks like |
-| `visualConcept` | Visual concept/approach |
-| `mainMessage` | Core message/takeaway |
-| `creativeConcept` | Creative concept approach |
-| `creativeExecution` | How the concept is executed |
-| `creativeRationale` | Why this creative approach |
-| `narrativeStyle` | Storytelling approach |
-| `narrativeFormat` | Narrative structure |
-| `productionStyle` | Production quality/approach |
-| `emotionalMood` | Emotional tone |
-| `emotionalStrategy` | Emotional persuasion approach |
-| `emotionalTones` | Emotional tone tags |
+| `viewsMultiple`, `commentsMultiple`, `sharesMultiple` | Item metric vs its source's baseline |
+| `longevityMultiple` | Days alive vs the source's average |
+| `sourceMedianLikes`, `sourceMedianViews`, `sourceMedianComments`, `sourceMedianShares` | The denominators behind the multiples |
+| `sourceAvgLikes` | Source average likes |
+| `sourceItemCount` | How many items back that baseline |
+| `mediaType` | `image` or `video` |
 
-### Strategy & Positioning Fields
-| Field | What it tells you |
-|-------|-------------------|
-| `brandPositioning` | Brand positioning statement |
-| `competitiveContext` | Competitive positioning |
-| `strategyFunction` | Strategic purpose |
-| `uniqueSellingProposition` | USP highlighted |
-| `problemStatement` | Problem the ad solves |
-| `demandStyle` | Push vs pull demand |
-| `oneLineInsight` | One-line creative insight |
-| `noteworthy` | What stands out |
+Multiples are size-agnostic: 3x means the same on a 1K-follower account as on a 1M one. Never present a multiple without its `sourceMedian*` baseline. A multiple is null until the baseline batch has run for that source — sort by a `*Multiple` key to surface the rows that carry lift.
 
-### Audience & Product Fields
-| Field | What it tells you |
-|-------|-------------------|
-| `targetAudienceAge` | Target age range |
-| `targetAudienceGender` | Target gender |
-| `targetAudienceLifestyle` | Target lifestyle/psychographic |
-| `productDescription` | Product/service description |
-| `productDisplayStyle` | How product is shown |
-| `productBenefits` | Benefits highlighted |
-| `categoryEntryPoints` | Category entry points |
-| `features` | Product features |
+### Creative analysis fields (request via `fields`)
 
-### CTA & Offer Fields
-| Field | What it tells you |
-|-------|-------------------|
-| `ctaText` | Call-to-action text |
-| `ctaFraming` | CTA psychological framing |
-| `offerType` | Type of offer |
-| `offerDelivery` | How offer is delivered |
+Not every item carries every field. Ad-schema items and organic creator items are analyzed by different prompts, so creator fields resolve to null on ads and vice versa.
 
-### Performance Fields
-| Field | What it tells you |
-|-------|-------------------|
-| `viewsMultiple` | Views vs source average |
-| `commentsMultiple` | Comments vs source average |
-| `sharesMultiple` | Shares vs source average |
-| `longevityMultiple` | Ad longevity vs source average |
-| `sourceAvgLikes` | Source baseline avg likes |
-| `sourceMedianLikes` | Source baseline median likes |
-| `sourceP90Likes` | Source 90th percentile likes |
-| `sourceItemCount` | Total items from this source |
+**Content** — `transcript`, `adDescription`, `descriptionOfAd`, `contentSummary`, `descriptionOfScenes`, `mainMessage`, `oneLineInsight`, `noteworthy`, `collectiveMeaning`
 
-### Label Dimensions (via `labelFields`)
-**Standard taxonomy** (available on most KSs): Hook, Format, Emotion, Narrative, Production, Audio, Talent, Setting, Topic, Community, ContentType, CreatorIntent, CreatorPersona, DeliveryStyle, Editing, Mood, VisualStyle, Authenticity
+**Hook** — `hookMechanism`, `hookCategory`, `hookVideoMechanism`, `hookImageMechanism`, `tagsHook`
 
-**KS-specific** (discover via `list_labels`): Audience, Brand, CTA, Claims, Creative, DemandStyle, Features, Message, Offer, Persuasion, Problem, Solution, Trust, Visual, plus any custom dimensions
+**Visual** — `visualDescription`, `detailedVisualDescription`, `visualConcept`, `colorScheme`, `background`, `visualObjects`, `visualTechniques`, `cameraTechniques`, `textInFrame`, `tagsVisual`
 
-### Common Patterns
-| Goal | fields | labelFields |
-|------|--------|-------------|
-| Quick scan | `[]` | `[]` |
-| Hook deep dive | `["hookMechanism", "hookCategory"]` | `["Hook"]` |
-| Creative strategy | `["creativeConcept", "narrativeStyle", "productionStyle"]` | `["Format", "Narrative"]` |
-| Audience analysis | `["targetAudienceAge", "targetAudienceLifestyle"]` | `["Audience"]` |
-| CTA optimization | `["ctaText", "ctaFraming", "offerType"]` | `["CTA"]` |
-| Full creative review | `["hookMechanism", "visualDescription", "creativeConcept", "emotionalMood", "ctaText"]` | `["Hook", "Format", "Emotion"]` |
-| Competitive positioning | `["brandPositioning", "competitiveContext", "uniqueSellingProposition"]` | `[]` |
+**Creative and narrative** — `creativeConcept`, `creativeExecution`, `creativeRationale`, `narrativeStyle`, `narrativeFormat`, `productionStyle`, `tagsProduction`
 
-### Retrieval Strategy
+**Emotion** — `emotionalMood`, `emotionalStrategy`, `emotionalTones`, `emotionalTension`, `humor`, `tagsEmotional`
 
-The agent can make multiple tool calls in parallel. Use this pattern for comprehensive analysis:
+**Strategy and positioning** — `brandPositioning`, `competitiveContext`, `strategyFunction`, `uniqueSellingProposition`, `messagingUsp`, `messagingMessageTypes`, `problemStatement`, `demandStyle`, `audienceActivation`, `interpretiveRisk`, `tagsPersuasive`
 
-1. **Scan** — `get_items` limit=50, fields=[], labelFields=[] (~75KB, ~19K tokens)
-2. **In parallel**: `aggregate_items` by relevant dimensions + `list_labels` to discover available dimensions
-3. **Read** — `get_items` with targeted filters + specific fields + specific labelFields on the items that matter
-4. **Deep dive** — `get_item_detail` on 3-5 specific items (returns all fields by default)
+**Audience and product** — `targetAudienceAge`, `targetAudienceGender`, `targetAudienceLifestyle`, `productDescription`, `productBenefits`, `productDisplayStyle`, `categoryEntryPoints`, `features`
 
-**Budget guide:**
-- 3 calls of 50 base items = 150 items = ~225KB = ~56K tokens
-- 5 calls of 30 selective items = 150 items = ~150KB = ~37K tokens
-- For 200+ items, summarize between batches
+**CTA and offer** — `ctaText`, `ctaFraming`, `offerType`, `offerDelivery`
 
-## Item Fields
+**Creator and community** (organic items) — `creatorType`, `creatorPersona`, `creatorSelfNarrative`, `creatorTargetCommunity`, `creatorAuthorityBasis`, `contentType`, `primaryTopic`, `viewerValue`, `worldview`, `captionStyle`, `rhetoricDevices`, `interactionBait`, `authenticitySignals`, `authenticityScore`, `authenticityRationale`, `integrityScore`, `communityMarkers`, `hashtags`, `links`, `location`, `tagsCreatorStyle`, `tagsCommunity`, `tagsContentType`, `tagsIntent`
 
-Every content item can include these fields (request via `fields` parameter):
+**Commercial and trend signals** — `monetizationSignals`, `isCommercial`, `isAdvertisement`, `contentRating`, `sensitiveContent`, `trendName`, `trendParticipation`, `seriesContext`
 
-### Identification
+### Label dimensions (via `labelFields`)
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | string | MongoDB document ID (hex string) |
-| `brand` | string | Brand/feed name from knowledge set mapping |
-| `feedType` | string | Feed category: `brand`, `influencer`, `search`, `discussion` |
-| `platform` | string | Social media platform identifier |
-| `sourceLabel` | string | Human-readable source label (e.g., "Meta Ad Library", "Instagram Profile") |
+Which dimensions exist depends on what has been analyzed in this project — there is no fixed list. Call `list_labels({ projectId })` (or `get_table_data({ projectId, listDimensions: true })`) and use the names it returns. `labelFields: []` suppresses labels; omitting it returns all of them.
 
-### Content
+### `query_items` row shape
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `headline` | string | First 200 characters of post text |
-| `transcript` | string? | Video/audio transcript (what is being said) |
-| `adDescription` | string? | Best available ad summary/description |
-| `url` | string | Direct URL to the original social media post |
-| `thumbnail` | string | Public URL to the item's thumbnail image |
-| `mediaType` | string | Media type of first asset: `image` or `video` |
+`query_items` returns a fixed row rather than a selectable one: `itemId`, `externalUrl`, `platform`, `format`, `feedType`, `brand`, `firstActiveAt`, `lastActiveAt`, `headline`, `mediaType`, `likes`, `views`, `comments`, `shares`, the five `*Multiple` keys, `isOutlier`, `outlierType`, `sourceAvgLikes`, `sourceMedianLikes`, `sourceItemCount`, and `boosted`. Set `includeAnalysis: true` to add `hookCategory`, `mainMessage`, `narrativeStyle`, `emotionalMood`. Review items also carry `rating`, `reviewer`, and `product`.
 
-### Engagement Metrics
+## Filters by tool
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `likes` | number | Number of likes |
-| `views` | number | Number of views |
-| `shares` | number | Number of shares |
-| `comments` | number | Number of comments |
-| `engagementScore` | number | Composite: likes + views + shares |
-| `engagementRate` | number? | (likes + comments) / views. Undefined if views = 0 |
-| `timesAccountAvg` | number? | Post performance vs account average. 5.0 = 5x typical. Size-agnostic. |
+The same concept has different parameter names per reader.
 
-### Performance Enrichment
+| Concept | `analyze` | `query_items` | `aggregate` (under `filters`) | `get_table_data` |
+|---------|-----------|---------------|-------------------------------|------------------|
+| Platform | `platformFilter: string[]` | `platform: string` (one) | `platform: string[]` | `platforms: string[]` |
+| Entity / brand | `feedNames: string[]` | `brand: string[]` | `brand: string[]` | `brands: string[]` |
+| Feed type | `feedTypes: string[]` | `feedType: string[]` | `feedType: string[]` | `feedTypes: string[]` |
+| Media | `mediaTypeFilter: "video"\|"image"` | `mediaType: "video"\|"image"` | `format: string[]` | `mediaTypes: ("video"\|"image")[]` |
+| Dates | `startDate` / `endDate` | `startDate` / `endDate` | `from` / `to` (half-open) + `timeField` | `startDate` / `endDate` |
+| Labels | `labelFilter: {dimension,value}` or `{filters,mode}` | `labelFilters: [{category,values}]` + `labelMode` | — | `labelFilter: {filters,mode}` |
+| Lift threshold | `outlierFilter: {metric, multipleGreaterThan}` | `outlierMetric` + `minOutlierMultiple` | — | — |
+| Keyword | `query` (+ `mode:"semantic"` for meaning) | `query` | — | — |
+| Paid vs organic | — | `excludeBoosted: true` | `excludeBoosted: true` | — |
+| Comments | `includeComments: true` | `feedType: ["discussion"]` | `feedType: ["discussion"]` | — |
 
-Every item includes pre-computed performance multiples that compare the item's metrics to its source's baseline. These are size-agnostic -- a 3x likes multiple means the same thing whether the account has 1K or 1M followers.
+**Platforms:** `facebook`, `instagram`, `tiktok`, `youtube`, `twitter`, `linkedin`, `reddit`, `threads`.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `likesMultiple` | number | Item likes / source median likes |
-| `viewsMultiple` | number | Item views / source median views |
-| `commentsMultiple` | number | Item comments / source median comments |
-| `sharesMultiple` | number | Item shares / source median shares |
-| `longevityMultiple` | number | Item days alive / source avg days alive |
-| `isOutlier` | boolean | Pre-computed flag: true if the item is a statistical outlier |
-| `outlierType` | string? | `"engagement"` or `"longevity"` -- what made it an outlier |
+**Feed types:** `brand`, `influencer`, `search`, `discussion`.
 
-#### Source Baseline Context
+**Dates** are ISO-8601 strings. In `aggregate`, `from` is inclusive and `to` is exclusive.
 
-Each item also carries the baseline stats for its source, so you can contextualize raw numbers without a separate lookup.
+**Defaults worth knowing.** `analyze`'s sampled distributions restrict to the creative feeds (brand and influencer) when `feedTypes` is omitted; `distribution:"exhaustive"` applies no such default. Semantic mode pushes down `platformFilter`, `feedTypes`, the date range, and `includeComments` — the other filters do not reach the search, so apply them by re-reading the hits rather than assuming they were honored.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `sourceItemCount` | number | Total items scraped from this source |
-| `sourceAvgLikes` | number | Source average likes |
-| `sourceMedianLikes` | number | Source median likes |
-| `sourceStddevLikes` | number | Source standard deviation of likes |
-| `sourceP90Likes` | number | Source 90th percentile likes |
-| `sourceAvgViews` | number | Source average views |
-| `sourceMedianViews` | number | Source median views |
-| `sourceAvgComments` | number | Source average comments |
-| `sourceMedianComments` | number | Source median comments |
-| `sourceAvgShares` | number | Source average shares |
-| `sourceMedianShares` | number | Source median shares |
-| `sourceAvgDaysAlive` | number | Source average content longevity in days |
+**`search_all`** takes only `query`, `platformFilter`, and `limit`, and returns a compact row: `citation`, `itemId`, `platform`, `brand`, `headline`, `likes`, `views`, `likesMultiple`, `url`. Use `analyze` when you need fields, labels, or date and media filters.
 
-### Timing
+## Sort keys
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `createdAt` | string | ISO date string of post creation |
+`query_items` (`sortBy`) and `analyze` with `distribution:"exhaustive"` (`sortBy`) share one key set:
 
-## Supported Platforms
+`lastActiveAt` (default), `firstActiveAt`, `firstScrapedAt`, `likes`, `views`, `comments`, `shares`, `likesMultiple`, `viewsMultiple`, `commentsMultiple`, `sharesMultiple`, `longevityMultiple`
 
-| Platform ID | Display Name |
-|-------------|-------------|
-| `tiktok` | TikTok |
-| `instagram` | Instagram |
-| `youtube` | YouTube |
-| `facebook` | Facebook |
-| `twitter` | Twitter / X |
-| `reddit` | Reddit |
-| `linkedin` | LinkedIn |
-| `threads` | Threads |
+Engagement keys rank by absolute counts; `*Multiple` keys rank by lift against the source baseline. In the sampled distributions, `sortMetric` (`engagement`, `likes`, `views`, `shares`, `comments`) picks what `distribution:"top"` means.
 
-## Filter Options
+## Aggregate vocabulary
 
-### Feed Filter
+- **`groupBy`** — `platform`, `brand`, `feedType`, `format`, `time`. Include `time` and set `timeBucket` to `day`, `week`, `month`, `quarter`, or `year`.
+- **`filters.timeField`** — `lastActiveAt` (default), `firstActiveAt`, `firstScrapedAt`.
+- **`measures`** — each takes `field` (`likes`, `views`, `comments`, `shares`, `engagementTotal`, or `*`) or a custom `expr` over those metrics with `+ - * /`, plus `fn` (`sum`, `avg`, `median`, `count`, `min`, `max`) and an optional alias `as`. An `expr` requires `as`.
+- **`having`** — post-grouping filter on a measure alias, e.g. `[{measure:"n", op:">=", value:5}]`.
+- **`sort`** — by a dimension name or a measure alias, `asc` or `desc`.
 
-Narrow results to specific feeds within a Knowledge Set:
+Every row carries `n`, the item count behind it, whether or not you asked for a count. `groupBy: ["brand"]` spans all feed types, so discussion sources appear under their subreddit name; add `filters.feedType: ["brand"]` for a competitor-only cut.
 
-- **paidBrandFeeds** -- Brand feeds filtered to Ad Library sources only
-- **organicBrandFeeds** -- Brand feeds filtered to organic social sources only
-- **personFeeds** -- Influencer feeds by name
-- **searchFeeds** -- Search term feeds by term
-- **discussionFeeds** -- Reddit subreddit feeds by name
+## Pivot vocabulary (`get_table_data`)
 
-### Platform Filter
+- **`rows`** — one label dimension, or two for a composite table.
+- **`columns`** — `brand`, `platform`, `feedType`, `mediaType`, `timePeriod`, `focalVsRest`, or `none` (default). `timePeriod` needs `timePeriod: {granularity}` (`week` | `month` | `quarter`); `focalVsRest` needs `focalBrand`, and `expandRest: true` breaks out the other brands.
+- **`metrics`** — up to four of `count`, `useRate`, `medianLikes`, `medianViews`, `medianShares`, `viralRate`. Default `["count","useRate"]`. The medians exclude zero-engagement Ad Library items; the counts include every labeled item.
 
-An array of platform identifiers to include. When omitted, all platforms are included.
+## Page limits
 
-### Date Range
+| Tool | Page size | Paging |
+|------|-----------|--------|
+| `analyze` | default 40, max 80 | `offset` up to 4000; read `itemsReturned`, `hasMore`, `nextOffset` |
+| `query_items` | default 80, max 500 | `offset`; read `fetchedCount`, `totalEstimated`, `hasMore`, `nextOffset` |
+| `aggregate` | default 200 rows, max 5000 | — |
+| `get_table_data` | `topN` default 15, max 50 | `rowOffset` |
+| `list_labels` | 30 dimensions, 10 values each (`topValuesPerDimension` max 20) | `offset`, `hasMore` |
+| `search_all` | default 20, max 50 | `totalEstimated`, `hasMore` |
 
-| Parameter | Format | Description |
-|-----------|--------|-------------|
-| `startDate` | ISO string (e.g., `2025-01-01`) | Include items from this date onward |
-| `endDate` | ISO string (e.g., `2025-12-31`) | Include items up to this date |
+`analyze` fits its page to a response-size budget, so a call can return fewer items than `limit` — loop on `nextOffset` until `hasMore` is false rather than assuming the first page is the whole set.
 
-### Media Format
+## Retrieval strategy
 
-Filter by content type: `image`, `video`, or `both`.
+1. **Orient** — `get_project` for what the scope covers, in parallel with `list_labels` for the dimensions available.
+2. **Quantify** — `aggregate` or `get_table_data` for the shape of the whole set. Grouped rows are cheap; items are not.
+3. **Illustrate** — `analyze` with targeted filters and a short `fields` list on the items that matter.
+4. **Deep dive** — `analyze({ itemIds })` on the three to five posts you will actually cite.
 
-## Sort Options
+Fetch grouped math before item pages, keep `fields` narrow once you know what you are looking for, and summarize between batches on large sets rather than holding hundreds of items at once.
 
-Items from the analysis pipeline are sampled using an egalitarian strategy that balances representation across brands and feed types. Within the pipeline, engagement metrics (likes, views, shares) and recency (createdAt) are used for ranking.
+## Notes on missing values
 
-## Label Dimensions
+Some platforms simply don't report a metric: Facebook Ad Library items carry no engagement data, and Reddit view counts are unavailable. `get_table_data`'s medians exclude those no-signal items rather than counting them as zero, while `count`, `useRate`, and `viralRate` include every labeled item — so a median and a count over the same cell can rest on different denominators. Say which you are quoting.
 
-Content can be analyzed by any of the 50+ label categories applied during content classification. Key dimensions for filtering and analysis:
-
-- HookPrimaryCategory, HookSecondaryCategory
-- VisualExecutionStyle, CreativeConcept
-- CTAActionType, CTAFraming
-- TonalQualities, BrandVoice
-- FunnelAlignment, MarketingObjective
-- DemographicAge, DemographicLifestyle
-- Platform, AspectRatio, VideoDurationCategory
-
-Label data is available both as aggregate statistics in `tableData.labelDistributionsByFeedType` and per-item via the `labelFields` parameter on item-returning tools.
-
-**Note on null fields:** Some fields may be null for certain items (e.g., `transcript` for image-only posts, `targetAudienceLifestyle` for unanalyzed items). Skip items with empty requested fields — focus on items where the data exists.
-
-## Export Formats
-
-| Format | Extension | Description |
-|--------|-----------|-------------|
-| Spreadsheet | CSV | Tabular data for Excel, Google Sheets, BI tools |
-| JSONL | .jsonl | One JSON object per line, for programmatic consumption |
-| Text | .txt | Human-readable formatted summaries |
+Fields resolve to null when the item's analysis doesn't carry them — `transcript` on an image post, creator fields on an ad, any analysis field on an item that hasn't been analyzed yet. Skip those items rather than treating a null as a finding, and check `access` in the response envelope when a whole source looks empty: it may be tracked but never acquired.

@@ -1,14 +1,14 @@
 # Adology — Content Intelligence
 
-Competitive ad intelligence inside Claude and other AI agents. Discover brands, build knowledge sets, analyze ad content, coach creators, vet influencers, run audience deep-dives, and generate strategic insights — all powered by Adology's data platform.
+Competitive ad intelligence inside Claude and other AI agents. Discover brands, build portfolios and project scopes, analyze ad content, coach creators, vet influencers, run audience deep-dives, and generate strategic insights — all powered by Adology's data platform.
 
 ## What This Plugin Does
 
-The `content-intelligence` plugin connects your AI agent to your Adology workspace, giving you access to competitive ad intelligence directly in conversation. You can search for brands, manage knowledge sets, run content analysis, coach influencer accounts, vet creator partnerships, and produce strategy artifacts without leaving your AI agent.
+The `content-intelligence` plugin connects your AI agent to your Adology workspace, giving you access to competitive ad intelligence directly in conversation. You can search for brands, manage portfolios and project scopes, run content analysis, coach influencer accounts, vet creator partnerships, and produce strategy artifacts without leaving your AI agent.
 
 ## Capabilities
 
-- **Knowledge Set Management** — Create, configure, and manage knowledge sets that track brands and competitors across ad platforms.
+- **Portfolio & Project Management** — Create and manage brand portfolios (a brand's tracked universe) and project scopes that track brands, influencers, searches, and discussions across platforms.
 - **Brand Discovery** — Search for brands across TikTok, Instagram, Facebook, YouTube, and more.
 - **Competitive Analysis** — Compare ad strategies, creative approaches, and content patterns across brands.
 - **Content Intelligence** — Analyze ad content with AI-powered labeling, structural analysis, and pattern detection.
@@ -31,14 +31,14 @@ The `content-intelligence` plugin connects your AI agent to your Adology workspa
 | Skill                  | Purpose                                                                        |
 | ---------------------- | ------------------------------------------------------------------------------ |
 | `getting-started`      | Onboarding walkthrough for first-time users                                    |
-| `brand-builder`        | Build a knowledge set around a brand and its competitors                       |
+| `brand-builder`        | Build a portfolio and project scope around a brand and its competitors                       |
 | `content-strategist`   | Quick creative analysis: hooks, formats, CTAs                                  |
 | `data-explorer`        | Query and explore Adology data fields directly                                 |
 | `research-analyst`     | Multi-step research patterns; standard and heavy modes                         |
 | `brand-marketing-mode` | Strategic brand thinking: positioning, landscape, content, go-to-market        |
 | `audience-deep-dive`   | Behaviorally grounded audience profile + empathy canvas + insight brief        |
 | `creative-toolkit`     | Living library of hooks/angles/scripts in the brand's voice, data-sourced      |
-| `influencer-coach`     | Personalized creator coaching from knowledge set + account analysis            |
+| `influencer-coach`     | Personalized creator coaching from portfolio + account analysis            |
 | `influencer-vetting`   | Score and select influencer/creator partners with evidence-based fit analysis  |
 | `thumbnails`           | Reliable embedding of Adology thumbnails in generated documents                |
 

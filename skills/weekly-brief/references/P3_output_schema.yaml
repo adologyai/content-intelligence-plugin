@@ -1,17 +1,17 @@
 # Page 3: Social Trends + Coaching — Output Schema
 #
 # !! FABRICATED EXAMPLE — every value below (brand names, headlines, quotes,
-# numbers, ks_id) is illustrative only. DO NOT copy any value verbatim into a
+# numbers, project_id) is illustrative only. DO NOT copy any value verbatim into a
 # real brief. The brand names in the prose (Glossier, Rhode, MAC, Fenty,
 # Charlotte Tilbury, Rare Beauty, etc.) are part of a worked example to show
-# *voice and structure* — replace them with the actual primary brand and KS
-# competitors pulled from the live data.
+# *voice and structure* — replace them with the actual primary brand and the
+# competitors the project actually tracks.
 #
 # Field names and structure must be followed exactly.
 
 # ── Inputs ──
-ks_id: "EXAMPLE_KS_ID"
-ks_name: "EXAMPLE_KS_NAME"
+project_id: "EXAMPLE_PROJECT_ID"
+project_name: "EXAMPLE_PROJECT_NAME"
 primary_brand: "EXAMPLE_PRIMARY_BRAND"
 week_start: "2026-03-24"
 week_end: "2026-03-30"
@@ -41,7 +41,7 @@ trends:
       - brand: "Rhode \"Snap Into Spring\" · 70K"
         url: "https://www.instagram.com/p/DWWoLhyFJVh/"
     desc: "MAC's \"90s products you still dream about\" hit 35K with pure heritage storytelling. Charlotte Tilbury x Sarah Michelle Gellar (24K). Rhode's mirror selfie collage taps social proof nostalgia. Pattern: shared cultural memory → audience fills in the emotion."
-    glossier_play: "White space — your last 60 days are 100% Sensory Appeal. A <strong>\"The OG Glossier Shelf\"</strong> throwback series (2014–2016 launches, pink pouches, Balm Dotcom originals) taps brand heritage your Reddit community already references."
+    brand_play: "White space — your last 60 days are 100% Sensory Appeal. A <strong>\"The OG Glossier Shelf\"</strong> throwback series (2014–2016 launches, pink pouches, Balm Dotcom originals) taps brand heritage your Reddit community already references."
 
   - num: 2
     name: "Celebrity Founder Raw Demos"
@@ -55,7 +55,7 @@ trends:
       - brand: "Rare Beauty — Selena demo · 39K"
         url: "https://www.instagram.com/p/DWbxtFui6LG/"
     desc: "Rhode's Hailey masking (187K), Rihanna's blush application (102K), Selena's foundation demo (39K). Same format: founder + product + camera. No script, no studio — collapses the aspiration-to-trust gap."
-    glossier_play: "Zero human-led content in your last 60 days. CMO Nicole Solórzano as <strong>\"the insider who uses the product daily\"</strong> — a \"Nicole's Morning 3\" routine series differentiates through executive authenticity."
+    brand_play: "Zero human-led content in your last 60 days. CMO Nicole Solórzano as <strong>\"the insider who uses the product daily\"</strong> — a \"Nicole's Morning 3\" routine series differentiates through executive authenticity."
 
   - num: 3
     name: "Animated Brand Mascots"
@@ -69,7 +69,7 @@ trends:
       - brand: "Fenty Mascot Crew Teaser · 16K"
         url: "https://www.instagram.com/p/DWUYa7UD9f9/"
     desc: "Fenty created animated characters per blush shade — a pink bear for \"Bow Peep,\" a purple spy bunny for \"Violet Vice$.\" Shades become collectible identities, turning a launch into a community event."
-    glossier_play: "Think <strong>\"Glossier Doodles\"</strong>: subtle hand-drawn characters layered on product shots. Cloud Paint shades (Beam, Dusk, Storm) already have evocative names — give them visual personalities. First-ever animation in your feed."
+    brand_play: "Think <strong>\"Glossier Doodles\"</strong>: subtle hand-drawn characters layered on product shots. Cloud Paint shades (Beam, Dusk, Storm) already have evocative names — give them visual personalities. First-ever animation in your feed."
 
   - num: 4
     name: "Purpose-Driven Fashion Collabs"
@@ -83,7 +83,7 @@ trends:
       - brand: "MAC Dominique Jackson · 16K"
         url: "https://www.instagram.com/p/DWg0um8CtCp/"
     desc: "MAC x Conner Ives: \"Protect the Dolls\" lipstick with 100% charity proceeds, bold typographic visuals, 27K eng. Brand commerce fused with community values — triggers Belonging + Love emotional responses."
-    glossier_play: "Your bottle painting activation (28K eng) proved art + product + community works. <strong>Scale into a named quarterly collab series</strong> with emerging artists — limited packaging + in-store + social. Extends your experiential strength into a franchise."
+    brand_play: "Your bottle painting activation (28K eng) proved art + product + community works. <strong>Scale into a named quarterly collab series</strong> with emerging artists — limited packaging + in-store + social. Extends your experiential strength into a franchise."
 
   - num: 5
     name: "Cross-Category Lifestyle Collabs"
@@ -97,7 +97,7 @@ trends:
       - brand: "Sephora SEPHORiA LA · 18K"
         url: "https://www.instagram.com/p/DWY4f1zldAn/"
     desc: "Sephora x Call Her Daddy giveaway hit 171K merging podcast fandom with beauty retail. e.l.f. x Dutch Bros \"bestie road trip\" (37K) fused coffee culture with Gen Z beauty. Pattern: borrow another audience by meeting them in their context."
-    glossier_play: "You Soie's \"vacation state of mind\" is all product-on-sand. <strong>Partner with a lifestyle brand</strong> (boutique hotel, surf brand, indie bookshop) for a co-branded \"Glossier Getaway\" kit. Zero cross-category collabs in your last 60 days."
+    brand_play: "You Soie's \"vacation state of mind\" is all product-on-sand. <strong>Partner with a lifestyle brand</strong> (boutique hotel, surf brand, indie bookshop) for a co-branded \"Glossier Getaway\" kit. Zero cross-category collabs in your last 60 days."
 
 # ── Coaching Posts (3 items) ──
 # Primary brand posts with specific optimization tweaks.
@@ -132,7 +132,7 @@ coaching:
 
 # CONSTRAINTS:
 # - trends: exactly 5, each with 3 clickable source links
-# - trend desc + glossier_play: COMPACT, max ~60 words each (page space is tight)
+# - trend desc + brand_play: COMPACT, max ~60 words each (page space is tight)
 # - coaching: exactly 3 primary brand posts
 # - All URLs must be real, clickable permalinks
 # - All thumb_b64 must be real downloaded + encoded images (not placeholders)

@@ -6,69 +6,62 @@ argument-hint: "<brand A> vs <brand B>"
 
 When the user invokes `/compare`, follow this process:
 
-## 1. Parse and Resolve
+## 1. Resolve both sides to tracked entities
 
-Split the input on "vs", "versus", "compared to", "and", or "against" to identify two brands or topics. If you cannot identify exactly two, ask: "Which two brands or topics would you like me to compare?"
+Split the input on "vs", "versus", "compared to", "and", or "against". If you cannot identify exactly two subjects, ask which two.
 
-Determine whether the brands live in the **same KS** or **different KSs**:
-- Same KS: you will filter by `feedNames` within a single KS
-- Different KSs: use `compare_knowledge_sets` for the cross-KS comparison
+Both sides have to be tracked before they can be compared. Orient with `list_portfolios` → `list_projects({ portfolioId })`, then call `get_project` and read its `dataScope`: the entity names it tracks are the names the read tools will match. `aggregate({ groupBy: ["brand"] })` is the fastest way to see which names actually carry items.
 
-If no KS has been established, call `list_knowledge_sets` and ask.
+If one side is not tracked anywhere in the project, say so before analyzing. Resolve its real handles with `lookup_brands`, add it to the portfolio's tracked universe with `author_portfolio_context`, then `pull_data` → show the quote → `confirm_pull` once the user approves the credits. A comparison against a brand with no data is not a comparison.
 
-## 2. Run Both Analyses in Parallel
+If the two brands live in different projects, run the same reads once per project and compare the results — say plainly that the two sides were read from different scopes and note any difference in coverage window.
 
-**This is critical — do not run sequentially.**
+## 2. Bind each read to one entity
 
-For same-KS comparisons, call `analyze` twice **in parallel**:
-- Brand A: `feedNames` filtered to brand A, `fields` and `labelFields` tailored to the comparison
-- Brand B: `feedNames` filtered to brand B, same field selection
+Each tool names the entity filter differently, and using the wrong one silently compares the whole scope against itself:
 
-For cross-KS comparisons, call `compare_knowledge_sets` which handles the parallel data retrieval internally.
+- `query_items({ brand: ["Sephora"] })` — the surest binding. It resolves the name against the project's tracked roster case-insensitively, and a name the project does not track comes back as an `entityScope` gap listing what *is* tracked, rather than as a scope-wide ranking dressed up as that brand's.
+- `analyze({ feedNames: ["Sephora"] })` — applies in the sampled and exhaustive reads. Semantic mode retrieves by meaning across the scope and does not narrow on `feedNames`, so bind the entity a different way when you use it.
+- `aggregate({ filters: { brand: [...] } })` — a case-insensitive name filter, or group by `brand` to get both sides in one call. A misspelled or untracked name yields empty groups rather than a gap notice, so confirm the spelling against a `groupBy: ["brand"]` pass first.
+- `get_table_data({ brands: [...] })`, or better, `columns: "focalVsRest"` with `focalBrand` set.
+- `get_creative_dna({ feedNames: [...] })` or `entities: [{ type, name }]`.
 
-## 3. Pull Example Items in Parallel
+## 3. Run the two sides in parallel
 
-Once you have the analysis results, call `get_items` for each brand **in parallel** to pull specific examples:
-- Brand A's top 3 outliers (sorted by `likesMultiple` or `viewsMultiple`)
-- Brand B's top 3 outliers
+They are independent reads — issue them together, not one after the other.
 
-These concrete examples are what make the comparison actionable — without them, you are just reporting label distributions.
+The most direct head-to-head is a single `get_table_data` call with `columns: "focalVsRest"`, `focalBrand: "<brand A>"`, and `expandRest: true`: it puts one brand's label mix against the field in one table. Follow it with `get_creative_dna`, whose VS CATEGORY section reports each brand's unique advantages and gaps against the rest of the scope, and whose OPPORTUNITY LABELS section names the lean-in and cut-back moves.
 
-## 4. Build the Comparison
+Then pull the evidence: `analyze({ feedNames: [...], distribution: "exhaustive", sortBy: "likesMultiple", limit: 10 })` for each brand. The concrete winning posts are what make the comparison actionable — a table of label percentages is not.
 
-Present a side-by-side markdown table. Focus on dimensions where the brands actually differ — skip rows where they are essentially the same.
+## 4. Build the comparison
 
-**When one brand dominates engagement:** Use multiples, not raw numbers. "Brand A averages 2.3x their baseline likes vs Brand B's 0.8x" is meaningful. "Brand A gets 45K likes vs Brand B's 12K" conflates audience size with content quality.
+Present a side-by-side table over the dimensions where the two actually diverge. Drop the rows where they are the same; a difference of two points is not a difference.
 
-**When platforms differ:** Do not compare Brand A's TikTok directly to Brand B's YouTube. Compare each brand's performance relative to their own platform baselines.
+Compare lift, not totals. "Brand A's top posts run 2.3x their own baseline while Brand B's run 0.8x" is a statement about content. "Brand A gets 45K likes and Brand B gets 12K" is mostly a statement about audience size. The same rule holds across platforms: compare each brand against its own platform baselines rather than putting one brand's TikTok next to the other's YouTube.
 
-## 5. Highlight Competitive Advantages
+Watch the `n` on every aggregate row. A ranking-shaped `aggregate` splits into `rows` (above the reliability floor) and `directionalRows` (below it) — a one-post group is a signal, not a result, and never a winner.
 
-For each brand, call out where it outperforms with specific numbers from the analysis. Back every claim with a concrete example:
-- "Brand A's question hooks outperform at 2.1x — see [specific item] which opens with '[actual hook text]' and pulled 3.4x likes"
-- Not just "Brand A has better hooks"
+## 5. Show where each one wins
 
-## 6. Strategic Recommendations
+For each brand, name the advantage and prove it with a specific post: what the creative does, and the multiple it pulled. Use `analyze({ itemIds })` to read the full creative on the two or three posts you are going to cite.
 
-3-5 actionable insights:
-- What Brand A could learn from Brand B's top performers (cite the specific items)
-- What Brand B could learn from Brand A
-- Gaps neither brand is exploiting — use `content_intelligence_search` to find examples from other brands filling that gap
-- Platform-specific strategies where one brand has a clear edge
+## 6. Recommendations
 
-## 7. Save and Follow Up
+Three to five moves, each tied to a finding:
 
-Offer to save each brand's top performers to separate collections via `save_to_collection` — share the returned URLs.
+- What Brand A should take from Brand B's top performers, citing the posts.
+- What Brand B should take from Brand A.
+- The space neither one occupies — the label combinations `get_creative_dna` flags as opportunity, or a search-demand gap from `seo_keywords` if the question is about categories rather than posts.
 
-Suggest next steps:
-- "Want me to go deeper on either brand? Try `/analyze [brand]`"
-- "Want to save each brand's top performers to shareable collections? I can call `save_to_collection`."
-- "Want to look at a specific platform or time period?"
-- "Want to find how other brands handle [gap identified]? I can search the full Adology database."
+## 7. Save and follow up
 
-## Anti-Patterns
+Save each side's standouts to its own collection with `save_to_collection` so the user can review them in the app. Then offer the natural next step: `/analyze` on one brand, `/export` for the table, or a narrower cut by platform or window.
 
-- Do not compare raw engagement numbers across platforms or across brands with different audience sizes. Always use multiples.
-- Do not list every label category side by side. Surface only dimensions where the brands meaningfully differ.
-- Every claim must cite specific data or specific items. Vague comparisons ("Brand A has more engaging content") are not acceptable.
-- Do not run the two brand analyses sequentially. They are independent — run them in parallel.
+## Anti-patterns
+
+- Do not compare raw counts across brands of different size or across platforms.
+- Do not report a comparison where one side is thin without saying how thin — give the item count for both sides.
+- Do not list every label dimension side by side. Show the ones where the two brands differ.
+- Do not run the two sides sequentially. They are independent.
+- Do not spend credits to fill a gap without quoting it and getting a yes first.

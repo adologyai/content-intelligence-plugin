@@ -11,7 +11,7 @@
 Our primary archetype is **[Primary]**, with **[Secondary]** [and optionally **[Secondary 2]**] adding texture. Together they give us a voice that [one short sentence — what this voice does for the audience].
 
 The biggest changes from how we sound today:
-1. [Change 1 — one line, specific behaviour]
+1. [Change 1 — one line, specific behavior]
 2. [Change 2]
 3. [Change 3]
 
@@ -45,7 +45,7 @@ We considered **[Alternative archetype]** because [reason]. We rejected it becau
 
 **Where we are distinctive:** [1–2 sentences. The territory we own that nobody else does.]
 
-**Where we overlap and how we'll sharpen:** [1–2 sentences. The watch-out and the specific verbal behaviours we'll use to differentiate.]
+**Where we overlap and how we'll sharpen:** [1–2 sentences. The watch-out and the specific verbal behaviors we'll use to differentiate.]
 
 ---
 
@@ -105,7 +105,7 @@ Marketing copy is where the archetype shows up fully. The Lover can be sensual, 
 
 ### 6.2 Service voice dials back
 
-When a customer is in a service moment — they need help, something went wrong, they have a question — personality is friction. Service voice keeps the archetype *recognisable* but removes anything that would slow them down or feel performative.
+When a customer is in a service moment — they need help, something went wrong, they have a question — personality is friction. Service voice keeps the archetype *recognizable* but removes anything that would slow them down or feel performative.
 
 **Specifically:**
 - [3–4 dial-back rules for this brand, e.g., "No jokes in service contexts. The Jester sits down."]
@@ -120,7 +120,7 @@ When a customer is in a service moment — they need help, something went wrong,
 > "[Render with archetype dial turned up.]"
 
 **Service voice:**
-> "[Render with archetype recognisable but dial turned down for clarity and reassurance.]"
+> "[Render with archetype recognizable but dial turned down for clarity and reassurance.]"
 
 **Why the difference:** [1–2 sentences.]
 
@@ -189,6 +189,6 @@ For each of [Competitor 1, 2, 3] — primary archetype reading + 2–3 example v
 
 ### A.3 Methodology
 
-- **Sample:** [N] items from the brand's Adology knowledge set, drawn across `distribution="balanced"` and `distribution="recent"` calls, dated [start]–[end].
+- **Sample:** [N] items from the brand's sources in the Adology project scope, drawn across `distribution: "balanced"` and `distribution: "recent"` reads, dated [start]–[end].
 - **Classification:** Each item read against the 12-archetype framework (Mark & Pearson). Primary archetype assigned per item based on dominant voice markers.
 - **Limitations:** Content reflects what the brand publishes, not what it intends. Engagement is not measured. Service and CRM voice (which this guide also covers) was not part of the Adology audit and was assessed separately from [supplied samples / website / direct observation].

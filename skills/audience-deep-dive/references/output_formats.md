@@ -18,18 +18,18 @@ A two-column strip at the top that defines the person before anything else:
 These two are the foundation. Everything in the empathy map below should be read *through* them.
 
 ### Band 2 — The empathy map (inputs → synthesis)
-Underneath, a classical empathy map arranged so the centre reads visibly as the synthesis of the four inputs around it:
+Underneath, a classical empathy map arranged so the center reads visibly as the synthesis of the four inputs around it:
 - **What they see** (top-left) — split explicitly into two sub-sections inside the same panel:
   - *From our brand* — how our specific brand shows up in their world (advertising, social, events, retail, website, open days).
   - *From the wider category* — the category context our brand lives inside (competitor codes, conventions, dominant tropes, category news).
-  The brand always lives *inside* the category. Showing them side-by-side forces the strategist to see our brand in its true context, and surfaces the gaps between our behaviour and category norms.
+  The brand always lives *inside* the category. Showing them side-by-side forces the strategist to see our brand in its true context, and surfaces the gaps between our behavior and category norms.
   For category-level briefs with no single focal brand: replace "From our brand" with "From specific operators" and list the shortlist (2–4 named operators) there, then use the category sub-section for category-wide patterns.
 - **What they hear** (top-right) — friends, family, peers, authorities, the grapevine (step 5).
 - **What they say** (bottom-left) — verbatim language, pulled with quotation marks (step 6).
-- **What they do** (bottom-right) — observable behaviour, journey, moments of truth (step 7 + step 9).
-- **What they think & feel** (centre, tinted, larger) — the System 1 decoder, pains, gains, cultural tension (step 4 + step 8). This is the strategist's read on what the four inputs *add up to*. Treat it as the synthesis — not another co-equal box.
+- **What they do** (bottom-right) — observable behavior, journey, moments of truth (step 7 + step 9).
+- **What they think & feel** (center, tinted, larger) — the System 1 decoder, pains, gains, cultural tension (step 4 + step 8). This is the strategist's read on what the four inputs *add up to*. Treat it as the synthesis — not another co-equal box.
 
-The template draws a hairline cross behind the centre panel to reinforce the visual logic: inputs flow in, synthesis lands in the middle.
+The template draws a hairline cross behind the center panel to reinforce the visual logic: inputs flow in, synthesis lands in the middle.
 
 **Header band:** Audience one-liner, Goal (= business goal for this audience), For / Date / Strategist meta.
 

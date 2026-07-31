@@ -1,17 +1,17 @@
 # Page 2: Market Signals — Output Schema
 #
 # !! FABRICATED EXAMPLE — every value below (brand names, headlines, quotes,
-# numbers, ks_id) is illustrative only. DO NOT copy any value verbatim into a
+# numbers, project_id) is illustrative only. DO NOT copy any value verbatim into a
 # real brief. The brand names in the prose (Glossier, Rhode, MAC, Fenty,
 # Charlotte Tilbury, The Ordinary, etc.) are part of a worked example to show
-# *voice and structure* — replace them with the actual primary brand and KS
-# competitors pulled from the live data.
+# *voice and structure* — replace them with the actual primary brand and the
+# competitors the project actually tracks.
 #
 # Field names and structure must be followed exactly.
 
 # ── Inputs ──
-ks_id: "EXAMPLE_KS_ID"
-ks_name: "EXAMPLE_KS_NAME"
+project_id: "EXAMPLE_PROJECT_ID"
+project_name: "EXAMPLE_PROJECT_NAME"
 primary_brand: "EXAMPLE_PRIMARY_BRAND"
 week_start: "2026-03-24"
 week_end: "2026-03-30"
@@ -190,13 +190,15 @@ brands:
     bar_width_pct: 0.1
     is_primary: false
 
-# ── Paid Activity (5 brands) ──
-# From Meta Ad Library. Sorted by ad count descending.
+# ── Paid Presence (5 brands) ──
+# The boosted count per brand: the same `aggregate` call run twice over the
+# window, once plain and once with filters.excludeBoosted = true. The difference
+# is what the brand declared boosted. Sorted by boosted count descending.
 paid:
   - brand: "Ulta Beauty"
     count: "279"
     msg: "Spring sale, rewards, brand exclusives"
-    persist: "high"                # high / med / new
+    persist: "high"                # high / med / new — how far back the boosted run goes
     persist_label: "30+ days"
   - brand: "Rare Beauty"
     count: "38"
@@ -251,7 +253,7 @@ plays:
 # - hooks: up to 6, sorted by median_likes descending
 # - combos: 4 rows, sorted by median_likes descending
 # - brands: up to 8, primary brand marked with is_primary: true
-# - paid: 5 brands from Meta Ad Library
+# - paid: 5 brands by boosted-post count over the window
 # - plays: exactly 3 (Defend, Attack, Watch)
 # - All bar_width_pct values relative to largest in their category (largest = 100%)
 # - Signal badges use CSS classes: signal-threat, signal-watch, signal-opportunity, signal-internal

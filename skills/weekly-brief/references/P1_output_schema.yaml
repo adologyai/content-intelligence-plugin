@@ -1,17 +1,17 @@
 # Page 1: Visual Scoreboard + Intel Strip — Output Schema
 #
 # !! FABRICATED EXAMPLE — every value below (brand names, headlines, quotes,
-# numbers, ks_id) is illustrative only. DO NOT copy any value verbatim into a
+# numbers, project_id) is illustrative only. DO NOT copy any value verbatim into a
 # real brief. The brand names in the prose (Glossier, Rhode, MAC, Fenty,
 # Charlotte Tilbury, etc.) are part of a worked example to show *voice and
-# structure* — replace them with the actual primary brand and KS competitors
-# pulled from the live data.
+# structure* — replace them with the actual primary brand and the competitors
+# the project actually tracks.
 #
 # Field names and structure must be followed exactly.
 
 # ── Inputs ──
-ks_id: "EXAMPLE_KS_ID"
-ks_name: "EXAMPLE_KS_NAME"
+project_id: "EXAMPLE_PROJECT_ID"
+project_name: "EXAMPLE_PROJECT_NAME"
 primary_brand: "EXAMPLE_PRIMARY_BRAND"
 week_start: "2026-03-24"
 week_end: "2026-03-30"
@@ -167,7 +167,9 @@ spotlight:
   thumb_b64: "data:image/jpeg;base64,..."
   rank_this_week: 7                  # Position if included in full ranked list
   gap_to_leader: "6.7x"             # Round(leader_eng_raw / spotlight_eng_raw, 1)
-  active_ads: 31                     # Count of active Meta ads for primary brand
+  lift: "3.4x"                       # spotlight.likesMultiple
+  lift_baseline: "8.2K"              # spotlight.sourceMedianLikes — always printed with lift
+  boosted_posts: 31                  # Posts the primary brand declared boosted this window
   hook_performance: "0.5x"           # Primary brand's dominant hook multiplier
   insight: "Your Sensory Appeal hook sits at 0.5x avg — the content is resonating locally but needs TikTok amplification to close the celebrity-founder gap."
   comments:

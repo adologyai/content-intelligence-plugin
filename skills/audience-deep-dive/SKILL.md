@@ -1,6 +1,6 @@
 ---
 name: audience-deep-dive
-description: Build a rich, behaviorally grounded audience profile that goes well beyond demographics — surfacing the fears, desires, jobs-to-be-done, category tensions, and System 1 drivers of a target audience. Produces an empathy canvas, insight brief, deck, or written report (your choice) backed by Adology social/reddit data, web research, and any supplied qual/quant/journey data. Use this skill whenever the user asks for an "audience deep dive", "persona", "audience profile", "empathy map", "customer insight", "who is our customer", "what drives them", "how does this audience think", "strategic target definition", or any request to understand a target audience at depth for brand strategy, comms, or creative briefing — even when they don't use those exact words. Trigger on phrases like "help me understand [audience]", "I need an insight piece on [customer]", "build me a persona for [segment]", or "deep dive on [target]".
+description: Build a rich, behaviorally grounded audience profile that goes well beyond demographics — surfacing the fears, desires, jobs-to-be-done, category tensions, and System 1 drivers of a target audience. Produces an empathy canvas, insight brief, deck, or written report (your choice) backed by Adology discussion and social data, web research, and any supplied qual/quant/journey data. Use this skill whenever the user asks for an "audience deep dive", "persona", "audience profile", "empathy map", "customer insight", "who is our customer", "what drives them", "how does this audience think", "strategic target definition", or any request to understand a target audience at depth for brand strategy, comms, or creative briefing — even when they don't use those exact words. Trigger on phrases like "help me understand [audience]", "I need an insight piece on [customer]", "build me a persona for [segment]", or "deep dive on [target]".
 ---
 
 # Audience Deep Dive
@@ -25,7 +25,7 @@ A rich audience profile the brand, comms, and creative teams can actually build 
 - User asks about an audience, persona, segment, customer, or target they need to understand.
 - User is starting a brand strategy, positioning exercise, campaign plan, or creative brief and needs the audience grounding first.
 - User wants to move past demographic stereotypes into real motivations.
-- User has Adology data on organic social / reddit and wants it interpreted through a strategist's lens.
+- User has Adology data on organic social and discussions and wants it interpreted through a strategist's lens.
 
 If the request is purely descriptive ("how old are our customers") — redirect to basic segmentation tools. This skill is for *depth*, not headcount.
 
@@ -33,14 +33,34 @@ If the request is purely descriptive ("how old are our customers") — redirect 
 
 Gather what's available. Don't block on completeness — start with what you have and flag gaps explicitly at the end.
 
-- **Adology data** — knowledge sets on the brand, competitors, category creators, and relevant communities. Use organic social + reddit + review content to read stated and latent attitudes. (Use `search_items`, `content_intelligence_search`, `get_item_detail`, `analyze`.)
-- **Web search** — recent news, trade press, reviews, forums, reddit threads, advocacy orgs, academic/ethnographic studies. This is how you pick up cultural tensions and counter-narratives.
+- **Adology data** — a project whose scope covers the brand, its competitors, the creators the audience follows, and the communities they inhabit. Discussion sources (subreddits, comments, reviews) carry the audience's own words; brand and influencer sources show what the audience is being told. See "Reading audience voice in Adology" below.
+- **Web search** — recent news, trade press, reviews, forums, advocacy orgs, academic/ethnographic studies. This is how you pick up cultural tensions and counter-narratives.
 - **Supplied purchase data** — transaction patterns, basket composition, recency/frequency, cohort behavior.
-- **Supplied journey mapping data** — or ask Adology to map the digital shopping journey for e-commerce brands (search terms, consideration pages, social touchpoints, review cadence, conversion surfaces).
+- **Supplied journey mapping data** — or map the digital shopping journey yourself for e-commerce brands (search terms, consideration pages, social touchpoints, review cadence, conversion surfaces).
 - **Supplied media consumption data** — what they read/watch/listen to; where attention actually lives.
 - **Supplied qual / quant** — interview transcripts, survey results, focus group outputs, call-center notes.
 
 **When inputs are missing, name the gap — don't invent the answer.** Every inferred claim gets a confidence tier (see below).
+
+## Reading audience voice in Adology
+
+Adology holds a shared pool of public social posts, ads, and discussions. A **portfolio** is a brand's tracked universe; a **project** is a working scope inside it — the set of sources your reads are about. Orient with `whoami` → `list_portfolios` → `list_projects({ portfolioId })`, then reuse a project or `create_project`. `get_project` tells you what it currently covers; a project with no sources yet reads the whole portfolio universe until you narrow it.
+
+**The audience-voice bucket is the `discussion` class** — Reddit threads, comments on social posts, and product reviews. It is where people talk to each other rather than to the brand, so it carries the language you'll bank in step 6 and the tensions you'll name in step 4.
+
+- **Read it in depth:** `analyze({ projectId, query, feedTypes: ["discussion"], includeComments: true })`. Sampled mode's default `distribution: "balanced"` gives equal weight per source, `"recent"` reads what is live now, and `"top"` reads what resonated. Set `mode: "semantic"` to find the specific conversation by natural-language query rather than sampling around it. `includeComments` matters: without it, comments on Instagram and TikTok posts stay fenced out of the read.
+- **List the actual posts:** `query_items({ projectId, feedType: ["discussion"], platform: "reddit" })`. A discussion-class read returns the ingested comments as well, so you get threads and replies in one page.
+- **Size it before you interpret it:** `aggregate({ projectId, groupBy: ["brand"], measures: [{ field: "*", fn: "count", as: "n" }], filters: { feedType: ["discussion"] } })`. For discussion sources the "brand" dimension is the subreddit or topic name, not a company. Every returned row carries `n` — cite it, and treat a thin row as a signal rather than a finding.
+- **See what the taxonomy already names:** `list_labels({ projectId, feedTypes: ["discussion"] })` shows which label dimensions the scope actually carries, so a label filter you apply later is one the data supports.
+
+**Widening the scope costs money, and the user decides.** `pull_data({ projectId, candidates: [...] })` plans a pull without spending: it attaches the sources the pool already covers for free and quotes only the gap. Relay `estimatedCostCredits` to the user, and call `confirm_pull({ previewId, projectId })` only after they approve. `check_pull({ runId })` reports progress while the data streams in.
+
+**Comments and reviews are separate paid fetches, both quote-first.**
+
+- `fetch_comments({ projectId })` with no `confirmedByUser` returns a cost ceiling and a `quoteToken` — no charge. Show the user the real `estimatedCredits`; never guess a figure. Once they approve, call again with `confirmedByUser: true`, the `quoteToken` echoed verbatim, and `maxCredits` set to exactly the amount they approved. Narrow with `sources` to fetch and pay for only the profiles you need. The run is asynchronous; a couple of minutes later read the landed comments with a discussion-class `query_items` on that platform.
+- `fetch_reviews({ projectId })` without `confirmedByUser` comes back refusing, and the refusal names the real brand count and credit cost. Relay it, then confirm with `confirmedByUser: true` and `maxCredits`. Reviews land as discussion items under platform `reviews`.
+
+**Quote what actually landed.** Every verbatim in the deliverable comes from an item you read, with its source. Save the ones that earn a place in the appendix with `save_to_collection({ projectId, collectionName, itemIds })` so the team can revisit them.
 
 ## Run modes — pick one before starting
 
@@ -87,9 +107,9 @@ Split their "need" into three jobs. This is where the strategic unlock usually s
 Run these as two columns, not two sections. The *gap* between them is where positioning lives.
 
 For each column, cover:
-- In advertising (pull from Adology — what creative codes, formats, tones dominate?)
+- In advertising (read the brand and influencer feeds — what creative codes, formats, tones dominate?)
 - In the news / trade press
-- On social media (organic content, reddit, influencer takes)
+- On social media (organic content, subreddits, influencer takes)
 - In stores / while shopping (retail environment, point-of-sale)
 - At events, festivals, sports games, community moments
 - In their everyday life (supermarket, home, work)
@@ -98,8 +118,8 @@ Highlight where the *category* does something the *brand* doesn't (or vice versa
 
 **Category-mode branch:** if the user's brief is category-level (no single focal brand — e.g., "understand the category shopper" or a competitive set with no incumbent), collapse the brand column into a per-operator mini-tour of the competitive set, then describe the category experience as a whole. The audience doesn't experience "the category" in the abstract; they experience a shortlist of 2–4 operators. Map them like that.
 
-### 4. Category codes & tensions (new)
-- **Codes** — the visual, verbal, and ritual conventions that saturate the category (colors, stock imagery, clichéd claims, format tropes). Use Adology's ad data to detect these. Conformity to codes = category legitimacy. Breaking them = distinctive but risky.
+### 4. Category codes & tensions
+- **Codes** — the visual, verbal, and ritual conventions that saturate the category (colors, stock imagery, clichéd claims, format tropes). `get_table_data({ projectId, rows: ["Hook"], columns: "brand" })` quantifies which conventions dominate and who is repeating them; `list_labels` first tells you which dimensions the scope carries. Conformity to codes = category legitimacy. Breaking them = distinctive but risky.
 - **Cultural tension** — the underlying psychological or social tension the audience is navigating in this category. Usually uncomfortable, usually unspoken in category advertising. Name it bluntly.
 
 Example (retirement living): Code = smiling grey-haired couple on a beach. Tension = "moving in means the end of my life is near." The category sells paradise; the customer fears surrender.
@@ -109,14 +129,16 @@ Example (retirement living): Code = smiling grey-haired couple on a beach. Tensi
 - From colleagues
 - From influencers / creators they follow
 - From health professionals / trusted authorities (where relevant)
-- In communities they belong to (reddit, forums, WhatsApp groups, local/church/sport)
+- In communities they belong to (subreddits, forums, WhatsApp groups, local/church/sport)
 
 ### 6. What they say — overt attitudes
-Pull from Adology (reviews, social comments, reddit threads), plus supplied qual.
+Read the discussion class (reviews, social comments, threads), plus supplied qual.
 - Stated attitudes toward the category
 - Stated attitudes toward the brand
 - Stated attitudes toward competitors
 - Words and phrases they actually use (bank these — creative teams need them)
+
+Semantic mode earns its keep here: `analyze({ projectId, query: "<the attitude you're chasing>", mode: "semantic", feedTypes: ["discussion"], includeComments: true })` finds the thread that says the thing, rather than a representative spread that talks around it.
 
 ### 7. What they do — overt behaviors
 - How they use the product / category today
@@ -137,7 +159,7 @@ Worked example: A prospective retirement home resident *says* "I'll know when th
 ### 9. Moments of truth
 Name 3–5 specific moments in the audience's lived experience where attitudes *form* or *shift*. These are prime comms targets — intervention here beats broadcast everywhere.
 
-### 10. Counter-narrative / reframe (new)
+### 10. Counter-narrative / reframe
 - **Conventional wisdom** — what does everyone in the category assume about this audience?
 - **Our reframe** — what does the data suggest is actually true, or differently true?
 - **Why this matters** — what does the reframe unlock for the brand?
@@ -154,7 +176,7 @@ Pick the top 3. Flag them as "killer insights." Everything else is supporting.
 ### 11a. Pre-mortem on the top insight
 Before committing to the top three, name which of them you are *most likely wrong about* and what evidence would disprove it. One sentence each is enough. Good briefs show their own uncertainty — it builds trust and tells the team what to validate first.
 
-### 12. So what for marketing (new)
+### 12. So what for marketing
 For each top insight, write one line each:
 - **Positioning implication** — what territory could the brand own?
 - **Messaging implication** — what tone, claim, or territory to lean into (or avoid)?
@@ -168,13 +190,13 @@ Name what we *don't* know that matters. For each gap, propose the cheapest way t
 - Call center / sales staff interviews (massively undervalued)
 - Diary studies / mobile ethnography
 - Targeted quant (segmentation, jobs-to-be-done sizing)
-- Adology keyword expansion (add communities, creators, competitors we missed)
+- Widen the Adology scope — add the communities, creators, and competitors this read missed with `update_project_scope`, or plan a `pull_data` for sources the pool doesn't cover yet and bring the cost to the user
 
 ## Confidence tiers — tag every insight
 
 Apply one of these tags to each claim. Keeps the work honest and tells the team what to validate.
 
-- **[Observed]** — directly evidenced in data (Adology thread, review, purchase record, supplied research). Cite it.
+- **[Observed]** — directly evidenced in data (a thread, a review, a purchase record, supplied research). Cite it.
 - **[Inferred]** — triangulated from 2+ observations using behavioral theory. Logical but not directly said.
 - **[Hypothesis]** — educated guess worth testing. Name it as such.
 
@@ -203,7 +225,7 @@ The deliverable should read like it was written by a senior strategist, not by a
 - **No rhetorical flourishes, em-dash pivots, or triple-adjective runs.** One clear claim per sentence. Plain verbs. Specific nouns.
 - **No truncated or jargon-coded phrases** the reader has to decode. If you write "a legible story" or "a social job, done," you owe the reader a sentence explaining what that actually means. Better: "a story they can tell their friends about having moved while still capable — proof of good judgment, not decline."
 - **Explain, don't just label.** If you invoke a behavioral lens ("loss aversion"), follow it with a plain-language reading of how it's showing up in *this* audience. Never assume the strategy team knows the framework.
-- **Short, concrete evidence over adjectives.** "Reddit thread with 430 upvotes saying X" beats "consumers widely express concern about X."
+- **Short, concrete evidence over adjectives.** "Thread with 430 upvotes saying X" beats "consumers widely express concern about X."
 - **Quote the audience whenever you can.** Verbatims do more work than anything you write about them.
 - **Name tensions bluntly.** The category says paradise; the prospect is negotiating with mortality. Say that.
 - **No marketing clichés.** "On-the-go," "busy lifestyle," "discerning consumer," "vibrant community," "wellness journey" — cut all of them.
@@ -234,10 +256,11 @@ Read these when you need them — don't load them all upfront.
 
 1. **Clarify the audience** — confirm the sharp definition with the user before anything else.
 2. **Confirm inputs & output format** — what data is available, what deliverable they want.
-3. **Pull the data** — Adology queries, web searches, read supplied files. Do this in parallel where you can.
-4. **Work through steps 1–13** in a scratch document. Tag every claim with a confidence tier and a citation if [Observed].
-5. **Pick the top 3 insights.** Be ruthless.
-6. **Render the deliverable** in the chosen format(s).
-7. **Close with the gaps & validation plan** — always.
+3. **Get the scope right** — orient, pick or create the project, check what `get_project` covers, and bring any pull or fetch cost to the user before spending.
+4. **Pull the data** — discussion reads, brand and influencer reads, web searches, supplied files. Do this in parallel where you can.
+5. **Work through steps 1–13** in a scratch document. Tag every claim with a confidence tier and a citation if [Observed].
+6. **Pick the top 3 insights.** Be ruthless.
+7. **Render the deliverable** in the chosen format(s).
+8. **Close with the gaps & validation plan** — always.
 
 Now go build something the creative team will actually tape to the wall.

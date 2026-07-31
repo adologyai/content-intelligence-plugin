@@ -2,12 +2,12 @@
 
 Use this file in step 4 (the spectrum plot) and step 5 (current vs. aspirational).
 
-The eight dimensions below are designed to translate the chosen archetype personality into observable, testable voice behaviours. Each dimension is a continuum, not a binary. A brand sits *somewhere* on each — never fully at one end — and that position should be defendable in one sentence tied to the archetype.
+The eight dimensions below are designed to translate the chosen archetype personality into observable, testable voice behaviors. Each dimension is a continuum, not a binary. A brand sits *somewhere* on each — never fully at one end — and that position should be defendable in one sentence tied to the archetype.
 
 For each dimension, you'll find:
 - **What it measures** — what the dimension is actually about
 - **Anchors** — what each end looks like, with brand examples
-- **Position cues** — concrete verbal behaviours that mark different positions on the continuum
+- **Position cues** — concrete verbal behaviors that mark different positions on the continuum
 - **This, not that** — short before/after to make the position concrete
 - **Common archetype mapping** — which archetypes typically sit where (a starting point, not a rule)
 
@@ -192,16 +192,16 @@ When you plot a brand, give each dimension a percentage (0–100, with 50 being 
 **Anchors:**
 - **Fully distinctive (0–20% conventional):** Liquid Death, Oatly, Aesop, Patagonia
 - **Distinctively branded (30–50%):** Apple, Nike, Glossier
-- **Recognisably category-fluent (60–80%):** Most challenger brands once they scale
+- **Recognizably category-fluent (60–80%):** Most challenger brands once they scale
 - **Fully conventional (80–100%):** Generic category players, white-label competitors
 
 **Position cues:**
-- *Distinctive end:* unusual word choices, idiosyncratic rhythm, breaks category visual/verbal conventions, has a recognisable "house style"
+- *Distinctive end:* unusual word choices, idiosyncratic rhythm, breaks category visual/verbal conventions, has a recognizable "house style"
 - *Conventional end:* uses category-standard vocabulary ("premium", "innovative", "quality"), familiar structures, indistinguishable from competitors in blind tests
 
 **This, not that:**
-- *Distinctive brand:* "Beer for plant murderers." NOT "Premium craft beer with a unique flavour profile."
-- *Conventional brand:* (if intentionally so for a value play) "Good beer. Fair price." NOT "Disrupting the category with bold flavour choices."
+- *Distinctive brand:* "Beer for plant murderers." NOT "Premium craft beer with a unique flavor profile."
+- *Conventional brand:* (if intentionally so for a value play) "Good beer. Fair price." NOT "Disrupting the category with bold flavor choices."
 
 **Common archetype mapping:**
 - Distinctive end: Outlaw, Jester, Creator, Magician

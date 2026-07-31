@@ -1,91 +1,74 @@
 ---
 name: data-explorer
 description: >
-  Guides advanced data querying, filtering, and export workflows. Use when users want
-  to browse content, filter by specific criteria, export data, or perform custom analysis
-  beyond standard insights. Triggers on: "export", "download", "filter", "show me items",
-  "browse", "search for", "find content", "CSV", "gallery".
+  Guides querying, filtering, and curation across a project's scope. Use when users want
+  to browse content, filter by specific criteria, pivot label data, search, or run custom
+  analysis beyond standard insights. Triggers on: "filter", "show me items", "browse",
+  "search for", "find content", "top performers", "breakdown by", "collection".
 ---
 
-# Data Exploration and Export
+# Data Exploration
 
-Your primary lever for controlling what you get back from every tool is **field selection**. Master `fields` and `labelFields` before anything else — they determine whether you get a useful, focused response or a wall of noise.
+Every read takes a `projectId` and returns what that project's scope covers. Two levers decide whether you get a useful answer or a wall of noise: picking the right reader, and controlling which fields come back.
 
-## Field Selection (Start Here)
+## Discover before you filter
 
-All item-returning tools (`get_items`, `search_items`, `analyze`, `get_item_detail`) accept two parameters that control what comes back:
+Label dimensions vary by project — they depend on what has been analyzed. Call `list_labels({ projectId })` to see which dimensions exist and their top values before naming one in a filter; a dimension the data doesn't carry silently matches nothing. `get_table_data({ projectId, listDimensions: true })` answers the same question from the pivot side. `aggregate({ projectId, groupBy: ["brand"], measures: [{ field: "*", fn: "count", as: "n" }] })` tells you the exact entity names the scope tracks, which is what `feedNames` and `brand` filters match against.
 
-- **`fields`** — Which item-level properties to include. Default base set: id, brand, platform, headline, engagement metrics, isOutlier, likesMultiple, createdAt, adDescription, transcript. Add more as needed (e.g., `fields: ["hookMechanism", "creativeConcept", "viewsMultiple"]`). Pass `fields: []` to suppress all item fields (stats-only mode).
-- **`labelFields`** — Which label dimensions to include on each item. Pass specific categories (e.g., `labelFields: ["HookType", "ContentFormat"]`) or `labelFields: []` to suppress labels entirely.
+## Choosing a reader
 
-**Use `list_labels` to discover available dimensions.** Before requesting label fields, call `list_labels` on the knowledge set. It returns every label category and its values — this tells you what dimensions exist so you don't guess at field names.
+**`analyze`** is the primary content tool. Four distributions:
 
-**Never use `compact: true`** — use `fields: []` and `labelFields: []` instead for the same effect with precise control. `compact` is a legacy toggle superseded by field selection.
+- `"balanced"` (default) — equal representation per feed, a mix of top and recent. The honest "what does this scope look like" read.
+- `"top"` — highest engagement per feed; set `sortMetric` to change which metric.
+- `"recent"` — newest per feed.
+- `"exhaustive"` — no sampling. A deterministic ranked page over the full filtered set with `totalEstimated` and `nextOffset`, so you can page the whole thing. Pair with `sortBy`, including the lift keys (`likesMultiple`, `viewsMultiple`, …). This is the leaderboard and "give me all of X" mode.
 
-See the [available fields reference](references/available-fields.md) for the full 45+ field catalog, sort options, and filter formats.
+The sampled distributions read the creative feeds — brand and influencer — unless you name `feedTypes` yourself, so raw search and discussion items don't crowd a "what hooks are working" sample. Exhaustive reads exactly what you filtered, nothing added.
 
-## Browsing Content
+Two other modes: `mode: "semantic"` finds posts by meaning from a natural-language `query` (it honors platform, feed type, dates, and `includeComments`; narrow further after the results come back), and passing `itemIds` runs a by-id deep dive that returns full creative, labels, and performance for specific posts.
 
-`get_items` provides paginated browsing with filters. `search_items` handles semantic/natural-language queries. Each item can include:
+**`aggregate`** answers analytical questions — trends, averages, "top platforms by median likes". It groups over `platform`, `brand`, `feedType`, `format`, and `time`, and always returns grouped rows, never items. Lift multiples are per-item and are rejected here; for lift, use `analyze` exhaustive sorted by a `*Multiple` key.
 
-- **Identification** — id, brand, feedType, platform, sourceLabel
-- **Content** — headline (first 200 chars of post text), transcript, adDescription, url
-- **Engagement** — likes, views, shares, comments, engagementScore, engagementRate
-- **Performance** — timesAccountAvg, likesMultiple, viewsMultiple, commentsMultiple, sharesMultiple, longevityMultiple, isOutlier, outlierType
-- **Source Baselines** — sourceItemCount, sourceAvgLikes, sourceMedianLikes, sourceStddevLikes, sourceP90Likes, sourceAvgViews, sourceMedianViews, sourceAvgComments, sourceMedianComments, sourceAvgShares, sourceMedianShares, sourceAvgDaysAlive
-- **Media** — thumbnail URL, mediaType (image/video)
-- **Timing** — createdAt (ISO date string)
+**`get_table_data`** builds label pivot tables: `rows` (one or two label dimensions) × `columns` (brand, platform, feedType, mediaType, timePeriod, or focalVsRest) × `metrics` (count, useRate, medianLikes, medianViews, medianShares, viralRate). Rows are always label dimensions, and it counts labeled items only — search and discussion items frequently carry no labels, so read those with `analyze` instead.
 
-### Filters
+**`get_creative_dna`** goes past distribution to effect — which structural elements actually drive performance, with controlled lift, per-brand advantages and gaps, and evidence posts. Lock the axes with `focusCategories: ["Hook","Emotion","Production"]`.
 
-- **Platform** — tiktok, instagram, youtube, facebook, twitter, reddit, linkedin, threads
-- **Feed filter** — Narrow to specific brand feeds, influencer feeds, search feeds, or discussion feeds
-- **Date range** — ISO date strings for start/end
-- **Media format** — image, video, or both
+**`search_all`** is keyword search within the project's scope, ranked by engagement. **`query_items`** lists rows over the same scope with a fixed shape.
 
-### Parallel Browsing
+## Field selection
 
-When comparing content across different dimensions, run multiple `get_items` calls in parallel with different filters. Examples:
+`analyze` returns a base set on every item — id, brand, feedType, platform, headline, likes, views, shares, comments, engagementScore, isOutlier, outlierType, likesMultiple, createdAt, url, thumbnail — and two independent axes on top:
 
-- Brand A's TikTok content + Brand A's Instagram content (platform comparison)
-- Brand A's outliers + Brand B's outliers (competitive comparison)
-- Last 30 days + previous 30 days (trend detection)
+- **`fields`** adds creative analysis: `fields: ["hookMechanism", "creativeConcept", "ctaText"]`. Omit it and the item comes back with everything the analysis carries.
+- **`labelFields`** chooses which label dimensions ride along: `labelFields: ["Hook", "Format"]`, or `[]` to suppress labels entirely.
 
-Each call is independent — do not wait for one to finish before starting the next.
+Whenever you cite a lift multiple, request its denominator too (`sourceMedianLikes` beside `likesMultiple`) and state the baseline. A "5x" with no baseline is not a finding.
 
-## Cross-KS Content Search
+Filter parameter names differ between readers — `analyze` takes `platformFilter` and `feedNames`, `query_items` takes `platform` and `brand`, `aggregate` nests everything under `filters`. See the [available fields reference](references/available-fields.md) for the full field catalog, the per-tool filter names, sort keys, and page limits.
 
-`content_intelligence_search` searches the **entire Adology database** using AI-powered aspect decomposition — not scoped to any Knowledge Set. Use it when:
+## Parallel reads
 
-- The user wants inspiration beyond their tracked brands
-- You need examples of a specific creative approach across the market
-- The user's KS doesn't have enough data on a topic
+Independent reads run at once. Two brands side by side, two platforms, this quarter against last, a `get_table_data` pivot alongside the `analyze` sample that will illustrate it — issue them together rather than in sequence.
 
-Results include full performance enrichment (multiples, outlier flags, source baselines).
+## Audience voice
 
-## Saving and Sharing
+Comments on Instagram and TikTok posts are fenced out of the default read so they don't drown brand analysis. To read them, ask for the discussion class explicitly: `analyze({ feedTypes: ["discussion"], includeComments: true, platformFilter: ["instagram"] })`, one call per platform. Reddit threads are always readable. Amazon product reviews land the same way — read them with `query_items({ feedType: ["discussion"], platform: "reviews" })`. Bringing new comments or reviews into the pool goes through `fetch_comments` / `fetch_reviews`, which quote first and charge only on a confirmed call; relay the exact figure the quote returns and wait for the user's yes.
 
-`save_to_collection` organizes items into named collections. The response includes a `url` field — a shareable gallery deep link to the collection in the Adology app. Use this whenever you find noteworthy content during browsing or analysis:
+## Read the envelope, not just the rows
 
-- Competitive examples worth revisiting
-- Inspiration references for a creative brief
-- Top performers to share with a team
+- `scopeEmpty` means the project has no sources yet. Check `get_project` and offer to pull rather than reporting "nothing found".
+- `totalEstimated` and `hasMore` say whether your page is the whole answer. Page with `nextOffset` before generalizing.
+- `access` counts flag sources that are stale or never acquired — say so when the numbers depend on them.
+- On ranking-shaped aggregates, `rows` cleared the reliability floor and `directionalRows` did not. Draw the ranking from `rows`; cite the rest as directional with their `n`.
 
-Always share the returned URL so the user can view the collection directly.
+## Curating
 
-## Export
+`save_to_collection({ projectId, collectionName, itemIds })` saves items into a named collection in the project's portfolio, creating it if needed. Item ids must come from reads in that same project. `list_collections` and `get_collection` bring a collection back, and its item ids feed straight into `analyze({ itemIds })` for a deep dive. Save the examples worth revisiting as you find them, not at the end.
 
-Bulk data export is available through the Adology web UI. Use `save_to_collection` to curate items into shareable collections when the user needs to share specific findings.
+## Error recovery
 
-## Analysis Patterns
-
-- **Stats-only** — `get_table_data` for aggregate numbers without individual items
-- **Content-first** — `get_items` with filters or `search_items` for semantic queries
-- **Full pipeline** — `analyze` returns sampled items + tableData + stats; drill into standouts with `get_item_detail`
-- **Dimension discovery** — `list_labels` to see what label categories exist before filtering or requesting label fields
-
-## Error Recovery
-
-- **0 results from `get_items`** — Broaden filters: remove platform constraint, widen date range, drop feed filter. If the KS is new, check `get_knowledge_set` for item counts — data may not have been scraped yet.
-- **`list_labels` returns empty** — The KS has items but they haven't been analyzed yet. Fall back to field-based browsing (engagement metrics, platform) without label dimensions.
-- **Unknown label category** — Always call `list_labels` first rather than guessing category names. The available categories vary by KS depending on which analysis pipeline ran.
+- **Zero items.** Broaden before concluding: drop the platform filter, widen the dates, remove the label filter. Then check `get_project` — the scope may cover sources whose data was never acquired.
+- **`list_labels` returns nothing.** The scope has items but no analysis yet. Read on engagement, platform, and recency instead of label dimensions.
+- **A label filter matches nothing.** The dimension or value name is off. Re-check it against `list_labels` rather than guessing a variant.
+- **A brand name comes back unresolved.** The project doesn't track it. The response lists what IS in scope — offer that, or offer to add the brand and pull its data.

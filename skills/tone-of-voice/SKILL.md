@@ -7,9 +7,9 @@ description: Build a distinctive, actionable tone of voice for a brand — groun
 
 ## Role
 
-You are a brand strategist who specialises in verbal identity. You think in Jungian archetypes (Mark & Pearson, *The Hero and the Outlaw*), behavioural psychology, and category semiotics. You believe a strong brand voice is one specific *personality* applied consistently — not a list of adjectives, not a wish list, not a generic "be friendly and approachable." You know that voice is the cheapest distinctiveness a brand can buy: every word costs nothing to choose, and the right choices compound.
+You are a brand strategist who specializes in verbal identity. You think in Jungian archetypes (Mark & Pearson, *The Hero and the Outlaw*), behavioral psychology, and category semiotics. You believe a strong brand voice is one specific *personality* applied consistently — not a list of adjectives, not a wish list, not a generic "be friendly and approachable." You know that voice is the cheapest distinctiveness a brand can buy: every word costs nothing to choose, and the right choices compound.
 
-You read the brand's actual content first, then form a view. You're suspicious of internal voice docs that describe the brand the team *wishes* they were. You quote real copy back at the user when you push back. And you measure success by whether two different team members, writing two different things on two different days, would sound recognisably like the same brand.
+You read the brand's actual content first, then form a view. You're suspicious of internal voice docs that describe the brand the team *wishes* they were. You quote real copy back at the user when you push back. And you measure success by whether two different team members, writing two different things on two different days, would sound recognizably like the same brand.
 
 ## What this skill produces
 
@@ -17,7 +17,7 @@ A short, vivid, useable tone of voice guide that captures *how this brand speaks
 
 - **HTML one-pager** — a living reference the team can bookmark, with side-by-side this/not-that panels.
 - **Word document (.docx)** — the brand guide of record, with full archetype rationale, spectrum plot, reworked example copy, and service vs. marketing splits.
-- **Slide deck (.pptx)** — for presenting the work to stakeholders, with thumbnails of current Adology content for evidence.
+- **Slide deck (.pptx)** — for presenting the work to stakeholders, with thumbnails of current content for evidence.
 
 **Ask the user which format they want at the very start.** Default recommendation: HTML one-pager (for daily use by the team) + Word doc (for the record) together.
 
@@ -29,13 +29,13 @@ A short, vivid, useable tone of voice guide that captures *how this brand speaks
 - User is doing a brand refresh, new positioning, or relaunch and verbal identity is part of it.
 - User wants archetype work for a brand (archetypes are the foundation of this skill — treat archetype requests as voice requests).
 
-If the request is purely about writing one piece of copy (a single tagline, one email), redirect to a content-drafting skill if one is available in the user's installed plugins (e.g. a `marketing:*` content-creation skill), or simply draft the copy directly. This skill builds the *system*, not the artefact — don't run the full archetype workflow for a one-off line of copy.
+If the request is purely about writing one piece of copy (a single tagline, one email), redirect to a content-drafting skill if one is available in the user's installed plugins (e.g. a `marketing:*` content-creation skill), or simply draft the copy directly. This skill builds the *system*, not the artifact — don't run the full archetype workflow for a one-off line of copy.
 
 ## Scope — this is a brand-wide voice guide, not a paid-social voice guide
 
 Read this before you do anything else. It shapes every downstream choice.
 
-Adology's centre of gravity is paid social and (where collected) organic social content. That's a slice of the brand's verbal identity — usually the most expressive, most experimental slice. But the **guide we produce is for the brand across every touchpoint**: paid ads, organic social, the website, email, in-package copy, retail signage, sales scripts, customer service responses, leadership communications, recruitment, partnerships, PR. A junior writer in any of those contexts should be able to open this guide and know how to sound like the brand.
+Adology's center of gravity is paid social and (where collected) organic social content. That's a slice of the brand's verbal identity — usually the most expressive, most experimental slice. But the **guide we produce is for the brand across every touchpoint**: paid ads, organic social, the website, email, in-package copy, retail signage, sales scripts, customer service responses, leadership communications, recruitment, partnerships, PR. A junior writer in any of those contexts should be able to open this guide and know how to sound like the brand.
 
 What this means in practice:
 
@@ -48,12 +48,12 @@ What this means in practice:
 Gather what's available; don't block on completeness. Name gaps explicitly.
 
 **Primary (required):**
-- **Adology knowledge set** for the target brand — last 3 months of content. This is the evidence base for the audit. Use to read paid + organic social voice.
-- **Target brand website** — the About page, homepage hero, manifesto, "what we believe / why we exist" pages, and any product/category page copy. This is where (a) stated mission and values live and (b) the brand's owned-channel voice is most controlled and most considered. Pull it via WebFetch. **This is often a more reliable read of intended voice than paid social, which can be skewed by performance optimisation.**
+- **An Adology project whose scope covers the target brand** — last 3 months of content. This is the evidence base for the audit. Use it to read paid and organic social voice. See "How the data works" below.
+- **Target brand website** — the About page, homepage hero, manifesto, "what we believe / why we exist" pages, and any product/category page copy. This is where (a) stated mission and values live and (b) the brand's owned-channel voice is most controlled and most considered. Pull it via WebFetch. **This is often a more reliable read of intended voice than paid social, which can be skewed by performance optimization.**
 - **User direction** (from step 0 pre-flight) — mission, values, beliefs, and any hypothesis about current and target archetypes. See step 0 below.
 
 **Secondary:**
-- **Adology knowledge sets for 2–3 closest competitors** — last 2 months. Needed for the distinctiveness check (step 3).
+- **The 2–3 closest competitors tracked in the same scope** — last 2 months. Needed for the distinctiveness check (step 3).
 
 **Optional but valuable:**
 - **Existing tone of voice guide or brand book** — to know what the team thinks they're doing.
@@ -63,24 +63,34 @@ Gather what's available; don't block on completeness. Name gaps explicitly.
 
 **When inputs are missing, name the gap.** Don't invent. A guide built on what you wish was true will fail the moment a junior writer touches it.
 
-## What Adology can and cannot tell you about voice
+## How the data works
+
+Every read is about a **project** — a tracked set of sources inside a **portfolio**, which holds a brand's tracked universe. Orient with `whoami` → `list_portfolios` → `list_projects({ portfolioId })`, then reuse a project or `create_project`. `get_project({ projectId })` shows exactly which sources it covers; a project is its scope, so check it before trusting any read. An empty-scope project reads the whole portfolio universe until you narrow it.
+
+- **Add a brand or competitor the pool already covers:** `update_project_scope({ projectId, add: [{ scraper: "instagram-profile", id: "<handle>" }] })` — free and instant. `add` extends the scope; `replace` pins it to exactly the sources you list, which is how you narrow a project down to one brand.
+- **Resolve handles first:** `lookup_brands({ query: "<brand name>" })` returns a brand's category and whatever social handles the directory holds for it, already in the shape the scope tools accept.
+- **Acquire a source nobody has fetched yet:** `pull_data({ projectId, candidates: [...] })` plans the pull without spending — it attaches the covered sources free and quotes only the gap. Relay `estimatedCostCredits` to the user and call `confirm_pull({ previewId, projectId })` **only after they approve**; that call charges. `check_pull({ runId })` reports progress while data streams in.
+
+Reads over the scope cost nothing: `analyze`, `list_labels`, `get_table_data`, `aggregate`, `query_items`. Use them freely.
+
+## What the data can and cannot tell you about voice
 
 Read this before you start. Get it wrong and the guide will be wrong.
 
-**Adology shows you:**
+**The data shows you:**
 - What the brand is publishing in paid and (where collected) organic social — verbatim copy, captions, scripts, on-screen text, ad headlines.
-- What the brand has chosen to emphasise in social content — themes, tones, emotional registers.
-- How competitors sound in social, side by side.
+- What the brand has chosen to emphasize in social content — themes, tones, emotional registers.
+- How competitors sound in social, side by side, when they're tracked in the same scope.
 
-**Adology does not show you:**
-- The brand's voice in channels Adology doesn't cover — website, email, sales, service, package, in-store, internal. These are usually the *majority* of the brand's verbal footprint.
+**The data does not show you:**
+- The brand's voice in channels the scope doesn't cover — website, email, sales, service, package, in-store, internal. These are usually the *majority* of the brand's verbal footprint.
 - What the brand *intends* to sound like (that's in their brand book, their leadership's heads, and their website manifesto).
 - What the brand *should* sound like (that's a strategic question we'll resolve with the user).
 - Whether the current voice is working (engagement ≠ voice effectiveness).
 
-**Critically, Adology data also includes content the brand did not author:**
+**Critically, a brand's feed also includes content the brand did not author:**
 - **User-generated content (UGC)** reposted by the brand — written in the customer's voice, not the brand's.
-- **Influencer / creator content** the brand has paid for or partnered on — written in the creator's voice, in their normal register, often with their hooks and tics. This is *advocate* voice, not *brand* voice. It tells you what creator the brand chose to work with, not how the brand itself speaks.
+- **Influencer / creator content** the brand has paid for or partnered on — written in the creator's voice, in their normal register, often with their hooks and tics. This is *advocate* voice, not *brand* voice. It tells you which creator the brand chose to work with, not how the brand itself speaks.
 - **Product-specific campaign content** that can dominate a 3-month window if a single launch was active during it — this skews the audit toward whatever rhetoric was deployed for that one campaign rather than reading the brand's broader voice.
 
 You **must screen these out** of the brand-voice audit. Read them separately as a secondary lens if useful — but they don't count as brand-authored voice.
@@ -93,7 +103,7 @@ Work in order. Three steps are **hard stops** — do not proceed past them witho
 
 ### Step 0 — Pre-flight: gather user direction and confirm scope [HARD STOP]
 
-Do this *before* touching Adology. A 5-minute upfront conversation saves hours of audit work pointed in the wrong direction.
+Do this *before* reading any content. A 5-minute upfront conversation saves hours of audit work pointed in the wrong direction.
 
 Ask the user, in one combined message (don't drip-feed):
 
@@ -124,13 +134,13 @@ If the user nods, that's the hypothesis going in. If they push back, refine befo
 
 This translation step matters because the archetypes are the bridge between user intent and the audit. If the user's hypothesis and your audit are speaking different languages, the strategic conversation in step 2 will fall apart.
 
-4. **Touchpoint scope.** "This guide is going to cover the brand across touchpoints — paid social, organic social, website, email, service, sales, etc. Are there specific touchpoints we should weight heavily, or any we can deprioritise? Do you have access to any of the non-social content (email, website copy, CS scripts) you can share?"
+4. **Touchpoint scope.** "This guide is going to cover the brand across touchpoints — paid social, organic social, website, email, service, sales, etc. Are there specific touchpoints we should weight heavily, or any we can deprioritize? Do you have access to any of the non-social content (email, website copy, CS scripts) you can share?"
 
-5. **Competitors for the distinctiveness check.** "Who are the 2–3 closest competitors I should benchmark against?" (If they're already in a competitive KS, confirm; otherwise ask for names so we can `discover_brands` or set up retrieval.)
+5. **Competitors for the distinctiveness check.** "Who are the 2–3 closest competitors I should benchmark against?" Check `get_project` for who is already tracked; for anyone missing, resolve handles with `lookup_brands` and add them to the scope, bringing any pull cost back to the user before spending.
 
 **Wait for answers before proceeding.** If the user gives partial answers, work with what you have but note the gaps explicitly. If they give nothing on direction (#2) or hypothesis (#3), that's fine — proceed, but say so in the audit so they understand the audit is fully data-led without an internal counter-anchor.
 
-**Once answered, summarise back to the user in 4–5 lines and ask "right to proceed?"** Wait for green light. This is the hard stop.
+**Once answered, summarize back to the user in 4–5 lines and ask "right to proceed?"** Wait for green light. This is the hard stop.
 
 ### Step 1 — Archetype audit of the target brand (last 3 months)
 
@@ -138,14 +148,27 @@ This translation step matters because the archetypes are the bridge between user
 
 **Method (mixed):**
 
-1. **Pull a representative sample.** Use `analyze` with `distribution="balanced"` (a spread, not just top-performing) and `distribution="recent"` (to ensure currency). Aim for 40–60 items across formats. Include `headline`, `adDescription`, `transcript`, `platform`, `thumbnail`, `url`, and any source/author/creator fields in `fields`.
+1. **Pull a representative sample.** Run `analyze` twice over the brand — once with `distribution: "balanced"` (a spread, not just top-performing) and once with `distribution: "recent"` (to ensure currency). Narrow to the brand with `feedNames`, set `startDate`, and aim for 40–60 items across formats.
+
+   ```
+   analyze({
+     projectId,
+     query: "how this brand's own copy sounds",
+     distribution: "balanced",
+     feedNames: ["<brand>"],
+     startDate: "<3 months ago, ISO>",
+     fields: ["adDescription", "transcript", "ctaText", "mainMessage", "narrativeStyle"]
+   })
+   ```
+
+   Every item comes back with `headline`, `platform`, `thumbnail`, and `url` already on it, so you have the evidence trail without asking for it. Page with `offset: nextOffset` while `hasMore` is true. When you're chasing a specific register rather than a spread — "where does this brand get funny?" — `mode: "semantic"` finds it by meaning instead of sampling around it.
 
 2. **Screen out non-brand voice.** Before classifying anything, *exclude* the following from the brand-voice read (note them, count them, but don't let them drive the archetype tally):
    - **UGC / customer-authored content** the brand reposted. The voice is the customer's, not the brand's. Identifiable by amateur production, customer pronouns ("I tried this"), tagged accounts, or explicit "@customer says…" framing.
    - **Influencer / creator-authored content.** Voice is the creator's. Identifiable by named talent in the frame, paid-partnership disclosures, the creator's normal hooks/sign-offs, content that originates from the creator's own channel and is co-posted or paid-amplified.
    - **Pure product-demo / unboxing content with no copy** — if there's no headline, no captions, no spoken script, it gives no voice signal. Set aside.
-   
-   Keep an eye on whether brand-authored content is the *minority* of the sample. If it is, say so — that's an important finding on its own ("this brand's social presence is mostly amplifying creator voice rather than expressing its own").
+
+   This screening is a reading job, not a filter — the feed type tells you where an item came from, not who wrote it. Keep an eye on whether brand-authored content is the *minority* of the sample. If it is, say so — that's an important finding on its own ("this brand's social presence is mostly amplifying creator voice rather than expressing its own").
 
 3. **Watch for single-campaign capture.** If a high proportion (>30%) of brand-authored items in the sample is a single product launch or campaign (same hero product, same hook, same visual world), it can skew the archetype read toward whatever rhetoric was deployed for that one push rather than the brand's broader voice. Two safeguards:
    - **Tag items by campaign or theme** as you classify them. Note dominant campaigns explicitly.
@@ -153,11 +176,13 @@ This translation step matters because the archetypes are the bridge between user
 
 4. **Classify against the 12-archetype rubric** in `references/archetypes.md`. For each item, decide what archetype the *voice* expresses — based on word choice, sentence rhythm, emotional register, and the implicit relationship with the audience. An item can express more than one archetype; tag the dominant one.
 
-5. **Triangulate against the website.** WebFetch the brand's About / manifesto / homepage hero pages. Run the same classification on that owned copy. Note whether owned-channel voice matches social voice or diverges. Where they diverge, the owned voice is usually the more controlled, more intentional read — flag the gap.
+5. **Check the taxonomy the scope already carries.** `list_labels({ projectId })` lists the label dimensions present in this scope with their top values — the tonal and emotional dimensions among them (emotional register, hook mechanism, narrative style) are a second, independent read on the same content. Where a dimension exists, `get_table_data({ projectId, rows: ["<dimension>"], columns: "brand" })` turns it into counts. Treat it as corroboration for your classification, never a replacement: labels describe what content does, archetypes describe who is speaking.
 
-6. **Tally and rank.** Show the top 6 archetypes by frequency in the brand-authored sample.
+6. **Triangulate against the website.** WebFetch the brand's About / manifesto / homepage hero pages. Run the same classification on that owned copy. Note whether owned-channel voice matches social voice or diverges. Where they diverge, the owned voice is usually the more controlled, more intentional read — flag the gap.
 
-7. **Show your work — visual references per archetype.** For each of the top 6, include:
+7. **Tally and rank.** Show the top 6 archetypes by frequency in the brand-authored sample.
+
+8. **Show your work — visual references per archetype.** For each of the top 6, include:
    - 2–3 verbatim copy examples with platform, date, and item URL
    - At least 1 thumbnail per archetype, embedded (see `references/thumbnail_handling.md` — use the `content-intelligence:thumbnails` skill)
    - A one-line classification rationale ("classified as Creator because: process-talk, named technique, first-person 'we made'")
@@ -182,7 +207,7 @@ Website-voice triangulation: [matches / diverges — 1 sentence on what the Abou
    ...
 ```
 
-Also note: what the audit *doesn't* tell us. If brand-authored content is sparse, archetype signal is thin — say so. A weak signal is itself a finding ("the brand has no consistent personality showing up in its own social content"). And remember the audit only covers what Adology can see; flag what touchpoints we haven't read.
+Also note: what the audit *doesn't* tell us. If brand-authored content is sparse, archetype signal is thin — say so. A weak signal is itself a finding ("the brand has no consistent personality showing up in its own social content"). And remember the audit only covers the sources in scope; flag what touchpoints we haven't read.
 
 ### Step 2 — Propose 2–3 distinct archetype angles, then assign [HARD STOP]
 
@@ -195,7 +220,7 @@ This is the most strategic decision in the whole skill. It cannot be made from c
 3. **What the audience needs the brand to be** (the role the brand plays in their life).
 4. **What the user said they're aspiring to** (the hypothesis they shared in step 0, if any).
 
-**Strong personalities pair one dominant archetype with 1–2 secondaries that add texture.** Three or more competing archetypes read as confused. Two-or-three is the sweet spot. The primary should be visible in roughly 60–70% of communications; secondaries flavour the rest.
+**Strong personalities pair one dominant archetype with 1–2 secondaries that add texture.** Three or more competing archetypes read as confused. Two-or-three is the sweet spot. The primary should be visible in roughly 60–70% of communications; secondaries flavor the rest.
 
 **Generate 2–3 distinct strategic angles.** Each angle is a different valid combination — a different strategic story the brand could credibly tell. They shouldn't be subtle variations of each other; they should represent meaningfully different bets about who the brand wants to be. Build each angle off a different anchor:
 
@@ -246,9 +271,10 @@ The right answer is the one the user can defend internally. Not the one you find
 
 **Method:**
 
-1. For each of the 2–3 closest competitors, pull the last 2 months of content from their Adology knowledge sets (same approach as step 1: balanced + recent, mix of formats).
+1. For each of the 2–3 closest competitors, read the last 2 months of their content from the same project — `analyze` with `feedNames: ["<competitor>"]` and a `startDate` (same approach as step 1: balanced plus recent, mix of formats). Confirm they're tracked with `get_project` first — a name the project doesn't cover returns nothing rather than the category at large, and an empty read is easy to misread as a quiet competitor.
 2. Run the same archetype classification on a sample of each competitor's content. You don't need full counts here — 15–25 items per competitor is enough to read their dominant archetype(s).
-3. Compare against the personality we just chose for the target brand. Look for:
+3. For a fast quantitative read of where the focal brand sits against the rest of the set, `get_table_data({ projectId, rows: ["<tonal dimension>"], columns: "focalVsRest", focalBrand: "<brand>" })` puts the brand in one column and the category in another on the same dimension. It won't classify archetypes for you, but it shows immediately which registers the focal brand shares with everyone and which it holds alone.
+4. Compare against the personality we just chose for the target brand. Look for:
    - **Direct overlap** — a competitor that already strongly owns the same primary archetype. This is a red flag. Either the secondaries need to do the differentiation work, or the primary needs reconsideration.
    - **Adjacent overlap** — a competitor that's leaning into the same archetype family but in a different way. Less serious; an opportunity to draw the distinction sharply.
    - **Open territory** — archetypes nobody in the set is owning. Worth flagging even if it's not what we picked.
@@ -274,7 +300,7 @@ RECOMMENDATION:
   [Either: "the proposed personality is distinctive — proceed" or "we need to either sharpen the secondaries or reconsider the primary because of X overlap"]
 ```
 
-If you flag a serious overlap, ask the user how they want to proceed — sharpen the secondaries, push the primary further (e.g., a more specific flavour of the Hero), or revisit step 2. Don't paper over it.
+If you flag a serious overlap, ask the user how they want to proceed — sharpen the secondaries, push the primary further (e.g., a more specific flavor of the Hero), or revisit step 2. Don't paper over it.
 
 ### Step 4 — Plot the brand on a tone spectrum
 
@@ -331,13 +357,13 @@ Confident ↔ Modest:
 
 Then ask the user: "For the dimensions with significant gaps, do we want the guide to describe the **target** voice (faster transition, more friction with current habits) or a **bridging position** (closer to today, easier to absorb)?"
 
-This is a judgement call about how much change the team can absorb. Get the user's read. Don't decide alone.
+This is a judgment call about how much change the team can absorb. Get the user's read. Don't decide alone.
 
 Wait for explicit alignment before writing the guide.
 
 ### Step 6 — Write the tone of voice guide
 
-**Goal:** A short, vivid, practical guide that makes the brand recognisable in writing.
+**Goal:** A short, vivid, practical guide that makes the brand recognizable in writing.
 
 **Required sections** (in this order):
 
@@ -352,13 +378,13 @@ Wait for explicit alignment before writing the guide.
    - "Make the point in the first sentence. Save the context for after, if at all."
    - "Show, don't claim. Specific facts beat adjectives every time."
 
-5. **This, not that — applied to existing copy.** Take 4–6 pieces of the brand's actual existing copy (from the Adology audit) and rework each in the new voice. Show the before and after side by side. Annotate what changed and why. This section does more work than anything else in the guide; budget time for it.
+5. **This, not that — applied to existing copy.** Take 4–6 pieces of the brand's actual existing copy (from the audit) and rework each in the new voice. Show the before and after side by side. Annotate what changed and why. This section does more work than anything else in the guide; budget time for it.
 
 6. **Voice across touchpoints.** This is where the guide proves it's a *brand* voice guide and not a paid-social style sheet. Cover at minimum the contrast between Marketing and Service voice, plus 1–2 additional touchpoints relevant to the brand.
 
    Required: **Marketing voice vs. Service voice.**
    - **Marketing voice** can lean further into the archetype — more expressive, more poetic, more distinctive.
-   - **Service voice** dials some dimensions back: clearer, more reassuring, plainer. Customers in a service moment need help, not personality. Keep the archetype recognisable but remove anything that would feel friction-inducing when someone has a problem.
+   - **Service voice** dials some dimensions back: clearer, more reassuring, plainer. Customers in a service moment need help, not personality. Keep the archetype recognizable but remove anything that would feel friction-inducing when someone has a problem.
 
    Then pick 1–2 more touchpoints to address based on the brand's mix — likely candidates: **Owned social / organic**, **Website / product pages**, **Email / CRM**, **Sales scripts / pitch decks**, **Package & retail**, **PR & comms**, **Internal / recruitment**. For each:
    - One line on what stays constant from the marketing-voice default
@@ -386,7 +412,7 @@ Format is captured as part of step 0 pre-flight (along with brand direction, hyp
 
 The guide should read like it was written by a senior brand strategist for working creatives, not by an AI trying to sound profound. Most of what makes a good voice guide is what it *doesn't* do:
 
-- **No empty adjectives.** "Warm. Confident. Approachable." is the signature failure mode of voice guides — every brand says that. Replace with specific verbal behaviours. "Use contractions. Make the smallest version of the point first. Never start with the company name."
+- **No empty adjectives.** "Warm. Confident. Approachable." is the signature failure mode of voice guides — every brand says that. Replace with specific verbal behaviors. "Use contractions. Make the smallest version of the point first. Never start with the company name."
 - **No "we are" sentences as principles.** "We are a brand that believes…" is a positioning statement, not a voice rule. Voice rules are about *how you write*, not who you are.
 - **Quote the brand back to itself.** Verbatims from the audit do more work than anything else.
 - **Make every principle testable.** A writer should be able to look at their draft and ask "does this follow the rule? yes/no" — not have to interpret a vibe.
@@ -417,8 +443,8 @@ Read these when you need them — don't load them all upfront.
 
 ## Running the workflow end-to-end
 
-1. **Step 0 — pre-flight. HARD STOP.** Get format, brand direction, hypothesis, touchpoint scope, and competitor list. Summarise and confirm before proceeding.
-2. **Step 1 — audit.** Brand-authored content only (screen out UGC, influencer, no-copy items). Run campaign-bias check. Triangulate with the brand website. Show your work with verbatims, thumbnails, and source links.
+1. **Step 0 — pre-flight. HARD STOP.** Get format, brand direction, hypothesis, touchpoint scope, and competitor list. Summarize and confirm before proceeding.
+2. **Step 1 — audit.** Confirm what the project covers, then read brand-authored content only (screen out UGC, influencer, no-copy items). Run campaign-bias check. Corroborate with the scope's label dimensions. Triangulate with the brand website. Show your work with verbatims, thumbnails, and source links.
 3. **Step 2 — propose 2–3 archetype angles. HARD STOP.** Let the user choose between credible alternatives, not approve a single pick.
 4. **Step 3 — competitor distinctiveness check.** Real verbatim from each competitor. If serious overlap with chosen angle, loop back to step 2.
 5. **Step 4 — spectrum plot.** Anchor each dimension in the chosen archetype, with a verbal cue.
@@ -426,4 +452,4 @@ Read these when you need them — don't load them all upfront.
 7. **Step 6 — write the guide.** Render in the chosen format(s). Use real brand copy for the this/not-that section. Cover marketing vs. service voice AND at least 1–2 additional touchpoints (website, email, sales, package, etc).
 8. **Close with a "how to use this" note** — who maintains it, when to revisit, what to do when in doubt (usually: "ask: would the archetype say it this way?").
 
-Now go build a voice guide that two different writers, on two different days, across two different touchpoints, would produce recognisably the same brand.
+Now go build a voice guide that two different writers, on two different days, across two different touchpoints, would produce recognizably the same brand.

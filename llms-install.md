@@ -46,7 +46,7 @@ register one remote URL, then let the user authenticate via OAuth.
    `https://adologyai.com` to create a free one, then retry.
 
 4. Confirm success by listing tools. You should see ~27 tools spanning brand
-   discovery, knowledge-set management, competitive analysis, Creative DNA
+   discovery, portfolio and project management, competitive analysis, Creative DNA
    breakdowns, audience deep-dives, influencer vetting, and pulling performance
    from the user's own connected ad accounts.
 

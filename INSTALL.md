@@ -12,7 +12,7 @@ All three paths use the same hosted Adology MCP server (`https://mcp.adologyai.c
 
 | Capability | Claude.ai connector | Claude Code plugin | Claude Cowork plugin |
 |---|:---:|:---:|:---:|
-| 27 MCP tools (`whoami`, knowledge sets, search, analyze, …) | ✅ | ✅ | ✅ |
+| 43 MCP tools (`whoami`, portfolios, projects, search, analyze, …) | ✅ | ✅ | ✅ |
 | 11 domain skills (`brand-builder`, `audience-deep-dive`, …) | — | ✅ | ✅ |
 | 4 slash commands | — | ✅ | ✅ |
 | OAuth via Stytch | ✅ | ✅ | ✅ |
@@ -245,7 +245,7 @@ You should get back a JSON document. If this fails, the issue is network-level (
 
 ### Empty results from analysis tools
 
-New knowledge sets need a few minutes to fetch data. Ask the agent to call `get_workflow_status` for your knowledge set — fetches typically take 5–15 minutes.
+New data pulls need a few minutes to land. Ask the agent to call `check_pull` for the run — fetches typically take 5–15 minutes.
 
 ---
 
