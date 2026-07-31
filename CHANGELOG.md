@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0
+
+### Minor Changes
+
+- [`53ea84f`](https://github.com/adologyai/content-intelligence-plugin/commit/53ea84f8c3c776e9de4f443fef11db9f246c31bd) - Modernize all skills, commands, and docs onto the portfolios/projects model: every tool reference now matches the production MCP server's current 43-tool surface (orient → scope → quoted-and-confirmed acquisition → reads), replacing the retired knowledge-set-era tools throughout. Adds the deep-analyst subagent and updated data-explorer field references.
+
 ## 0.2.1
 
 ### Patch Changes

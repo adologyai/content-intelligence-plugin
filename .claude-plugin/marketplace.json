@@ -10,13 +10,13 @@
   "plugins": [
     {
       "name": "content-intelligence",
-      "displayName": "Adology \u2014 Content Intelligence",
+      "displayName": "Adology — Content Intelligence",
       "source": {
         "source": "url",
         "url": "https://github.com/adologyai/content-intelligence-plugin.git"
       },
-      "version": "0.2.1",
-      "description": "Competitive ad intelligence inside Claude and other AI agents \u2014 discover brands, build portfolios and project scopes, analyze content, and generate insights powered by Adology's data platform.",
+      "version": "0.3.0",
+      "description": "Competitive ad intelligence inside Claude and other AI agents — discover brands, build portfolios and project scopes, analyze content, and generate insights powered by Adology's data platform.",
       "shortDescription": "Competitive ad intelligence for marketers, powered by Adology.",
       "category": "marketing",
       "tags": [
